@@ -51,5 +51,6 @@ See:
 
 - `docs/architecture/FlintOS-system-design.md`
 - `docs/architecture/ADR-0001-java-native-flintos.md`
+- `docs/architecture/TESTING_STRATEGY.md`
 - `docs/scrum/PRODUCT_BACKLOG.md`
 - `docs/scrum/SPRINT_001.md`
