@@ -1,0 +1,10 @@
+{
+  "id": "flintos.launcher",
+  "name": "Launcher",
+  "version": "0.1.0",
+  "type": "system",
+  "runtime": "flintjvm",
+  "mainClass": "flintos.launcher.LauncherApp",
+  "permissions": ["app.launch", "system.info"],
+  "minOs": "0.1.0"
+}

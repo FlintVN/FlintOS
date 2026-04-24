@@ -1,0 +1,10 @@
+idf_component_register(
+    SRCS
+        "flintos_main.cpp"
+        "../native/core/logger.cpp"
+        "../native/core/boot_manager.cpp"
+        "../native/jvm_bridge/flintjvm_host.cpp"
+    INCLUDE_DIRS
+        "."
+        "../native"
+)
