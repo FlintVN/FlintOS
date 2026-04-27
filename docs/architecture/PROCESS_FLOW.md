@@ -2,6 +2,8 @@
 
 This document captures the execution flows for FlintOS as a Java/native embedded operating environment.
 
+See also `MICROPYTHONOS_REFERENCE_ALIGNMENT.md` for the product-reference mapping from MicroPythonOS docs into FlintOS Java/native flows.
+
 FlintOS uses MicroPythonOS only as product/UX inspiration for a thin app-centric OS, launcher, app store/catalog, OTA, touch UI, multi-device feel, and lightweight embedded experience. FlintOS does **not** use Python or MicroPython as runtime, app runtime, system API layer, service layer, or boot implementation.
 
 ## 1. Boot flow: ESP-IDF to Java Launcher

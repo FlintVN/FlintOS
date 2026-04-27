@@ -5,6 +5,8 @@ import flint.app.AppEvent;
 import flint.app.AppInfo;
 import flint.app.AppManager;
 import flint.app.FlintApp;
+import flint.app.Intent;
+import flint.ui.ListView;
 import flint.ui.Screen;
 
 public final class LauncherApp implements FlintApp {
@@ -18,9 +20,11 @@ public final class LauncherApp implements FlintApp {
             return;
         }
 
+        String[] names = new String[apps.length];
         for (int index = 0; index < apps.length; index++) {
-            Screen.drawText(apps[index].name(), 0, 16 + index * 12);
+            names[index] = apps[index].name();
         }
+        new ListView(names, 0, 16).render();
     }
 
     @Override
@@ -28,8 +32,14 @@ public final class LauncherApp implements FlintApp {
         if ("launch:first".equals(event.type())) {
             AppInfo[] apps = AppManager.installedApps();
             if (apps.length > 0) {
-                AppManager.launch(apps[0].id());
+                AppManager.startActivity(Intent.explicit(apps[0].id()));
             }
+        }
+        if ("open:settings".equals(event.type())) {
+            AppManager.startActivity(Intent.action(Intent.ACTION_SETTINGS));
+        }
+        if ("open:appstore".equals(event.type())) {
+            AppManager.startActivity(Intent.action(Intent.ACTION_APP_STORE));
         }
     }
 

@@ -18,7 +18,10 @@ void NativeBindings::registerAll() {
     Logger::info("Binding flint.os.UpdateManager");
     Logger::info("Binding flint.os.Storage");
     Logger::info("Binding flint.os.Power");
+    Logger::info("Binding flint.os.TaskManager");
+    Logger::info("Binding flint.os.DownloadManager");
     Logger::info("Binding flint.ui.Input");
+    Logger::info("Binding flint.app.Intent/AppManager routing");
     Logger::info("Binding flint.net.WiFi");
     Logger::info("Binding flint.io.Pin");
     Logger::info("Binding flint.io.I2C");
