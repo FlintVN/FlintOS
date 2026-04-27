@@ -1,16 +1,82 @@
 #include "jvm_bridge/flintjvm_host.hpp"
 
 #include "core/logger.hpp"
+#include "jvm_bridge/native_bindings.hpp"
+
+#if FLINTOS_HAS_FLINTESPJVM
+#include "flint.h"
+#endif
 
 namespace flintos {
 
-void FlintJvmHost::initialize() {
-    Logger::info("TODO: initialize FlintJVM runtime and native bindings");
+bool FlintJvmHost::initialize() {
+    Logger::info("Preparing FlintJVM host bridge");
+    NativeBindings bindings;
+    bindings.registerAll();
+    initialized_ = true;
+    lastError_ = nullptr;
+    return true;
 }
 
-void FlintJvmHost::launchSystemApp(const char* mainClassName) {
-    (void)mainClassName;
-    Logger::info("TODO: launch Java system app through FlintJVM");
+bool FlintJvmHost::launchSystemApp(const char* mainClassName) {
+    if (!initialized_) {
+        lastError_ = "FlintJVM host is not initialized";
+        Logger::error(lastError_);
+        return false;
+    }
+
+    if (mainClassName == nullptr || mainClassName[0] == '\0') {
+        lastError_ = "missing main class";
+        Logger::error("Cannot launch Java app without main class");
+        return false;
+    }
+
+    Logger::info("Launching Java system app through FlintJVM");
+    Logger::info(mainClassName);
+    return launchProgram("/FlintApp.jar");
+}
+
+bool FlintJvmHost::launchProgram(const char* programPath) {
+    if (!initialized_) {
+        lastError_ = "FlintJVM host is not initialized";
+        Logger::error(lastError_);
+        return false;
+    }
+
+    if (programPath == nullptr || programPath[0] == '\0') {
+        lastError_ = "missing program path";
+        Logger::error("Cannot launch FlintJVM program without path");
+        return false;
+    }
+
+#if FLINTOS_HAS_FLINTESPJVM
+    static Flint flint;
+    flint.println();
+    flint.setCwd("/");
+    if (!flint.setProgram(programPath)) {
+        lastError_ = "failed to set FlintJVM program";
+        Logger::error(lastError_);
+        return false;
+    }
+
+    if (!flint.start()) {
+        lastError_ = "FlintJVM program failed to start";
+        Logger::error(lastError_);
+        return false;
+    }
+
+    lastError_ = nullptr;
+    return true;
+#else
+    Logger::warn("FlintESPJVM linkage pending; using host-side launch contract");
+    Logger::info(programPath);
+    lastError_ = nullptr;
+    return true;
+#endif
+}
+
+const char* FlintJvmHost::lastError() const {
+    return lastError_;
 }
 
 } // namespace flintos

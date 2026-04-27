@@ -1,0 +1,67 @@
+flowchart TB
+    subgraph Native["Native C/C++ / ESP-IDF / FreeRTOS"]
+        N1["BootManager"]
+        N2["ServiceRegistry"]
+        N3["Logger"]
+        N4["SettingsStore"]
+        N5["PermissionManager"]
+        N6["AppRegistry"]
+        N7["PackageManager"]
+        N8["OTAUpdateManager"]
+        N9["StorageService"]
+        subgraph HAL["Implemented HAL / Board Profile"]
+            H1["BoardProfile"]
+            H2["DisplayDriver"]
+            H3["InputDriver"]
+            H4["NetworkDriver"]
+            H5["PowerManager"]
+        end
+    end
+    subgraph Bridge["JVM Bridge"]
+        B1["FlintJvmHost"]
+        B2["NativeBindings"]
+        B3["Exception Bridge planned"]
+        B4["Event Loop Bridge planned"]
+    end
+    subgraph Runtime["FlintJVM / FlintESPJVM"]
+        R1["VM Heap planned/configured by FlintESPJVM"]
+        R2["Class Loader"]
+        R3["Thread Mapping planned"]
+        R4["Native Method Dispatch"]
+    end
+    subgraph JDK["FlintJDK / FlintOS Java APIs"]
+        J1["Java platform modules"]
+        J2["flint.io"]
+        J3["flint.net"]
+        J4["flint.app"]
+        J5["flint.os"]
+        J6["flint.ui"]
+    end
+    subgraph Apps["Java Apps"]
+        A1["Launcher"]
+        A2["Settings planned"]
+        A3["Diagnostics planned"]
+        A4["Updater planned"]
+        A5["User Apps planned"]
+    end
+    N1 --> N2
+    N1 --> N9
+    N1 --> HAL
+    N2 --> N3
+    N2 --> N4
+    N2 --> N5
+    N2 --> N6
+    N2 --> N7
+    N2 --> N8
+    N1 --> B1
+    HAL --> B2
+    N2 --> B2
+    B1 --> Runtime
+    B2 --> R4
+    B3 --> Runtime
+    B4 --> Runtime
+    Runtime --> JDK
+    JDK --> Apps
+    Apps --> JDK
+    JDK --> B2
+    B2 --> N2

@@ -1,0 +1,19 @@
+flowchart TD
+    A["Updater Java System App planned"] --> B["flint.os.UpdateManager"]
+    B --> C["Native OTAUpdateManager MVP skeleton"]
+    C --> D["Check update metadata planned"]
+    D --> E["Download firmware package planned"]
+    E --> F["Verify checksum/signature planned"]
+    F --> G{"Valid update?"}
+    G -->|No| H["Abort OTA"]
+    H --> I["Log failure / keep current firmware"]
+    G -->|Yes| J["Write to OTA partition via ESP-IDF OTA API planned"]
+    J --> K["Mark pending boot partition planned"]
+    K --> L["Reboot device"]
+    L --> M["Boot new firmware"]
+    M --> N["Boot health check"]
+    N --> O{"Healthy?"}
+    O -->|Yes| P["Mark OTA valid planned"]
+    P --> Q["Continue normal boot"]
+    O -->|No| R["Rollback to previous firmware planned"]
+    R --> S["Log rollback reason"]

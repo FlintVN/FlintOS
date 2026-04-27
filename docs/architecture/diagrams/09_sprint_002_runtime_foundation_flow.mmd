@@ -1,0 +1,60 @@
+flowchart TD
+    A["Sprint 002: App Runtime Foundation"] --> B["Repo Hygiene"]
+    B --> B1["Confirm no Python runtime"]
+    B --> B2["Record baseline status"]
+    B1 --> C["Verify Sprint 001 DoD"]
+    B2 --> C
+    C --> C1["Java module compile"]
+    C --> C2["ESP-IDF build if IDF active"]
+    C --> C3["Forbidden runtime scan"]
+    C1 --> D["Integrate FlintESPJVM"]
+    C2 --> D
+    C3 --> D
+    D --> D1["Add sdkconfig.defaults"]
+    D --> D2["Add partitions.csv"]
+    D --> D3["Link FlintJVM sources/includes"]
+    D --> D4["Define target board"]
+    D1 --> E["Native ServiceRegistry MVP"]
+    D2 --> E
+    D3 --> E
+    D4 --> E
+    E --> E1["PermissionManager"]
+    E --> E2["AppRegistry"]
+    E --> E3["SettingsStore skeleton"]
+    E --> E4["Logger"]
+    E --> E5["StorageService"]
+    E1 --> F["FlintJvmHost MVP Contract"]
+    E2 --> F
+    E3 --> F
+    E4 --> F
+    E5 --> F
+    F --> F1["initialize host bridge"]
+    F --> F2["register native bindings"]
+    F --> F3["launch FlintApp.jar"]
+    F --> F4["record lastError"]
+    F1 --> G["Java API Expansion"]
+    F2 --> G
+    F3 --> G
+    F4 --> G
+    G --> G1["AppInfo / AppManager"]
+    G --> G2["Logger / Settings / Storage / UpdateManager"]
+    G --> G3["SystemInfo"]
+    G --> G4["Screen"]
+    G1 --> H["Launcher MVP"]
+    G2 --> H
+    G3 --> H
+    G4 --> H
+    H --> H1["List installed apps"]
+    H --> H2["Render app list"]
+    H --> H3["Launch selected app through MVP contract"]
+    H1 --> I["Tests / Evidence"]
+    H2 --> I
+    H3 --> I
+    I --> I1["Static checks implemented"]
+    I --> I2["Java compile implemented"]
+    I --> I3["Native integration smoke markers"]
+    I --> I4["Host/HIL tests planned"]
+    I1 --> J["Sprint 002 Done Criteria"]
+    I2 --> J
+    I3 --> J
+    I4 --> J

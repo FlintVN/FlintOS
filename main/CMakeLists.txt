@@ -1,10 +1,50 @@
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/FlintESPJVM.cmake)
+
 idf_component_register(
     SRCS
         "flintos_main.cpp"
         "../native/core/logger.cpp"
         "../native/core/boot_manager.cpp"
+        "../native/core/service_registry.cpp"
+        "../native/core/permission_manager.cpp"
+        "../native/core/app_manifest.cpp"
+        "../native/core/app_registry.cpp"
+        "../native/core/settings_store.cpp"
+        "../native/core/storage_service.cpp"
+        "../native/core/package_manager.cpp"
+        "../native/core/ota_update_manager.cpp"
+        "../native/hal/board_profile.cpp"
+        "../native/hal/display_driver.cpp"
+        "../native/hal/input_driver.cpp"
+        "../native/hal/network_driver.cpp"
+        "../native/hal/power_manager.cpp"
         "../native/jvm_bridge/flintjvm_host.cpp"
+        "../native/jvm_bridge/native_bindings.cpp"
+        "../native/jvm_bridge/flintos_flint_native.cpp"
+        ${FLINTESPJVM_SRCS}
     INCLUDE_DIRS
         "."
         "../native"
+        ${FLINTESPJVM_INCS}
+    PRIV_REQUIRES
+        fatfs
+        wear_levelling
+        esp_partition
+        esp_timer
+        esp_wifi
+        nvs_flash
+        driver
 )
+
+if(FLINTOS_HAS_FLINTESPJVM)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE FLINTOS_HAS_FLINTESPJVM=1 ESP32_S3N8RX MULTI_HEAP_FREERTOS)
+    target_compile_options(${COMPONENT_LIB} PRIVATE
+        -Wno-address
+        -Wno-volatile
+        -Wno-uninitialized
+        -Wno-strict-aliasing
+        -Wno-implicit-fallthrough
+        -Wno-cast-function-type
+        -Wno-ignored-qualifiers
+    )
+endif()

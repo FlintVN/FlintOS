@@ -1,0 +1,30 @@
+flowchart TD
+    A["Boot / Package Install / Registry Refresh"] --> B["Scan System App Manifests"]
+    B --> C["Scan User App Manifests planned"]
+    C --> D["Read app.json"]
+    D --> E["Schema Validation"]
+    E --> E1["id"]
+    E --> E2["name"]
+    E --> E3["version"]
+    E --> E4["type: system/user"]
+    E --> E5["runtime: flintjvm"]
+    E --> E6["mainClass"]
+    E --> E7["permissions"]
+    E --> E8["minOs"]
+    E1 --> F["Semantic Validation"]
+    E2 --> F
+    E3 --> F
+    E4 --> F
+    E5 --> F
+    E6 --> F
+    E7 --> F
+    E8 --> F
+    F --> G{"Valid?"}
+    G -->|No| H["Reject App"]
+    H --> H1["Log reason"]
+    H1 --> H2["Do not expose in launcher"]
+    G -->|Yes| I["Register AppManifest / AppInfo"]
+    I --> J["Persist registry planned"]
+    J --> K["Checksum / trust state planned"]
+    K --> L["Expose to flint.app.AppManager"]
+    L --> M["Launcher displays installed apps"]

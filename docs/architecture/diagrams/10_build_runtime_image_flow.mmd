@@ -1,0 +1,24 @@
+flowchart TD
+    A["CMake configure/build"] --> B["flintos_runtime_image target"]
+    B --> C["tools/build_runtime_image.py"]
+    C --> D["tools/build_java_modules.py --clean"]
+    D --> E["javac --module-source-path"]
+    E --> F["build/java-runtime modules"]
+    F --> G["jar --create --main-class flintos.launcher.LauncherApp"]
+    G --> H["build/storage-root/FlintApp.jar"]
+    H --> I["wl_fatfsgen.py post-build"]
+    I --> J["build/storage.bin"]
+    J --> K["FATFS storage partition image"]
+    K --> L["Mounted storage at boot"]
+    L --> M["FlintJvmHost.launchProgram(/FlintApp.jar)"]
+
+    C --> N["Input: java/modules"]
+    C --> O["Input: java/system_apps/launcher/src"]
+    C --> P["Input: launcher app.json"]
+    N --> D
+    O --> D
+    P --> G
+
+    M --> Q{"Runtime path matches mount point?"}
+    Q -->|Yes| R["Launcher JAR available to FlintJVM"]
+    Q -->|No| S["Fix mount point or program path"]

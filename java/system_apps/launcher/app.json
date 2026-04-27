@@ -6,5 +6,6 @@
   "runtime": "flintjvm",
   "mainClass": "flintos.launcher.LauncherApp",
   "permissions": ["app.launch", "system.info"],
-  "minOs": "0.1.0"
+  "minOs": "0.1.0",
+  "minJdk": "0.1.0"
 }

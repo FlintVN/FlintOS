@@ -40,7 +40,7 @@ Suggested checks:
 
 ```bash
 # Java module compile
-javac -d build/java-check --module-source-path "java/modules;java/system_apps/launcher/src" --module flint.app,flint.os,flint.ui,flintos.launcher
+python tools/build_java_modules.py --clean
 
 # ESP-IDF build, when environment is active
 idf.py build
@@ -247,7 +247,7 @@ FlintOS implementation should maintain competence in:
 
 ## Immediate actions
 
-1. Add Java module compile command to CI.
+1. Add Java module compile and runtime image build commands to CI.
 2. Add `tests/scripts/serial_monitor.py` later for HIL.
 3. Add boot smoke serial markers once native boot is connected to UART logs.
 4. Add manifest schema tests once app registry exists.

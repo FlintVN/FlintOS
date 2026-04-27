@@ -1,0 +1,42 @@
+flowchart TD
+    A["ESP32 Reset / Power On"] --> B["ESP-IDF Bootloader"]
+    B --> C["Partition Table: Factory or OTA App"]
+    C --> D["ESP-IDF app_main()"]
+    D --> E["Logger::info boot banner"]
+    E --> F["BootManager.initialize()"]
+    F --> G["BoardProfile::name()"]
+    G --> H["StorageService.initialize()"]
+    H --> I["DisplayDriver.clear()"]
+    I --> J["InputDriver.initialize()"]
+    J --> K["NetworkDriver.initialize()"]
+    K --> L["PowerManager.initialize()"]
+    L --> M["SettingsStore.initialize()"]
+    M --> N["AppRegistry.initialize()"]
+    N --> O["PackageManager.initialize()"]
+    O --> P["OTAUpdateManager.initialize()"]
+    P --> Q["ServiceRegistry.initialize(permissions, apps, settings, packages, ota)"]
+    Q --> R["BootManager.start()"]
+    R --> S["FLINTOS_TEST_START boot_smoke"]
+    S --> T{"Native services ready?"}
+    T -->|No| X1["FLINTOS_TEST_FAIL native_services_not_ready"]
+    T -->|Yes| U["AppRegistry.findById(flintos.launcher)"]
+    U --> V{"Launcher manifest found?"}
+    V -->|No| X2["FLINTOS_TEST_FAIL launcher_manifest_missing"]
+    V -->|Yes| W["PermissionManager checks app.launch + system.info"]
+    W --> Y{"Permissions allowed?"}
+    Y -->|No| X3["FLINTOS_TEST_FAIL launcher_permission_denied"]
+    Y -->|Yes| Z["FlintJvmHost.initialize()"]
+    Z --> Z1["NativeBindings.registerAll()"]
+    Z1 --> AA{"JVM host initialized?"}
+    AA -->|No| X4["FLINTOS_TEST_FAIL jvm_init_failed"]
+    AA -->|Yes| AB["FlintJvmHost.launchSystemApp(manifest.mainClass)"]
+    AB --> AC["FlintJvmHost.launchProgram(/FlintApp.jar)"]
+    AC --> AD{"Program started or host contract accepted?"}
+    AD -->|No| X5["FLINTOS_TEST_FAIL jvm_launch_pending"]
+    AD -->|Yes| AE["FLINTOS_TEST_PASS boot_smoke"]
+    X1 --> AF["FLINTOS_TEST_END boot_smoke"]
+    X2 --> AF
+    X3 --> AF
+    X4 --> AF
+    X5 --> AF
+    AE --> AF

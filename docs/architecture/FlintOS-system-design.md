@@ -34,6 +34,36 @@ Important observations:
 
 These modules should be treated as the base substrate for FlintOS rather than replacing them with Python APIs.
 
+## MicroPythonOS product reference boundary
+
+MicroPythonOS overview was reviewed as an external product reference. The ideas that are safe to carry into FlintOS design are product/UX-level concepts only:
+
+- **Thin OS / everything is an app**: system capabilities such as Launcher, Settings, Diagnostics, App Store, and Updater should appear as apps with manifests and lifecycle hooks.
+- **Touch and gesture-first UI**: FlintOS should support touch-friendly screens, simple gestures, and embedded display/input flows through `flint.ui` and native display/input HALs.
+- **App Store / app catalog**: FlintOS should support installable app packages and an app registry/catalog model, implemented through `.flintapp`, PackageManager, AppRegistry, and FlintToolHub/FlintTool.
+- **OTA updates**: FlintOS should provide controlled system/app updates, implemented with native ESP-IDF OTA services, package verification, rollback, and Java updater UI.
+- **Hardware-oriented embedded UX**: FlintOS should target ESP32-class boards with optional touch screens, IMUs, cameras/sensors, storage, WiFi/networking, and board profiles.
+- **Lightweight/resource-efficient feel**: boot should be fast, app lifecycle should be small and predictable, and memory/stack usage should be measurable.
+- **Cross-device / multi-board direction**: Java app APIs should remain stable while board differences are hidden behind native board profiles and HALs.
+
+Explicit non-goals:
+
+- FlintOS does **not** adopt the MicroPythonOS runtime architecture.
+- FlintOS does **not** use Python or MicroPython as app runtime, system API layer, service layer, or boot/runtime implementation.
+- Python may only appear in tooling, CI helpers, package builders, HIL runners, serial monitors, or test automation scripts.
+
+### Product-reference mapping
+
+| MicroPythonOS overview concept | FlintOS design mapping |
+| --- | --- |
+| Thin OS where everything is an app | Java system/user apps implementing `flint.app.FlintApp`, with `app.json` manifests and lifecycle control |
+| Touch screen UI / gestures | `flint.ui` Java APIs backed by native display/input HAL and event loop bridge |
+| App Store | Java AppStore system app + native PackageManager/AppRegistry + `.flintapp` package format + FlintToolHub/FlintTool support |
+| OTA updates | Java Updater system app + native OTAUpdateManager using ESP-IDF OTA APIs, verification, rollback, and boot health checks |
+| Hardware support: touch screens, IMUs, cameras, more | Native board profiles and HAL drivers exposed through stable FlintJDK/FlintOS Java APIs |
+| Lightweight/resource-efficient | Bounded boot flow, compact app registry, measured heap/stack, watchdog-aware services, minimal bridge crossings |
+| Cross-platform/multi-device feel | Multi-board ESP32-family profiles first; host/simulator support only for tests/tooling where useful |
+
 ## Design Principles
 
 1. **Native core, Java apps**

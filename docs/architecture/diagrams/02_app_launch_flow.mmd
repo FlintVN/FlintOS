@@ -1,0 +1,35 @@
+sequenceDiagram
+    participant User
+    participant Launcher as Java LauncherApp
+    participant Screen as flint.ui.Screen
+    participant AppManager as flint.app.AppManager
+    participant Contract as MVP Native Launch Contract
+    participant Registry as Native AppRegistry
+    participant Permission as Native PermissionManager
+    participant JVM as FlintJvmHost
+    participant App as Java User/System App
+
+    User->>Launcher: Touch / button select app
+    Launcher->>Screen: render installed app list
+    Launcher->>AppManager: listInstalledApps()
+    AppManager-->>Launcher: AppInfo[]
+    Launcher->>AppManager: launch(appId)
+    AppManager->>Contract: native launch request
+
+    Note over Contract,JVM: Implemented today as MVP contract; full dynamic app lifecycle is planned.
+    Contract->>Registry: findById(appId)
+    Registry-->>Contract: AppManifest / missing
+    Contract->>Permission: check caller + requested permissions
+    Permission-->>Contract: allowed / denied
+
+    alt permission denied or manifest missing
+        Contract-->>AppManager: false / error
+        AppManager-->>Launcher: launch failed
+        Launcher->>Screen: draw error state
+    else permission allowed
+        Contract->>JVM: launchSystemApp(mainClass)
+        JVM->>JVM: launchProgram(FlintApp.jar)
+        Note over JVM,App: Planned: load mainClass, instantiate FlintApp, call onStart(AppContext).
+        JVM-->>AppManager: true / pending runtime result
+        AppManager-->>Launcher: launch success
+    end

@@ -1,0 +1,26 @@
+flowchart TD
+    A["Developer builds .flintapp"] --> B["tools/package_app.py"]
+    B --> C["Validate app.json"]
+    C --> D["Add classes/modules/assets"]
+    D --> E["Write .flintapp zip package"]
+    E --> F["Send package to device planned"]
+    F --> G["Native PackageManager receives package"]
+    G --> H["Write to staging area planned"]
+    H --> I["Verify package structure"]
+    I --> I1["app.json exists"]
+    I --> I2["classes/modules exist"]
+    I --> I3["assets optional"]
+    I --> I4["checksum/signature planned"]
+    I1 --> J["Manifest Validation"]
+    I2 --> J
+    I3 --> J
+    I4 --> J
+    J --> K{"Valid package?"}
+    K -->|No| L["Delete staging package / return failure"]
+    K -->|Yes| M["Check permissions policy"]
+    M --> N{"Allowed permissions?"}
+    N -->|No| O["Reject install / require approval planned"]
+    N -->|Yes| P["Install to app storage planned"]
+    P --> Q["Atomic registry update planned"]
+    Q --> R["Notify Launcher / AppRegistry refresh planned"]
+    R --> S["App visible in Launcher"]
