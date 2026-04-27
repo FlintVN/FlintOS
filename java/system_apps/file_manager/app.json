@@ -1,0 +1,11 @@
+{
+  "id": "flintos.filemanager",
+  "name": "File Manager",
+  "version": "0.1.0",
+  "type": "system",
+  "runtime": "flintjvm",
+  "mainClass": "flintos.filemanager.FileManagerApp",
+  "permissions": ["system.info", "ui.screen", "storage.read", "storage.write"],
+  "minOs": "0.1.0",
+  "minJdk": "0.1.0"
+}

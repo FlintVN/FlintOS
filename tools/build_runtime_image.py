@@ -1,15 +1,55 @@
+import argparse
 import json
 import shutil
 import subprocess
 from pathlib import Path
 
+SYSTEM_APPS = {
+    "launcher": "flintos.launcher",
+    "settings": "flintos.settings",
+    "diagnostics": "flintos.diagnostics",
+    "updater": "flintos.updater",
+    "app_store": "flintos.appstore",
+    "file_manager": "flintos.filemanager",
+}
+SHARED_MODULES = ["flint.app", "flint.os", "flint.ui", "flint.io", "flint.net"]
+
+
+def add_module_args(command: list[str], java_out: Path, module_name: str) -> None:
+    module_dir = java_out / module_name
+    if module_dir.exists():
+        command.extend(["-C", str(module_dir), "."])
+
+
+def create_app_jar(java_out: Path, staging: Path, app_name: str, module_name: str) -> None:
+    app_dir = Path("java") / "system_apps" / app_name
+    manifest = json.loads((app_dir / "app.json").read_text(encoding="utf-8"))
+    jar_path = staging / "system" / "apps" / manifest["id"] / "FlintApp.jar"
+    jar_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(app_dir / "app.json", jar_path.parent / "app.json")
+
+    command = [
+        "jar",
+        "--create",
+        "--file",
+        str(jar_path),
+        "--main-class",
+        manifest["mainClass"],
+    ]
+    add_module_args(command, java_out, module_name)
+    for shared_module in SHARED_MODULES:
+        add_module_args(command, java_out, shared_module)
+    subprocess.run(command, check=True)
+
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Build FlintOS Java runtime storage tree.")
+    parser.add_argument("--output", type=Path, default=None, help="Output staging directory. Defaults to build/storage-root.")
+    args = parser.parse_args()
+
     root = Path(__file__).resolve().parents[1]
     java_out = root / "build" / "java-runtime"
-    staging = root / "build" / "storage-root"
-    jar_path = staging / "FlintApp.jar"
-    manifest = json.loads((root / "java" / "system_apps" / "launcher" / "app.json").read_text(encoding="utf-8"))
+    staging = args.output if args.output is not None else root / "build" / "storage-root"
 
     subprocess.run([
         "python",
@@ -21,30 +61,14 @@ def main() -> int:
 
     if staging.exists():
         shutil.rmtree(staging)
-    (staging / "lib").mkdir(parents=True, exist_ok=True)
+    (staging / "system" / "apps").mkdir(parents=True, exist_ok=True)
 
-    subprocess.run([
-        "jar",
-        "--create",
-        "--file",
-        str(jar_path),
-        "--main-class",
-        manifest["mainClass"],
-        "-C",
-        str(java_out / "flintos.launcher"),
-        ".",
-        "-C",
-        str(java_out / "flint.app"),
-        ".",
-        "-C",
-        str(java_out / "flint.os"),
-        ".",
-        "-C",
-        str(java_out / "flint.ui"),
-        ".",
-    ], check=True)
+    for app_name, module_name in SYSTEM_APPS.items():
+        create_app_jar(java_out, staging, app_name, module_name)
 
-    print(f"OK {jar_path}")
+    launcher_jar = staging / "system" / "apps" / "flintos.launcher" / "FlintApp.jar"
+    shutil.copy2(launcher_jar, staging / "FlintApp.jar")
+    print(f"OK {staging}")
     return 0
 
 

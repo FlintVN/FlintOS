@@ -39,6 +39,10 @@ bool PackageManager::verifyPackage(const char* packagePath) const {
     return initialized_ && packagePath != nullptr && packagePath[0] != '\0' && hasSuffix(packagePath, ".flintapp");
 }
 
+bool PackageManager::verifyPackageStructure(bool hasManifest, bool hasClassesOrModules, bool hasValidChecksum) const {
+    return initialized_ && hasManifest && hasClassesOrModules && hasValidChecksum;
+}
+
 PackageInstallStatus PackageManager::installPackage(const char* packagePath, bool permissionsApproved) {
     if (!initialized_) {
         lastError_ = "package manager is not initialized";

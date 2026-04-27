@@ -1,0 +1,13 @@
+{
+  "include": [
+    {
+      "name": "boot_smoke",
+      "type": "hil_boot",
+      "target": "esp32s3",
+      "port": "COM3",
+      "baud": 115200,
+      "timeout_seconds": 30,
+      "pass_pattern": "FLINTOS_TEST_PASS boot_smoke"
+    }
+  ]
+}

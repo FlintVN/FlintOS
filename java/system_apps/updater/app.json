@@ -1,0 +1,11 @@
+{
+  "id": "flintos.updater",
+  "name": "Updater",
+  "version": "0.1.0",
+  "type": "system",
+  "runtime": "flintjvm",
+  "mainClass": "flintos.updater.UpdaterApp",
+  "permissions": ["system.info", "ui.screen", "ota.update"],
+  "minOs": "0.1.0",
+  "minJdk": "0.1.0"
+}

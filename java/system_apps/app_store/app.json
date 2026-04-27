@@ -1,0 +1,11 @@
+{
+  "id": "flintos.appstore",
+  "name": "App Store",
+  "version": "0.1.0",
+  "type": "system",
+  "runtime": "flintjvm",
+  "mainClass": "flintos.appstore.AppStoreApp",
+  "permissions": ["system.info", "ui.screen", "storage.read"],
+  "minOs": "0.1.0",
+  "minJdk": "0.1.0"
+}

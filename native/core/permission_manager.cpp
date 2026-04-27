@@ -65,6 +65,19 @@ bool PermissionManager::isAllowed(const char* appId, const char* permission) con
                equals(permission, "ota.update");
     }
 
+    if (equals(appId, "flintos.appstore")) {
+        return equals(permission, "system.info") ||
+               equals(permission, "ui.screen") ||
+               equals(permission, "storage.read");
+    }
+
+    if (equals(appId, "flintos.filemanager")) {
+        return equals(permission, "system.info") ||
+               equals(permission, "ui.screen") ||
+               equals(permission, "storage.read") ||
+               equals(permission, "storage.write");
+    }
+
     return false;
 }
 

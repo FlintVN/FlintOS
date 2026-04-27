@@ -1,9 +1,29 @@
-build/
+﻿build/
 managed_components/
 sdkconfig
 sdkconfig.old
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Keep local-only Claude settings private, but track shared installer project assets.
 .claude/settings.local.json
+.claude/worktrees/
+.claude/skills/
+
+# Ignore hidden local tool state by default, then allow shared project automation.
 .*/
+!.github/
+!.github/workflows/
+!.github/workflows/*.yml
+!.claude/
+!.claude/commands/
+!.claude/commands/*.md
+!.claude/AGENT_SKILL_PLAN.md
+
+# Installer/MCP backups are generated locally.
+.mcp.json.bak.*
+.mcp.json
+
+.claude/settings.json
+

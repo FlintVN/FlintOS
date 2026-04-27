@@ -1,0 +1,11 @@
+{
+  "id": "flintos.diagnostics",
+  "name": "Diagnostics",
+  "version": "0.1.0",
+  "type": "system",
+  "runtime": "flintjvm",
+  "mainClass": "flintos.diagnostics.DiagnosticsApp",
+  "permissions": ["system.info", "ui.screen"],
+  "minOs": "0.1.0",
+  "minJdk": "0.1.0"
+}

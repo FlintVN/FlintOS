@@ -33,6 +33,19 @@ constexpr const char* UPDATER_PERMISSIONS[] = {
     "ota.update",
 };
 
+constexpr const char* APP_STORE_PERMISSIONS[] = {
+    "system.info",
+    "ui.screen",
+    "storage.read",
+};
+
+constexpr const char* FILE_MANAGER_PERMISSIONS[] = {
+    "system.info",
+    "ui.screen",
+    "storage.read",
+    "storage.write",
+};
+
 constexpr AppManifest SYSTEM_APPS[] = {
     {
         "flintos.launcher",
@@ -88,6 +101,34 @@ constexpr AppManifest SYSTEM_APPS[] = {
         "0.1.0",
         "0.1.0",
         "builtin:flintos.updater",
+        AppTrustState::Trusted,
+    },
+    {
+        "flintos.appstore",
+        "App Store",
+        "0.1.0",
+        "system",
+        "flintjvm",
+        "flintos.appstore.AppStoreApp",
+        APP_STORE_PERMISSIONS,
+        sizeof(APP_STORE_PERMISSIONS) / sizeof(APP_STORE_PERMISSIONS[0]),
+        "0.1.0",
+        "0.1.0",
+        "builtin:flintos.appstore",
+        AppTrustState::Trusted,
+    },
+    {
+        "flintos.filemanager",
+        "File Manager",
+        "0.1.0",
+        "system",
+        "flintjvm",
+        "flintos.filemanager.FileManagerApp",
+        FILE_MANAGER_PERMISSIONS,
+        sizeof(FILE_MANAGER_PERMISSIONS) / sizeof(FILE_MANAGER_PERMISSIONS[0]),
+        "0.1.0",
+        "0.1.0",
+        "builtin:flintos.filemanager",
         AppTrustState::Trusted,
     },
 };

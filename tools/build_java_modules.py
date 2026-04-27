@@ -3,8 +3,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
-DEFAULT_MODULES = "flint.app,flint.io,flint.net,flint.os,flint.ui,flintos.launcher"
-DEFAULT_MODULE_SOURCE_PATH = "java/modules;java/system_apps/launcher/src"
+DEFAULT_MODULES = "flint.app,flint.io,flint.net,flint.os,flint.ui,flintos.launcher,flintos.settings,flintos.diagnostics,flintos.appstore,flintos.updater,flintos.filemanager"
+DEFAULT_MODULE_SOURCE_PATH = "java/modules;java/system_apps/launcher/src;java/system_apps/settings/src;java/system_apps/diagnostics/src;java/system_apps/app_store/src;java/system_apps/updater/src;java/system_apps/file_manager/src"
 
 
 def main() -> int:
