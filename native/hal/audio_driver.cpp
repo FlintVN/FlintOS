@@ -1,6 +1,7 @@
 #include "hal/audio_driver.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 #include "core/logger.hpp"
 #include "driver/i2s_std.h"
@@ -14,7 +15,7 @@ constexpr int I2SBclkGpio = 15;
 constexpr int I2SWsGpio = 16;
 constexpr int I2SDoutGpio = 7;
 constexpr uint32_t SampleRate = 24000;
-constexpr int GainQ15_75 = 24576; // 0.75 in Q15 format
+constexpr float Pi = 3.14159265358979323846f;
 constexpr int GainQ15_100 = 32768; // 1.0 in Q15 format
 
 i2s_chan_handle_t audioTxChannel = nullptr;
@@ -26,6 +27,41 @@ extern const std::size_t bootSoundSampleCount;
 extern const int16_t bootSoundPcm[];
 
 namespace {
+
+int16_t toneSample(float frequency, uint32_t index, uint32_t sampleRate, float envelope) {
+    const float phase = 2.0f * Pi * frequency * static_cast<float>(index) / static_cast<float>(sampleRate);
+    const float value = std::sin(phase) * envelope;
+    return static_cast<int16_t>(static_cast<int32_t>(value * 32767.0f) * GainQ15_100 >> 15);
+}
+
+void writeTone(float frequency, uint32_t durationMs) {
+    if (audioTxChannel == nullptr) {
+        return;
+    }
+
+    constexpr std::size_t FrameSamples = 240;
+    int16_t stereo[FrameSamples * 2] = {};
+    const uint32_t totalSamples = SampleRate * durationMs / 1000;
+
+    for (uint32_t offset = 0; offset < totalSamples; offset += FrameSamples) {
+        const uint32_t count = std::min<uint32_t>(FrameSamples, totalSamples - offset);
+        for (uint32_t index = 0; index < count; ++index) {
+            const uint32_t absolute = offset + index;
+            float envelope = 1.0f;
+            if (absolute < SampleRate / 100) {
+                envelope = static_cast<float>(absolute) / static_cast<float>(SampleRate / 100);
+            } else if (totalSamples - absolute < SampleRate / 80) {
+                envelope = static_cast<float>(totalSamples - absolute) / static_cast<float>(SampleRate / 80);
+            }
+            const int16_t sample = toneSample(frequency, absolute, SampleRate, envelope);
+            stereo[index * 2] = sample;
+            stereo[index * 2 + 1] = sample;
+        }
+
+        size_t bytesWritten = 0;
+        i2s_channel_write(audioTxChannel, stereo, count * 2 * sizeof(int16_t), &bytesWritten, portMAX_DELAY);
+    }
+}
 
 void writePcm(const int16_t* samples, std::size_t sampleCount) {
     if (audioTxChannel == nullptr || samples == nullptr) {
@@ -109,6 +145,17 @@ bool AudioDriver::initialize(uint32_t sampleRate) {
 }
 
 void AudioDriver::playBootSound() {
+    if (!initialize(bootSoundSampleRate)) {
+        return;
+    }
+
+    writeTone(523.25f, 85);
+    writeTone(659.25f, 85);
+    writeTone(783.99f, 140);
+    writeSilence(20);
+}
+
+void AudioDriver::playMusicTestTone() {
     if (!initialize(bootSoundSampleRate)) {
         return;
     }

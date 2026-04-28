@@ -20,6 +20,7 @@ void BootManager::initialize() {
     packages_.initialize();
     ota_.initialize();
     services_.initialize(permissions_, apps_, settings_, packages_, ota_);
+    audio_.playMusicTestTone();
 }
 
 void BootManager::start() {
