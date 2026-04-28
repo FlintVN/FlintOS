@@ -20,7 +20,6 @@ void BootManager::initialize() {
     packages_.initialize();
     ota_.initialize();
     services_.initialize(permissions_, apps_, settings_, packages_, ota_);
-    audio_.playMusicTestTone();
 }
 
 void BootManager::start() {
@@ -58,6 +57,10 @@ void BootManager::start() {
         Logger::warn("FLINTOS_TEST_FAIL boot_smoke jvm_launch_pending");
         Logger::info("FLINTOS_TEST_END boot_smoke");
         return;
+    }
+
+    if (!audio_.playMusicTestTone()) {
+        Logger::warn("Audio initialization failed, skipping music test tone");
     }
 
     Logger::info("FLINTOS_TEST_PASS boot_smoke");

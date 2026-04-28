@@ -4,6 +4,7 @@
 #include <cmath>
 
 #include "core/logger.hpp"
+#include "hal/display_driver.hpp"
 #include "driver/i2s_std.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -155,13 +156,16 @@ void AudioDriver::playBootSound() {
     writeSilence(20);
 }
 
-void AudioDriver::playMusicTestTone() {
+bool AudioDriver::playMusicTestTone() {
     if (!initialize(bootSoundSampleRate)) {
-        return;
+        return false;
     }
 
+    DisplayDriver display;
+    display.drawText("Playing music test tone...", 10, 10);
     writePcm(bootSoundPcm, bootSoundSampleCount);
     writeSilence(20);
+    return true;
 }
 
 } // namespace flintos
