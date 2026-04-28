@@ -13,6 +13,7 @@ SYSTEM_APPS = {
     "file_manager": "flintos.filemanager",
 }
 SHARED_MODULES = ["flint.app", "flint.os", "flint.ui", "flint.io", "flint.net"]
+JDK_JARS = ["java.base.jar", "flint.io.jar", "flint.net.jar"]
 
 
 def add_module_args(command: list[str], java_out: Path, module_name: str) -> None:
@@ -35,6 +36,7 @@ def create_app_jar(java_out: Path, staging: Path, app_name: str, module_name: st
         str(jar_path),
         "--main-class",
         manifest["mainClass"],
+        "-0",
     ]
     add_module_args(command, java_out, module_name)
     for shared_module in SHARED_MODULES:
@@ -62,6 +64,10 @@ def main() -> int:
     if staging.exists():
         shutil.rmtree(staging)
     (staging / "system" / "apps").mkdir(parents=True, exist_ok=True)
+    lib_dir = staging / "lib"
+    lib_dir.mkdir(parents=True, exist_ok=True)
+    for jar_name in JDK_JARS:
+        shutil.copy2(root.parent / "FlintESPJVM" / "BUILD_SYSTEM" / "Resources" / "lib" / jar_name, lib_dir / jar_name)
 
     for app_name, module_name in SYSTEM_APPS.items():
         create_app_jar(java_out, staging, app_name, module_name)

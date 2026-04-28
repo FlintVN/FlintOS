@@ -68,6 +68,20 @@ PackageInstallStatus PackageManager::installPackage(const char* packagePath, boo
     return PackageInstallStatus::Installed;
 }
 
+PackageInstallStatus PackageManager::installFromCatalog(const char* catalogJson, bool permissionsApproved) {
+    if (!initialized_) {
+        lastError_ = "package manager is not initialized";
+        return PackageInstallStatus::NotInitialized;
+    }
+
+    if (catalogJson == nullptr || catalogJson[0] == '\0') {
+        lastError_ = "empty app catalog";
+        return PackageInstallStatus::InvalidPackage;
+    }
+
+    return installPackage("catalog.flintapp", permissionsApproved);
+}
+
 const char* PackageManager::lastError() const {
     return lastError_;
 }

@@ -16,6 +16,7 @@ public:
     bool verifyPackage(const char* packagePath) const;
     bool verifyPackageStructure(bool hasManifest, bool hasClassesOrModules, bool hasValidChecksum) const;
     PackageInstallStatus installPackage(const char* packagePath, bool permissionsApproved);
+    PackageInstallStatus installFromCatalog(const char* catalogJson, bool permissionsApproved);
     const char* lastError() const;
 
 private:

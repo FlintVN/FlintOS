@@ -21,6 +21,8 @@ def main() -> int:
     args.output.mkdir(parents=True, exist_ok=True)
     command = [
         "javac",
+        "--release",
+        "9",
         "-d",
         str(args.output),
         "--module-source-path",

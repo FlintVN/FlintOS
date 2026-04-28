@@ -11,6 +11,7 @@
 #include "hal/board_profile.hpp"
 #include "hal/display_driver.hpp"
 #include "hal/network_driver.hpp"
+#include "flint_array_object.h"
 #include "flint_class_loader.h"
 #include "flint_method_info.h"
 #include "flint_native.h"
@@ -37,14 +38,29 @@ void nativeScreenDrawText(FNIEnv*, jstring, jint x, jint y) {
     display.drawText("<java-string>", x, y);
 }
 
-void nativeAppManagerInstalledApps(FNIEnv* env) {
+jobjectArray nativeAppManagerInstalledApps(FNIEnv* env) {
     flintos::AppRegistry registry;
     registry.initialize();
     std::size_t count = 0;
-    registry.installedApps(&count);
+    const flintos::AppManifest* apps = registry.installedApps(&count);
 
     jclass appInfoClass = env->findClass("flint/app/AppInfo");
-    env->newObjectArray(appInfoClass, static_cast<jint>(count));
+    jmethodId ctor = env->getConstructorId(appInfoClass, "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
+    jobjectArray result = env->newObjectArray(appInfoClass, static_cast<jint>(count));
+    if (result == nullptr || ctor == nullptr || apps == nullptr) {
+        return result;
+    }
+
+    JObject** data = result->getData();
+    for (std::size_t index = 0; index < count; index++) {
+        data[index] = env->newObject(
+            appInfoClass,
+            ctor,
+            env->newString(apps[index].id),
+            env->newString(apps[index].name),
+            env->newString(apps[index].mainClass));
+    }
+    return result;
 }
 
 jbool nativeAppManagerLaunch(FNIEnv*, jstring) {

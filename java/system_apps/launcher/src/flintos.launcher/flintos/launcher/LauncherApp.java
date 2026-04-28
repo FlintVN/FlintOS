@@ -10,6 +10,10 @@ import flint.ui.ListView;
 import flint.ui.Screen;
 
 public final class LauncherApp implements FlintApp {
+    public static void main(String[] args) {
+        new LauncherApp().onStart(null);
+    }
+
     @Override
     public void onStart(AppContext context) {
         Screen.clear();

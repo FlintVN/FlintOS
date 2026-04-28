@@ -12,6 +12,10 @@ idf_component_register(
         "../native/core/settings_store.cpp"
         "../native/core/storage_service.cpp"
         "../native/core/package_manager.cpp"
+        "../native/core/app_manager_native.cpp"
+        "../native/core/task_manager.cpp"
+        "../native/core/download_manager.cpp"
+        "../native/core/input_event_dispatcher.cpp"
         "../native/core/ota_update_manager.cpp"
         "../native/hal/board_profile.cpp"
         "../native/hal/display_driver.cpp"
@@ -32,6 +36,7 @@ idf_component_register(
         esp_partition
         esp_timer
         esp_wifi
+        esp_http_client
         nvs_flash
         driver
 )

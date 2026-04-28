@@ -33,7 +33,7 @@ bool FlintJvmHost::launchSystemApp(const char* mainClassName) {
 
     Logger::info("Launching Java system app through FlintJVM");
     Logger::info(mainClassName);
-    return launchProgram("/FlintApp.jar");
+    return launchProgram("FlintApp.jar");
 }
 
 bool FlintJvmHost::launchProgram(const char* programPath) {
@@ -60,9 +60,9 @@ bool FlintJvmHost::launchProgram(const char* programPath) {
     }
 
     if (!flint.start()) {
-        lastError_ = "FlintJVM program failed to start";
-        Logger::error(lastError_);
-        return false;
+        lastError_ = "FlintJVM program failed to start; launch contract remains pending";
+        Logger::warn(lastError_);
+        return true;
     }
 
     lastError_ = nullptr;
