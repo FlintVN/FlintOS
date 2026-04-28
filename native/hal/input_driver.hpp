@@ -8,6 +8,7 @@ public:
     bool isInitialized() const;
     bool hasPendingEvent() const;
     const char* readEventType() const;
+    bool isBootButtonPressed() const;
 
 private:
     bool initialized_ = false;

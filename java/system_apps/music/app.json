@@ -1,0 +1,11 @@
+{
+  "id": "flintos.music",
+  "name": "Music Player",
+  "version": "0.1.0",
+  "type": "system",
+  "runtime": "flintjvm",
+  "mainClass": "flintos.music.MusicApp",
+  "permissions": ["ui.screen", "app.launch"],
+  "minOs": "0.1.0",
+  "minJdk": "0.1.0"
+}

@@ -2,8 +2,45 @@
 
 #include "core/logger.hpp"
 #include "jvm_bridge/flintjvm_host.hpp"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 namespace flintos {
+namespace {
+
+TaskHandle_t bootButtonMusicTask = nullptr;
+
+void watchBootButtonForMusic(void*) {
+    InputDriver input;
+    AudioDriver audio;
+    input.initialize();
+
+    bool wasPressed = input.isBootButtonPressed();
+    while (true) {
+        const bool pressed = input.isBootButtonPressed();
+        if (pressed && !wasPressed) {
+            Logger::info("BOOT0 pressed, starting music player");
+            if (!audio.startMusicPlayer()) {
+                Logger::warn("Music player start failed");
+            }
+        }
+        wasPressed = pressed;
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+}
+
+void startBootButtonMusicWatcher() {
+    if (bootButtonMusicTask != nullptr) {
+        return;
+    }
+    if (xTaskCreate(watchBootButtonForMusic, "boot0_music", 3072, nullptr, tskIDLE_PRIORITY + 1, &bootButtonMusicTask) != pdPASS) {
+        bootButtonMusicTask = nullptr;
+        Logger::warn("BOOT0 music watcher start failed");
+    }
+}
+
+} // namespace
+
 
 void BootManager::initialize() {
     Logger::info("Initializing FlintOS native services");
@@ -59,9 +96,13 @@ void BootManager::start() {
         return;
     }
 
-    if (!audio_.playMusicTestTone()) {
-        Logger::warn("Audio initialization failed, skipping music test tone");
+    if (input_.isBootButtonPressed()) {
+        Logger::info("BOOT0 held, starting music player");
+        if (!audio_.startMusicPlayer()) {
+            Logger::warn("Music player start failed");
+        }
     }
+    startBootButtonMusicWatcher();
 
     Logger::info("FLINTOS_TEST_PASS boot_smoke");
     Logger::info("FLINTOS_TEST_END boot_smoke");

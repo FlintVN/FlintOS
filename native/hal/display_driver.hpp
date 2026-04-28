@@ -12,6 +12,7 @@ public:
     void initialize();
     void clear();
     void drawText(const char* text, int x, int y);
+    void drawMusicPlayer(const char* title, uint8_t frame, uint8_t level = 0);
     void playBootAnimation();
 
 private:

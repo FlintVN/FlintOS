@@ -211,6 +211,79 @@ void DisplayDriver::drawText(const char* text, int x, int y) {
     flush();
 }
 
+void DisplayDriver::drawMusicPlayer(const char* title, uint8_t frame, uint8_t level) {
+    initialize();
+    const char* trackTitle = title == nullptr ? "unknown" : title;
+
+    if (backend_ != Backend::SSD1306I2C) {
+        Logger::info("Music Player");
+        Logger::info(trackTitle);
+        return;
+    }
+
+    auto drawTextBuffered = [this](const char* text, int x, int y) {
+        int cursorX = x;
+        int cursorY = y;
+        for (const char* current = text; current != nullptr && *current != '\0'; ++current) {
+            drawChar(*current, cursorX, cursorY);
+            cursorX += FontAdvance;
+            if (cursorX + FontWidth > profile_.width) {
+                break;
+            }
+        }
+    };
+
+    std::fill(framebuffer_, framebuffer_ + FramebufferSize, 0);
+
+    for (int x = 0; x < profile_.width; ++x) {
+        setPixel(x, 10, true);
+        setPixel(x, 54, true);
+    }
+
+    drawTextBuffered("Flint Music", 28, 1);
+    drawTextBuffered(trackTitle, 8, 17);
+    drawTextBuffered("PLAYING", 42, 43);
+
+    constexpr int IconX = 56;
+    constexpr int IconY = 28;
+    for (int y = 0; y < 13; ++y) {
+        for (int x = 0; x <= y / 2; ++x) {
+            setPixel(IconX + x, IconY + y, true);
+        }
+    }
+
+    const int bars[] = {3, 6, 10, 6, 3};
+    const int phase = frame % 5;
+    const int boost = 1 + level / 32;
+    for (int index = 0; index < 5; ++index) {
+        const int height = std::min(13, bars[(index + phase) % 5] + boost);
+        const int x = 18 + index * 5;
+        for (int y = 0; y < height; ++y) {
+            setPixel(x, 39 - y, true);
+            setPixel(x + 1, 39 - y, true);
+        }
+    }
+    for (int index = 0; index < 5; ++index) {
+        const int height = std::min(13, bars[(index + 5 - phase) % 5] + boost);
+        const int x = 86 + index * 5;
+        for (int y = 0; y < height; ++y) {
+            setPixel(x, 39 - y, true);
+            setPixel(x + 1, 39 - y, true);
+        }
+    }
+
+    const int progress = static_cast<int>((frame % 32) * 112 / 31);
+    for (int x = 8; x < 120; ++x) {
+        setPixel(x, 58, true);
+    }
+    for (int x = 8; x < 8 + progress; ++x) {
+        setPixel(x, 57, true);
+        setPixel(x, 59, true);
+    }
+
+    flush();
+}
+
 void DisplayDriver::playBootAnimation() {
     initialize();
     if (backend_ != Backend::SSD1306I2C) {

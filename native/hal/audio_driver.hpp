@@ -9,7 +9,7 @@ class AudioDriver {
 public:
     bool initialize(uint32_t sampleRate = 24000);
     void playBootSound();
-    bool playMusicTestTone();
+    bool startMusicPlayer();
 
 private:
     static bool initialized_;

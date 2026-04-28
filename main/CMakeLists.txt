@@ -21,6 +21,7 @@ idf_component_register(
         "../native/hal/display_driver.cpp"
         "../native/hal/audio_driver.cpp"
         "../native/hal/boot_sound.cpp"
+        "../native/hal/music_sound.cpp"
         "../native/hal/input_driver.cpp"
         "../native/hal/network_driver.cpp"
         "../native/hal/power_manager.cpp"

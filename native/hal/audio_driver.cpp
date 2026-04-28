@@ -2,12 +2,14 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 
 #include "core/logger.hpp"
 #include "hal/display_driver.hpp"
 #include "driver/i2s_std.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/semphr.h"
 
 namespace flintos {
 namespace {
@@ -20,12 +22,17 @@ constexpr float Pi = 3.14159265358979323846f;
 constexpr int GainQ15_100 = 32768; // 1.0 in Q15 format
 
 i2s_chan_handle_t audioTxChannel = nullptr;
+TaskHandle_t musicPlayerTask = nullptr;
+bool musicPlayerStarted = false;
 
 } // namespace
 
 extern const uint32_t bootSoundSampleRate;
 extern const std::size_t bootSoundSampleCount;
 extern const int16_t bootSoundPcm[];
+extern const uint32_t musicSoundSampleRate;
+extern const std::size_t musicSoundSampleCount;
+extern const int16_t musicSoundPcm[];
 
 namespace {
 
@@ -64,24 +71,58 @@ void writeTone(float frequency, uint32_t durationMs) {
     }
 }
 
-void writePcm(const int16_t* samples, std::size_t sampleCount) {
+void writePcm(const int16_t* samples, std::size_t sampleCount, DisplayDriver* display, const char* title) {
     if (audioTxChannel == nullptr || samples == nullptr) {
         return;
     }
 
     constexpr std::size_t FrameSamples = 240;
     int16_t stereo[FrameSamples * 2] = {};
+    uint8_t frame = 0;
+
+    constexpr std::size_t UiUpdateSamples = 32000;
+    uint32_t levelAccumulator = 0;
+    std::size_t levelSamples = 0;
 
     for (std::size_t offset = 0; offset < sampleCount; offset += FrameSamples) {
+        if (display != nullptr && offset % UiUpdateSamples == 0) {
+            const uint8_t level = levelSamples == 0 ? 0 : static_cast<uint8_t>(std::min<uint32_t>(127, levelAccumulator / levelSamples / 256));
+            display->drawMusicPlayer(title, frame++, level);
+            levelAccumulator = 0;
+            levelSamples = 0;
+        }
+
         const std::size_t count = std::min<std::size_t>(FrameSamples, sampleCount - offset);
         for (std::size_t index = 0; index < count; ++index) {
             const int16_t sample = static_cast<int16_t>((static_cast<int32_t>(samples[offset + index]) * GainQ15_100) >> 15);
+            levelAccumulator += static_cast<uint32_t>(std::abs(static_cast<int>(sample)));
+            levelSamples++;
             stereo[index * 2] = sample;
             stereo[index * 2 + 1] = sample;
         }
 
         size_t bytesWritten = 0;
         i2s_channel_write(audioTxChannel, stereo, count * 2 * sizeof(int16_t), &bytesWritten, portMAX_DELAY);
+    }
+}
+
+void writeSilence(uint32_t durationMs);
+
+void musicPlayerLoop(void*) {
+    AudioDriver audio;
+    if (!audio.initialize(musicSoundSampleRate)) {
+        Logger::warn("Music player audio init failed");
+        musicPlayerStarted = false;
+        musicPlayerTask = nullptr;
+        vTaskDelete(nullptr);
+        return;
+    }
+
+    DisplayDriver display;
+    Logger::info("Music player started");
+    while (true) {
+        writePcm(musicSoundPcm, musicSoundSampleCount, &display, "oii.mp3");
+        writeSilence(80);
     }
 }
 
@@ -156,15 +197,19 @@ void AudioDriver::playBootSound() {
     writeSilence(20);
 }
 
-bool AudioDriver::playMusicTestTone() {
-    if (!initialize(bootSoundSampleRate)) {
-        return false;
+bool AudioDriver::startMusicPlayer() {
+    if (musicPlayerStarted) {
+        return true;
     }
 
-    DisplayDriver display;
-    display.drawText("Playing music test tone...", 10, 10);
-    writePcm(bootSoundPcm, bootSoundSampleCount);
-    writeSilence(20);
+    musicPlayerStarted = true;
+    const BaseType_t created = xTaskCreate(musicPlayerLoop, "music_player", 4096, nullptr, tskIDLE_PRIORITY + 1, &musicPlayerTask);
+    if (created != pdPASS) {
+        musicPlayerStarted = false;
+        musicPlayerTask = nullptr;
+        Logger::warn("Music player task start failed");
+        return false;
+    }
     return true;
 }
 

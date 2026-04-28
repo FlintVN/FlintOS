@@ -11,6 +11,7 @@ SYSTEM_APPS = {
     "updater": "flintos.updater",
     "app_store": "flintos.appstore",
     "file_manager": "flintos.filemanager",
+    "music": "flintos.music",
 }
 SHARED_MODULES = ["flint.app", "flint.os", "flint.ui", "flint.io", "flint.net"]
 JDK_JARS = ["java.base.jar", "flint.io.jar", "flint.net.jar"]
@@ -27,7 +28,6 @@ def create_app_jar(java_out: Path, staging: Path, app_name: str, module_name: st
     manifest = json.loads((app_dir / "app.json").read_text(encoding="utf-8"))
     jar_path = staging / "system" / "apps" / manifest["id"] / "FlintApp.jar"
     jar_path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(app_dir / "app.json", jar_path.parent / "app.json")
 
     command = [
         "jar",
@@ -42,6 +42,7 @@ def create_app_jar(java_out: Path, staging: Path, app_name: str, module_name: st
     for shared_module in SHARED_MODULES:
         add_module_args(command, java_out, shared_module)
     subprocess.run(command, check=True)
+    shutil.copy2(app_dir / "app.json", jar_path.parent / "app.json")
 
 
 def main() -> int:
