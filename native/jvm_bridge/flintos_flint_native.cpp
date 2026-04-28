@@ -4,13 +4,20 @@
 #include <cstring>
 
 #include "core/app_registry.hpp"
+#include "core/app_manager_native.hpp"
+#include "core/download_manager.hpp"
+#include "core/input_event_dispatcher.hpp"
 #include "core/logger.hpp"
 #include "core/ota_update_manager.hpp"
+#include "core/permission_manager.hpp"
 #include "core/settings_store.hpp"
 #include "core/storage_service.hpp"
+#include "core/task_manager.hpp"
 #include "hal/board_profile.hpp"
 #include "hal/display_driver.hpp"
+#include "hal/input_driver.hpp"
 #include "hal/network_driver.hpp"
+#include "hal/power_manager.hpp"
 #include "flint_array_object.h"
 #include "flint_class_loader.h"
 #include "flint_method_info.h"
@@ -19,31 +26,23 @@
 
 namespace {
 
-void nativeSystemInfoOsVersion(FNIEnv* env) {
-    env->newString("0.1.0");
+const char* copyString(jstring text, char* buffer, std::size_t bufferSize) {
+    if (bufferSize == 0) {
+        return "";
+    }
+    if (text == nullptr) {
+        buffer[0] = '\0';
+        return buffer;
+    }
+
+    const uint32_t length = text->getLength();
+    const uint32_t copyLength = length < bufferSize ? length : bufferSize - 1;
+    std::memcpy(buffer, text->getAscii(), copyLength);
+    buffer[copyLength] = '\0';
+    return buffer;
 }
 
-void nativeSystemInfoBoardName(FNIEnv* env) {
-    flintos::BoardProfile board;
-    env->newString(board.name());
-}
-
-void nativeScreenClear(FNIEnv*) {
-    flintos::DisplayDriver display;
-    display.clear();
-}
-
-void nativeScreenDrawText(FNIEnv*, jstring, jint x, jint y) {
-    flintos::DisplayDriver display;
-    display.drawText("<java-string>", x, y);
-}
-
-jobjectArray nativeAppManagerInstalledApps(FNIEnv* env) {
-    flintos::AppRegistry registry;
-    registry.initialize();
-    std::size_t count = 0;
-    const flintos::AppManifest* apps = registry.installedApps(&count);
-
+jobjectArray createAppInfoArray(FNIEnv* env, const flintos::AppManifest* const* apps, std::size_t count) {
     jclass appInfoClass = env->findClass("flint/app/AppInfo");
     jmethodId ctor = env->getConstructorId(appInfoClass, "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
     jobjectArray result = env->newObjectArray(appInfoClass, static_cast<jint>(count));
@@ -53,37 +52,132 @@ jobjectArray nativeAppManagerInstalledApps(FNIEnv* env) {
 
     JObject** data = result->getData();
     for (std::size_t index = 0; index < count; index++) {
+        const flintos::AppManifest* app = apps[index];
+        if (app == nullptr) {
+            continue;
+        }
         data[index] = env->newObject(
             appInfoClass,
             ctor,
-            env->newString(apps[index].id),
-            env->newString(apps[index].name),
-            env->newString(apps[index].mainClass));
+            env->newString(app->id),
+            env->newString(app->name),
+            env->newString(app->mainClass));
     }
     return result;
 }
 
-jbool nativeAppManagerLaunch(FNIEnv*, jstring) {
-    flintos::Logger::info("Java AppManager launch request received");
-    return true;
+jobjectArray createAppInfoArray(FNIEnv* env, const flintos::AppManifest* apps, std::size_t count) {
+    const flintos::AppManifest* refs[16] = {};
+    const std::size_t copyCount = count < 16 ? count : 16;
+    for (std::size_t index = 0; index < copyCount; index++) {
+        refs[index] = &apps[index];
+    }
+    return createAppInfoArray(env, refs, copyCount);
 }
 
-void nativeLoggerInfo(FNIEnv*, jstring) {
-    flintos::Logger::info("<java-log>");
+jstring nativeSystemInfoOsVersion(FNIEnv* env) {
+    return env->newString("0.1.0");
 }
 
-void nativeLoggerWarn(FNIEnv*, jstring) {
-    flintos::Logger::warn("<java-log>");
+jstring nativeSystemInfoBoardName(FNIEnv* env) {
+    flintos::BoardProfile board;
+    return env->newString(board.name());
 }
 
-void nativeLoggerError(FNIEnv*, jstring) {
-    flintos::Logger::error("<java-log>");
+void nativeScreenClear(FNIEnv*) {
+    flintos::DisplayDriver display;
+    display.clear();
 }
 
-void nativeSettingsGetString(FNIEnv* env, jstring, jstring) {
+void nativeScreenDrawText(FNIEnv*, jstring text, jint x, jint y) {
+    char buffer[128];
+    flintos::DisplayDriver display;
+    display.drawText(copyString(text, buffer, sizeof(buffer)), x, y);
+}
+
+jobjectArray nativeAppManagerInstalledApps(FNIEnv* env) {
+    flintos::AppRegistry registry;
+    registry.initialize();
+    std::size_t count = 0;
+    const flintos::AppManifest* apps = registry.installedApps(&count);
+    return createAppInfoArray(env, apps, count);
+}
+
+jbool nativeAppManagerLaunch(FNIEnv*, jstring appId) {
+    char appIdBuffer[96];
+    flintos::AppRegistry registry;
+    flintos::PermissionManager permissions;
+    flintos::AppManagerNative appManager;
+    registry.initialize();
+    appManager.initialize(registry, permissions);
+    return appManager.startActivity("flintos.launcher", copyString(appId, appIdBuffer, sizeof(appIdBuffer)), nullptr);
+}
+
+void nativeAppManagerFinishActivity(FNIEnv*) {
+    flintos::AppRegistry registry;
+    flintos::PermissionManager permissions;
+    flintos::AppManagerNative appManager;
+    registry.initialize();
+    appManager.initialize(registry, permissions);
+    appManager.finishActivity();
+}
+
+void nativeAppManagerRegisterIntentHandler(FNIEnv*, jstring action, jstring appId) {
+    char actionBuffer[96];
+    char appIdBuffer[96];
+    flintos::AppRegistry registry;
+    flintos::PermissionManager permissions;
+    flintos::AppManagerNative appManager;
+    registry.initialize();
+    appManager.initialize(registry, permissions);
+    appManager.registerIntentHandler(
+        copyString(action, actionBuffer, sizeof(actionBuffer)),
+        copyString(appId, appIdBuffer, sizeof(appIdBuffer)));
+}
+
+jobjectArray nativeAppManagerQueryIntentActivities(FNIEnv* env, jobject intent) {
+    flintos::AppRegistry registry;
+    flintos::PermissionManager permissions;
+    flintos::AppManagerNative appManager;
+    registry.initialize();
+    appManager.initialize(registry, permissions);
+
+    jstring action = nullptr;
+    if (intent != nullptr) {
+        jclass intentClass = env->findClass("flint/app/Intent");
+        jmethodId actionMethod = env->getMethodId(intentClass, "action", "()Ljava/lang/String;");
+        action = static_cast<jstring>(env->callObjectMethod(actionMethod, intent));
+    }
+
+    char actionBuffer[96];
+    std::size_t count = 0;
+    const flintos::AppManifest* const* apps = appManager.queryIntentActivities(copyString(action, actionBuffer, sizeof(actionBuffer)), &count);
+    return createAppInfoArray(env, apps, count);
+}
+
+void nativeLoggerInfo(FNIEnv*, jstring message) {
+    char buffer[160];
+    flintos::Logger::info(copyString(message, buffer, sizeof(buffer)));
+}
+
+void nativeLoggerWarn(FNIEnv*, jstring message) {
+    char buffer[160];
+    flintos::Logger::warn(copyString(message, buffer, sizeof(buffer)));
+}
+
+void nativeLoggerError(FNIEnv*, jstring message) {
+    char buffer[160];
+    flintos::Logger::error(copyString(message, buffer, sizeof(buffer)));
+}
+
+jstring nativeSettingsGetString(FNIEnv* env, jstring key, jstring fallback) {
+    char keyBuffer[96];
+    char fallbackBuffer[128];
     flintos::SettingsStore settings;
     settings.initialize();
-    env->newString(settings.getString("os.name", ""));
+    return env->newString(settings.getString(
+        copyString(key, keyBuffer, sizeof(keyBuffer)),
+        copyString(fallback, fallbackBuffer, sizeof(fallbackBuffer))));
 }
 
 jbool nativeUpdateManagerHasPendingValidUpdate(FNIEnv*) {
@@ -92,10 +186,14 @@ jbool nativeUpdateManagerHasPendingValidUpdate(FNIEnv*) {
     return ota.hasPendingValidUpdate();
 }
 
-jbool nativeUpdateManagerStageUpdate(FNIEnv*, jstring, jstring) {
+jbool nativeUpdateManagerStageUpdate(FNIEnv*, jstring metadataUrl, jstring expectedChecksum) {
+    char metadataBuffer[192];
+    char checksumBuffer[96];
     flintos::OTAUpdateManager ota;
     ota.initialize();
-    return ota.stageUpdate("metadata", "checksum") == flintos::OTAUpdateStatus::Pending;
+    return ota.stageUpdate(
+        copyString(metadataUrl, metadataBuffer, sizeof(metadataBuffer)),
+        copyString(expectedChecksum, checksumBuffer, sizeof(checksumBuffer))) == flintos::OTAUpdateStatus::Pending;
 }
 
 void nativeUpdateManagerMarkBootHealthy(FNIEnv*, jbool healthy) {
@@ -104,16 +202,17 @@ void nativeUpdateManagerMarkBootHealthy(FNIEnv*, jbool healthy) {
     ota.markBootHealthy(healthy);
 }
 
-jbool nativeStorageExists(FNIEnv*, jstring) {
+jbool nativeStorageExists(FNIEnv*, jstring path) {
+    char pathBuffer[128];
     flintos::StorageService storage;
     storage.initialize();
-    return storage.exists("/");
+    return storage.exists(copyString(path, pathBuffer, sizeof(pathBuffer)));
 }
 
-void nativeStorageRootPath(FNIEnv* env) {
+jstring nativeStorageRootPath(FNIEnv* env) {
     flintos::StorageService storage;
     storage.initialize();
-    env->newString(storage.rootPath());
+    return env->newString(storage.rootPath());
 }
 
 jbool nativeWiFiIsEnabled(FNIEnv*) {
@@ -122,10 +221,73 @@ jbool nativeWiFiIsEnabled(FNIEnv*) {
     return network.isWifiEnabled();
 }
 
-jbool nativeWiFiConnect(FNIEnv*, jstring) {
+jbool nativeWiFiConnect(FNIEnv*, jstring ssid) {
+    char ssidBuffer[96];
     flintos::NetworkDriver network;
     network.initialize();
-    return network.connectWifi("ssid");
+    return network.connectWifi(copyString(ssid, ssidBuffer, sizeof(ssidBuffer)));
+}
+
+jbool nativeInputHasPendingEvent(FNIEnv*) {
+    flintos::InputDriver input;
+    input.initialize();
+    return input.hasPendingEvent();
+}
+
+jbool nativeDownloadManagerDownloadUrl(FNIEnv*, jstring url, jstring outputPath) {
+    char urlBuffer[192];
+    char outputPathBuffer[128];
+    flintos::DownloadManager downloads;
+    downloads.initialize();
+    return downloads.downloadUrl(
+        copyString(url, urlBuffer, sizeof(urlBuffer)),
+        copyString(outputPath, outputPathBuffer, sizeof(outputPathBuffer)));
+}
+
+jstring nativeDownloadManagerDownloadText(FNIEnv* env, jstring url, jint timeoutMs) {
+    char urlBuffer[192];
+    flintos::DownloadManager downloads;
+    downloads.initialize();
+    return env->newString(downloads.downloadText(
+        copyString(url, urlBuffer, sizeof(urlBuffer)),
+        static_cast<uint32_t>(timeoutMs)));
+}
+
+jint nativePowerBatteryPercent(FNIEnv*) {
+    flintos::PowerManager power;
+    power.initialize();
+    return power.isInitialized() ? 100 : 0;
+}
+
+jbool nativePowerIsCharging(FNIEnv*) {
+    flintos::PowerManager power;
+    power.initialize();
+    return power.isInitialized();
+}
+
+jint nativeTaskManagerCreateTask(FNIEnv*, jstring taskName) {
+    char taskNameBuffer[96];
+    flintos::TaskManager tasks;
+    tasks.initialize();
+    return tasks.createTask(copyString(taskName, taskNameBuffer, sizeof(taskNameBuffer)));
+}
+
+void nativeTaskManagerCancelTask(FNIEnv*, jint taskId) {
+    flintos::TaskManager tasks;
+    tasks.initialize();
+    tasks.cancelTask(taskId);
+}
+
+jbool nativeTaskManagerIsTaskActive(FNIEnv*, jint taskId) {
+    flintos::TaskManager tasks;
+    tasks.initialize();
+    return tasks.isTaskActive(taskId);
+}
+
+void nativeTaskManagerSleepMs(FNIEnv*, jint milliseconds) {
+    flintos::TaskManager tasks;
+    tasks.initialize();
+    tasks.sleepMs(static_cast<uint32_t>(milliseconds));
 }
 
 void nativePinWrite(FNIEnv*, jint, jbool) {
@@ -153,6 +315,9 @@ constexpr NativeMethod SCREEN_METHODS[] = {
 constexpr NativeMethod APP_MANAGER_METHODS[] = {
     NATIVE_METHOD("installedApps", "()[Lflint/app/AppInfo;", nativeAppManagerInstalledApps),
     NATIVE_METHOD("launch", "(Ljava/lang/String;)Z", nativeAppManagerLaunch),
+    NATIVE_METHOD("finishActivity", "()V", nativeAppManagerFinishActivity),
+    NATIVE_METHOD("registerIntentHandler", "(Ljava/lang/String;Ljava/lang/String;)V", nativeAppManagerRegisterIntentHandler),
+    NATIVE_METHOD("queryIntentActivities", "(Lflint/app/Intent;)[Lflint/app/AppInfo;", nativeAppManagerQueryIntentActivities),
 };
 
 constexpr NativeMethod LOGGER_METHODS[] = {
@@ -181,6 +346,27 @@ constexpr NativeMethod WIFI_METHODS[] = {
     NATIVE_METHOD("connect", "(Ljava/lang/String;)Z", nativeWiFiConnect),
 };
 
+constexpr NativeMethod INPUT_METHODS[] = {
+    NATIVE_METHOD("hasPendingEvent", "()Z", nativeInputHasPendingEvent),
+};
+
+constexpr NativeMethod DOWNLOAD_MANAGER_METHODS[] = {
+    NATIVE_METHOD("downloadUrl", "(Ljava/lang/String;Ljava/lang/String;)Z", nativeDownloadManagerDownloadUrl),
+    NATIVE_METHOD("downloadText", "(Ljava/lang/String;I)Ljava/lang/String;", nativeDownloadManagerDownloadText),
+};
+
+constexpr NativeMethod POWER_METHODS[] = {
+    NATIVE_METHOD("batteryPercent", "()I", nativePowerBatteryPercent),
+    NATIVE_METHOD("isCharging", "()Z", nativePowerIsCharging),
+};
+
+constexpr NativeMethod TASK_MANAGER_METHODS[] = {
+    NATIVE_METHOD("createTask", "(Ljava/lang/String;)I", nativeTaskManagerCreateTask),
+    NATIVE_METHOD("cancelTask", "(I)V", nativeTaskManagerCancelTask),
+    NATIVE_METHOD("isTaskActive", "(I)Z", nativeTaskManagerIsTaskActive),
+    NATIVE_METHOD("sleepMs", "(I)V", nativeTaskManagerSleepMs),
+};
+
 constexpr NativeMethod PIN_METHODS[] = {
     NATIVE_METHOD("write", "(IZ)V", nativePinWrite),
     NATIVE_METHOD("read", "(I)Z", nativePinRead),
@@ -199,6 +385,10 @@ constexpr NativeClass FLINTOS_NATIVE_CLASSES[] = {
     NATIVE_CLASS("flint/os/UpdateManager", UPDATE_MANAGER_METHODS),
     NATIVE_CLASS("flint/os/Storage", STORAGE_METHODS),
     NATIVE_CLASS("flint/net/WiFi", WIFI_METHODS),
+    NATIVE_CLASS("flint/ui/Input", INPUT_METHODS),
+    NATIVE_CLASS("flint/os/DownloadManager", DOWNLOAD_MANAGER_METHODS),
+    NATIVE_CLASS("flint/os/Power", POWER_METHODS),
+    NATIVE_CLASS("flint/os/TaskManager", TASK_MANAGER_METHODS),
     NATIVE_CLASS("flint/io/Pin", PIN_METHODS),
     NATIVE_CLASS("flint/io/I2C", BUS_METHODS),
     NATIVE_CLASS("flint/io/SPI", BUS_METHODS),
