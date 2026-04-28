@@ -10,6 +10,8 @@ void BootManager::initialize() {
     Logger::info(board_.name());
     storage_.initialize();
     display_.clear();
+    audio_.playBootSound();
+    display_.playBootAnimation();
     input_.initialize();
     network_.initialize();
     power_.initialize();

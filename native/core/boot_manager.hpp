@@ -7,6 +7,7 @@
 #include "core/service_registry.hpp"
 #include "core/settings_store.hpp"
 #include "core/storage_service.hpp"
+#include "hal/audio_driver.hpp"
 #include "hal/board_profile.hpp"
 #include "hal/display_driver.hpp"
 #include "hal/input_driver.hpp"
@@ -24,6 +25,7 @@ private:
     BoardProfile board_;
     StorageService storage_;
     DisplayDriver display_;
+    AudioDriver audio_;
     InputDriver input_;
     NetworkDriver network_;
     PowerManager power_;

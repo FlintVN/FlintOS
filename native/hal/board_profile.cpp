@@ -15,7 +15,11 @@ bool BoardProfile::hasPsram() const {
 }
 
 unsigned BoardProfile::flashSizeMb() const {
-    return 8;
+    return 16;
+}
+
+DisplayProfile BoardProfile::display() const {
+    return {};
 }
 
 } // namespace flintos

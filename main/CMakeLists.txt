@@ -19,6 +19,8 @@ idf_component_register(
         "../native/core/ota_update_manager.cpp"
         "../native/hal/board_profile.cpp"
         "../native/hal/display_driver.cpp"
+        "../native/hal/audio_driver.cpp"
+        "../native/hal/boot_sound.cpp"
         "../native/hal/input_driver.cpp"
         "../native/hal/network_driver.cpp"
         "../native/hal/power_manager.cpp"
@@ -39,6 +41,7 @@ idf_component_register(
         esp_http_client
         nvs_flash
         driver
+        esp_driver_i2s
 )
 
 if(FLINTOS_HAS_FLINTESPJVM)
