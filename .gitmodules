@@ -1,0 +1,3 @@
+[submodule "flintjvm"]
+	path = flintjvm
+	url = https://github.com/FlintVN/FlintJVM.git
