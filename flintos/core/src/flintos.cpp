@@ -1,6 +1,7 @@
 
 #include "flint.h"
 #include "flintos.h"
+#include "flintos_devices.h"
 #include "flint_system_api.h"
 #include "flintos_debugger.h"
 
@@ -24,6 +25,8 @@ static void FlintTerminated(Flint *flint) {
 }
 
 void FlintOS::main(void) {
+    FDev::Screen::brightness(100);
+
     FosDbg::getInstance()->receiveTask();
 }
 

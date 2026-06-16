@@ -9,6 +9,7 @@
 #include "esp_wifi.h"
 #include "esp_vfs_fat.h"
 #include "esp_usb_device.h"
+#include "ili9341_lcd_driver.h"
 #include "esp_board.h"
 
 static void GPIO_Init(void) {
@@ -53,6 +54,7 @@ void Board_Init(void) {
     USB_DeviceInit();
     esp_tusb_init_console(TINYUSB_CDC_ACM_0);
     FS_Init();
+    LCD_Init();
     WiFi_Init();
     vTaskPrioritySet(NULL, 2);
 }

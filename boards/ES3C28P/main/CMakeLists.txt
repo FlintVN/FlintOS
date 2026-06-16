@@ -10,9 +10,11 @@ idf_component_register(
     SRCS "src/main.cpp"
     SRCS "src/esp_usb_device.c"
     SRCS "src/esp_board_esp32_s3.cpp"
+    SRCS "src/ili9341_lcd_driver.cpp"
     SRCS "src/esp_usb_cdc_debugger.cpp"
     SRCS "src/esp_flint_system_api.cpp"
     SRCS "src/esp_flintos_wifi_api.cpp"
+    SRCS "src/esp_flintos_screen_api.cpp"
 
     SRCS ${FLINTOS_SRCS}
 
