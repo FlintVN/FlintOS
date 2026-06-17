@@ -172,7 +172,7 @@ static void SPI_WriteCmd(uint8_t cmd, uint8_t *data, uint32_t length) {
 }
 
 static void LCD_Clear(void) {
-    static const uint8_t data[64] = {};
+    static const uint8_t data[256] = {};
 
     /* Column address set */
     SPI_WriteCmd(0x2A, 0, 0, (240 >> 8), 240);

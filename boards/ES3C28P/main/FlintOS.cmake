@@ -63,6 +63,7 @@ set(FLINTOS_SRCS
     "../../../flintjvm/native/draw/src/flint_native_rgb565_graphics.cpp"
 
     "../../../flintos/core/src/flintos.cpp"
+    "../../../flintos/core/src/flintos_logo.cpp"
     "../../../flintos/core/src/flint_system_api.cpp"
     "../../../flintos/core/src/flintos_debugger.cpp"
 
