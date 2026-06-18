@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdatomic.h>
-#include "flintos_screen.h"
+#include "flintos_display.h"
 #include "flintos_devices.h"
 #include "flint_system_api.h"
 #include "flint_file_reader.h"
@@ -30,11 +30,11 @@ typedef struct __attribute__((packed)) {
     uint32_t biClrImportant;
 } BitmapInfoHeader;
 
-alignas(2) static uint8_t screenBuff[SCREEN_WIDTH * SCREEN_HEIGHT * 2];
+alignas(2) static uint8_t displayBuff[DISPLAY_WIDTH * DISPLAY_HEIGHT * 2];
 static atomic_bool requireUpdate = false;
 
-static void Screen_Clear(void) {
-    memset(screenBuff, 0, sizeof(screenBuff));
+static void Display_Clear(void) {
+    memset(displayBuff, 0, sizeof(displayBuff));
 }
 
 static void ConvertToRgb565(uint16_t *data, uint32_t length) {
@@ -47,17 +47,17 @@ static void ConvertToRgb565(uint16_t *data, uint32_t length) {
 static bool ReadRgb555(FileReader *reader, BitmapInfoHeader *infoHeader) {
     int32_t w = infoHeader->biWidth;
     int32_t h = infoHeader->biHeight;
-    uint16_t x = (SCREEN_WIDTH - w) / 2;
-    uint16_t y = (SCREEN_HEIGHT - std::abs(h)) / 2;
+    uint16_t x = (DISPLAY_WIDTH - w) / 2;
+    uint16_t y = (DISPLAY_HEIGHT - std::abs(h)) / 2;
     uint32_t rowSize = w * 2;
     if(h > 0) for(uint32_t i = 0; i < h; i++) {
-        uint16_t *buff = &((uint16_t *)screenBuff)[((h - 1 - i) + y) * SCREEN_WIDTH + x];
+        uint16_t *buff = &((uint16_t *)displayBuff)[((h - 1 - i) + y) * DISPLAY_WIDTH + x];
         if(reader->read(buff, rowSize) != rowSize)
             return false;
         ConvertToRgb565(buff, w);
     }
     else for(uint32_t i = 0; i < h; i++) {
-        uint16_t *buff = &((uint16_t *)screenBuff)[(i + y) * SCREEN_WIDTH + x];
+        uint16_t *buff = &((uint16_t *)displayBuff)[(i + y) * DISPLAY_WIDTH + x];
         if(reader->read(buff, rowSize) != rowSize)
             return false;
         ConvertToRgb565(buff, w);
@@ -65,33 +65,33 @@ static bool ReadRgb555(FileReader *reader, BitmapInfoHeader *infoHeader) {
     return true;
 }
 
-void FosScreen::setBrightness(uint8_t value) {
-    FDev::Screen::brightness(value);
+void FosDisplay::setBrightness(uint8_t value) {
+    FDev::Display::brightness(value);
 }
 
-void FosScreen::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data) {
-    if(w == SCREEN_WIDTH)
-        memcpy(&screenBuff[(y * SCREEN_WIDTH + x) * 2], data, w * h * 2);
+void FosDisplay::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data) {
+    if(w == DISPLAY_WIDTH)
+        memcpy(&displayBuff[(y * DISPLAY_WIDTH + x) * 2], data, w * h * 2);
     else {
         uint32_t rowSz = w * 2;
         for(uint32_t i = 0; i < h; i++) {
-            memcpy(&screenBuff[((i + y) * SCREEN_WIDTH + x) * 2], data, rowSz);
+            memcpy(&displayBuff[((i + y) * DISPLAY_WIDTH + x) * 2], data, rowSz);
             data += rowSz;
         }
     }
     requireUpdate.store(true);
 }
 
-bool FosScreen::update(void) {
+bool FosDisplay::update(void) {
     bool expected = true;
     if(requireUpdate.compare_exchange_strong(expected, false))
-        return FDev::Screen::write(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, screenBuff);
+        return FDev::Display::write(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, displayBuff);
     else
         return true;
 }
 
-void FosScreen::showLogo(void) {
-    Screen_Clear();
+void FosDisplay::showLogo(void) {
+    Display_Clear();
 
     FileReader reader(NULL, "/sys/icons/flint_64x64.bmp");
     if(!reader.open()) return;

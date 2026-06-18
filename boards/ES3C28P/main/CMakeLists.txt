@@ -14,7 +14,7 @@ idf_component_register(
     SRCS "src/esp_usb_cdc_debugger.cpp"
     SRCS "src/esp_system_api.cpp"
     SRCS "src/esp_device_wifi.cpp"
-    SRCS "src/esp_device_screen.cpp"
+    SRCS "src/esp_device_display.cpp"
 
     SRCS ${FLINTOS_SRCS}
 

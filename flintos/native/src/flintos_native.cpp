@@ -5,9 +5,11 @@
 #include "flint_class_loader.h"
 #include "flint_native.h"
 #include "flintos_native_wifi.h"
+#include "flintos_native_display.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
-    NATIVE_CLASS("flint/net/WiFi", wifiMethods),
+    NATIVE_CLASS("flint/net/WiFi",         wifiMethods),
+    NATIVE_CLASS("flintos/device/Display", displayMethods),
 };
 
 void FlintAPI::System::reset(void) {

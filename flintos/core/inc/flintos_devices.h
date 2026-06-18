@@ -3,7 +3,7 @@
 #define __FLINTOS_API_H
 
 #include <stdint.h>
-namespace FDev::Screen {
+namespace FDev::Display {
     bool write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data);
     void brightness(uint8_t value);
 }

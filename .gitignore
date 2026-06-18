@@ -1,6 +1,7 @@
 .vscode
 build
 managed_components
+java/bin
 
 *.lock
 sdkconfig

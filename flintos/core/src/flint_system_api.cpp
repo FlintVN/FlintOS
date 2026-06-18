@@ -11,5 +11,5 @@ const char *FlintAPI::System::getClassPath(uint32_t index) {
     };
     if(index < LENGTH(jars))
         return jars[index];
-    return NULL;        
+    return NULL;
 }

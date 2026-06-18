@@ -1,9 +1,13 @@
 package flintos.device;
 
-public class Screen {
-    private Screen() {
+public class Display {
+    private Display() {
 
     }
+
+    public static native int getWidth();
+
+    public static native int getHeight();
 
     public static native void write(int x, int y, int w, int h, byte[] data);
 
