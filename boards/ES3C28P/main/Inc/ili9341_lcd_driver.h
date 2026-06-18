@@ -13,6 +13,6 @@
 
 void LCD_Init(void);
 void LCD_Brightness(uint8_t value);
-void LCD_Write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data, bool sycn);
+bool LCD_Write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data);
 
 #endif /* __ILI9341_LCD_DRIVER_H */

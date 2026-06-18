@@ -18,7 +18,7 @@
 #define LCD_DC(_level)          gpio_set_level((gpio_num_t)LCD_DC_PIN, _level)
 
 static spi_device_handle_t spiHandle = NULL;
-static volatile atomic_flag spiIsBusy;
+static atomic_bool spiIsBusy = false;
 
 static void GPIO_Init(void) {
     gpio_config_t ioCfg = {};
@@ -54,7 +54,7 @@ static void LED_Init(void) {
 
 static void SPI_PostCb(spi_transaction_t *t) {
     if(t->user == (void *)0xFFFFFFFF)
-        atomic_flag_clear_explicit(&spiIsBusy, memory_order_release);
+        spiIsBusy.store(false);
 }
 
 static void SPI_Init(void) {
@@ -68,7 +68,7 @@ static void SPI_Init(void) {
     spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO);
 
     spi_device_interface_config_t devcfg = {};
-    devcfg.clock_speed_hz = 80000000;
+    devcfg.clock_speed_hz = 60000000;
     devcfg.mode = 0;
     devcfg.spics_io_num = LCD_CS_PIN;
     devcfg.queue_size = SPI_QUEUE_SIZE;
@@ -77,10 +77,10 @@ static void SPI_Init(void) {
     spi_bus_add_device(SPI2_HOST, &devcfg, &spiHandle);
 }
 
-static void SPI_Write(uint8_t b) {
+static void SPI_Write(uint8_t b, bool keepCs) {
     spi_transaction_t t = {};
     t.tx_data[0] = b;
-    t.flags = SPI_TRANS_USE_TXDATA | SPI_TRANS_USE_RXDATA;
+    t.flags = SPI_TRANS_USE_TXDATA | SPI_TRANS_USE_RXDATA | (keepCs ? SPI_TRANS_CS_KEEP_ACTIVE : 0);
     t.length = 8 * 1;
     spi_device_polling_transmit(spiHandle, &t);
 }
@@ -115,60 +115,63 @@ static void SPI_Write(uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4) {
     spi_device_polling_transmit(spiHandle, &t);
 }
 
-static void SPI_Write(uint8_t *data, uint32_t len) {
+static void SPI_Write(uint8_t *data, uint32_t len, bool keepCs) {
     spi_transaction_t t = {};
     t.length = len * 8;
     t.tx_buffer = data;
+    t.flags = keepCs ? SPI_TRANS_CS_KEEP_ACTIVE : 0;
     spi_device_polling_transmit(spiHandle, &t);
 }
 
 static void SPI_WriteCmd(uint8_t cmd) {
     LCD_DC(0);
-    SPI_Write(cmd);
+    SPI_Write(cmd, false);
     LCD_DC(1);
 }
 
 static void SPI_WriteCmd(uint8_t cmd, uint8_t b) {
+    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
-    SPI_Write(cmd);
+    SPI_Write(cmd, true);
     LCD_DC(1);
-    SPI_Write(b);
+    SPI_Write(b, false);
+    spi_device_release_bus(spiHandle);
 }
 
 static void SPI_WriteCmd(uint8_t cmd, uint8_t b1, uint8_t b2) {
+    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
-    SPI_Write(cmd);
+    SPI_Write(cmd, true);
     LCD_DC(1);
     SPI_Write(b1, b2);
+    spi_device_release_bus(spiHandle);
 }
 
 static void SPI_WriteCmd(uint8_t cmd, uint8_t b1, uint8_t b2, uint8_t b3) {
+    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
-    SPI_Write(cmd);
+    SPI_Write(cmd, true);
     LCD_DC(1);
     SPI_Write(b1, b2, b3);
+    spi_device_release_bus(spiHandle);
 }
 
 static void SPI_WriteCmd(uint8_t cmd, uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4) {
+    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
-    SPI_Write(cmd);
+    SPI_Write(cmd, true);
     LCD_DC(1);
     SPI_Write(b1, b2, b3, b4);
-}
-
-static void SPI_WriteCmd(uint8_t cmd, uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4, uint8_t b5) {
-    LCD_DC(0);
-    SPI_Write(cmd);
-    LCD_DC(1);
-    SPI_Write(b1, b2, b3, b4);
-    SPI_Write(b5);
+    spi_device_release_bus(spiHandle);
 }
 
 static void SPI_WriteCmd(uint8_t cmd, uint8_t *data, uint32_t length) {
+    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
-    SPI_Write(cmd);
+    SPI_Write(cmd, true);
     LCD_DC(1);
-    SPI_Write(data, length);
+    SPI_Write(data, length, false);
+    spi_device_release_bus(spiHandle);
 }
 
 static void LCD_Clear(void) {
@@ -181,48 +184,56 @@ static void LCD_Clear(void) {
     SPI_WriteCmd(0x2B, 0, 0, (320 >> 8), (uint8_t)320);
 
     /* Write to RAM */
-    SPI_WriteCmd(0x2C);
-    for(uint32_t i = 0; i < 240 * 320 * 2; i += sizeof(data))
-        SPI_Write((uint8_t *)data, sizeof(data));
-}
-
-static void SPI_Wait(void) {
-    while(atomic_flag_test_and_set_explicit(&spiIsBusy, memory_order_acquire))
-        FlintAPI::Thread::yield();
-}
-
-void LCD_Write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data, bool sycn) {
-    static spi_transaction_t trans[SPI_QUEUE_SIZE] = {};
-
-    SPI_Wait();
-
-    /* Column address set */
-    uint16_t tmp = x + w - 1;
-    SPI_WriteCmd(0x2A, (x >> 8), x, (tmp >> 8), tmp);
-
-    /* Row address set */
-    tmp = y + h - 1;
-    SPI_WriteCmd(0x2B, (y >> 8), y, (tmp >> 8), tmp);
-
-    /* Write to RAM */
-    uint32_t count = 0;
-    uint32_t len = w * h * 2;
-    SPI_WriteCmd(0x2C);
-    while(len > 0) {
-        uint32_t sz = len > SPI_MAX_TRANSFER_SZ ? SPI_MAX_TRANSFER_SZ : len;
-        trans[count].length = sz * 8;
-        trans[count].tx_buffer = data;
-        len -= sz;
-        trans[count].user = len > 0 ? 0 : (void *)0xFFFFFFFF;
-        spi_device_queue_trans(spiHandle, &trans[count], portMAX_DELAY);
-        data += sz;
+    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
+    LCD_DC(0);
+    SPI_Write(0x2C, true);
+    LCD_DC(1);
+    uint32_t n = (240 * 320 * 2) / sizeof(data);
+    for(uint32_t i = 0; i < n;) {
+        i++;
+        SPI_Write((uint8_t *)data, sizeof(data), i < n ? true : false);
     }
+    spi_device_release_bus(spiHandle);
+}
 
-    if(sycn) SPI_Wait();
+bool LCD_Write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data) {
+    static spi_transaction_t trans[SPI_QUEUE_SIZE] = {};
+    bool expected = false;
+
+    if(spiIsBusy.compare_exchange_strong(expected, true)) {
+        /* Column address set */
+        uint16_t tmp = x + w - 1;
+        SPI_WriteCmd(0x2A, (x >> 8), x, (tmp >> 8), tmp);
+
+        /* Row address set */
+        tmp = y + h - 1;
+        SPI_WriteCmd(0x2B, (y >> 8), y, (tmp >> 8), tmp);
+
+        /* Write to RAM */
+        uint32_t count = 0;
+        uint32_t len = w * h * 2;
+        spi_device_acquire_bus(spiHandle, portMAX_DELAY);
+        LCD_DC(0);
+        SPI_Write(0x2C, true);
+        LCD_DC(1);
+        while(len > 0) {
+            uint32_t sz = len > SPI_MAX_TRANSFER_SZ ? SPI_MAX_TRANSFER_SZ : len;
+            trans[count].length = sz * 8;
+            trans[count].tx_buffer = data;
+            len -= sz;
+            trans[count].user = len > 0 ? 0 : (void *)0xFFFFFFFF;
+            trans[count].flags = len > 0 ? SPI_TRANS_CS_KEEP_ACTIVE : 0;
+            spi_device_queue_trans(spiHandle, &trans[count], portMAX_DELAY);
+            count++;
+            data += sz;
+        }
+        spi_device_release_bus(spiHandle);
+        return true;
+    }
+    return false;
 }
 
 void LCD_Init(void) {
-    spiIsBusy.clear();
     GPIO_Init();
     LED_Init();
     SPI_Init();
@@ -233,7 +244,7 @@ void LCD_Init(void) {
     SPI_WriteCmd(0xCF, 0x00, 0xC1, 0x30);
 	SPI_WriteCmd(0xED, 0x64, 0x03, 0X12, 0X81);
 	SPI_WriteCmd(0xE8, 0x85, 0x00, 0x78);
-	SPI_WriteCmd(0xCB, 0x39, 0x2C, 0x00, 0x34, 0x02);
+	SPI_WriteCmd(0xCB, (uint8_t []) {0x39, 0x2C, 0x00, 0x34, 0x02}, 5);
 	SPI_WriteCmd(0xF7, 0x20);
 	SPI_WriteCmd(0xEA, (uint8_t)0x00, 0x00);
     // Power control, VRH[5:0]

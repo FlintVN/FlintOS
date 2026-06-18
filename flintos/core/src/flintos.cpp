@@ -1,15 +1,14 @@
 
 #include "flint.h"
 #include "flintos.h"
-#include "flintos_logo.h"
-#include "flintos_devices.h"
+#include "flintos_screen.h"
 #include "flint_system_api.h"
 #include "flintos_debugger.h"
 
 class FlintNode : public ListNode, public Flint {
 public:
     FlintNode() : ListNode(), Flint() {
-        
+
     }
 };
 
@@ -26,8 +25,8 @@ static void FlintTerminated(Flint *flint) {
 }
 
 void FlintOS::main(void) {
-    FDev::Screen::brightness(100);
-    Logo_Show();
+    FosScreen::setBrightness(100);
+    FosScreen::showLogo();
 
     FosDbg::getInstance()->receiveTask();
 }
