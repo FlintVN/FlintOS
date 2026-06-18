@@ -16,4 +16,9 @@
     #warning "SCREEN_HEIGHT is not defined. Default value will be used"
 #endif /* SCREEN_HEIGHT */
 
+#ifndef SCREEN_FREQ
+    #define SCREEN_FREQ           60
+    #warning "SCREEN_FREQ is not defined. Default value will be used"
+#endif /* SCREEN_HEIGHT */
+
 #endif /* __FLINTOS_DEFAULT_CONF_H */

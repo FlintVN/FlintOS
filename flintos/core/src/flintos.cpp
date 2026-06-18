@@ -4,6 +4,7 @@
 #include "flintos_screen.h"
 #include "flint_system_api.h"
 #include "flintos_debugger.h"
+#include "flintos_default_conf.h"
 
 class FlintNode : public ListNode, public Flint {
 public:
@@ -24,11 +25,29 @@ static void FlintTerminated(Flint *flint) {
     FlintAPI::System::free((FlintNode *)flint);
 }
 
+static void DebuggerTask() {
+    FosDbg::getInstance()->receiveTask();
+}
+
 void FlintOS::main(void) {
     FosScreen::setBrightness(100);
     FosScreen::showLogo();
+    FlintAPI::Thread::create((void (*)(void *))DebuggerTask, NULL, 4096);
 
-    FosDbg::getInstance()->receiveTask();
+    uint32_t notifiValue;
+
+    uint32_t screenPeriodic = (1000 + SCREEN_FREQ / 2) / SCREEN_FREQ;
+    uint32_t screenStart = (uint32_t)FlintAPI::System::getTimeMillis();
+    while(true) {
+        uint32_t tick = (uint32_t)FlintAPI::System::getTimeMillis();
+        if((uint32_t)(tick - screenStart) >= screenPeriodic) {
+            if(FosScreen::update())
+                screenStart = tick;
+        }
+        if(FlintAPI::Thread::wait(2, &notifiValue)) {
+            // TODO
+        }
+    }
 }
 
 Flint *FlintOS::newFlint(void) {
