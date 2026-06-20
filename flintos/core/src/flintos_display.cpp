@@ -30,11 +30,30 @@ typedef struct __attribute__((packed)) {
     uint32_t biClrImportant;
 } BitmapInfoHeader;
 
+static atomic_flag displayLocked = ATOMIC_FLAG_INIT;
+static uint16_t ymin = DISPLAY_HEIGHT - 1;
+static uint16_t ymax = 0;
 alignas(2) static uint8_t displayBuff[DISPLAY_WIDTH * DISPLAY_HEIGHT * 2];
-static atomic_bool requireUpdate = false;
+
+static void Display_Lock(void) {
+    while(atomic_flag_test_and_set_explicit(&displayLocked, memory_order_acquire))
+        FlintAPI::Thread::yield();
+}
+
+static void Display_Unlock(void) {
+    atomic_flag_clear_explicit(&displayLocked, memory_order_release);
+}
 
 static void Display_Clear(void) {
     memset(displayBuff, 0, sizeof(displayBuff));
+}
+
+static void UpdateRequest(uint16_t y, uint16_t h) {
+    uint16_t y2 = y + h - 1;
+    Display_Lock();
+    if(y < ymin) ymin = y;
+    if(y2 > ymax) ymax = y2;
+    Display_Unlock();
 }
 
 static void ConvertToRgb565(uint16_t *data, uint32_t length) {
@@ -79,15 +98,27 @@ void FosDisplay::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *
             data += rowSz;
         }
     }
-    requireUpdate.store(true);
+    UpdateRequest(y, h);
 }
 
 bool FosDisplay::update(void) {
-    bool expected = true;
-    if(requireUpdate.compare_exchange_strong(expected, false))
-        return FDev::Display::write(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, displayBuff);
-    else
-        return true;
+    if(ymin > ymax) return true;
+
+    Display_Lock();
+    uint16_t y1 = ymin;
+    uint16_t y2 = ymax;
+    Display_Unlock();
+
+    bool ret = FDev::Display::write(0, y1, DISPLAY_WIDTH, y2 - y1 + 1, &displayBuff[y1 * DISPLAY_WIDTH]);
+    if(ret && ymin == y1 && ymax == y2) {
+        Display_Lock();
+        if(ymin == y1 && ymax == y2) {  /* Double-check to ensure there are no changes. */
+            ymin = DISPLAY_HEIGHT - 1;
+            ymax = 0;
+        }
+        Display_Unlock();
+    }
+    return ret;
 }
 
 void FosDisplay::showLogo(void) {
@@ -109,5 +140,5 @@ void FosDisplay::showLogo(void) {
     } while(0);
 
     reader.close();
-    requireUpdate.store(true);
+    UpdateRequest(0, DISPLAY_HEIGHT);
 }
