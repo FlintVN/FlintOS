@@ -13,7 +13,7 @@
 
 #define FILE_NAME_BUFF_SIZE         128
 
-#define DEFAULT_STACK_SIZE          KILO_BYTE(5)
+#define DEFAULT_STACK_SIZE          KILO_BYTE(64)
 #define OBJECT_COUNT_TO_GC          10000
 
 #define MAX_OF_BREAK_POINT          20

@@ -60,6 +60,7 @@ set(FLINTOS_SRCS
     "../../../flintjvm/native/draw/src/flint_gfx_common.cpp"
     "../../../flintjvm/native/draw/src/flint_rgb565_sw_gfx.cpp"
     "../../../flintjvm/native/draw/src/flint_rgb565_sw_gfx_helper.cpp"
+    "../../../flintjvm/native/draw/src/flint_native_graphics.cpp"
     "../../../flintjvm/native/draw/src/flint_native_rgb565_graphics.cpp"
 
     "../../../flintos/core/src/flintos.cpp"
