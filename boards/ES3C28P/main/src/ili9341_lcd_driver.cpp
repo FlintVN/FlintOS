@@ -219,6 +219,7 @@ bool LCD_Write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data) {
         while(len > 0) {
             uint32_t sz = len > SPI_MAX_TRANSFER_SZ ? SPI_MAX_TRANSFER_SZ : len;
             trans[count].length = sz * 8;
+            trans[count].rxlength = 0;
             trans[count].tx_buffer = data;
             len -= sz;
             trans[count].user = len > 0 ? 0 : (void *)0xFFFFFFFF;
