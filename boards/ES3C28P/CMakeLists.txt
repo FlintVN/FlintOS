@@ -16,7 +16,7 @@ add_custom_command(
             --partition_size 0xE70000
             --sector_size 512
             --long_name_support
-            ../../../Files
+            ../../../files
 )
 
 add_custom_command(

@@ -44,7 +44,7 @@ bool FDev::WiFi::getAPinfo(FDev::WiFi::ApRecordType *apInfo) {
     esp_err_t ret = esp_wifi_sta_get_ap_info(&apRecord);
     if(ret != ESP_OK) return false;
     memcpy(apInfo->mac, apRecord.bssid, 6);
-    strncpy((char *)apInfo->ssid, (char *)apRecord.ssid, 32);
+    memcpy(apInfo->ssid, apRecord.ssid, 32);
     apInfo->rssi = apRecord.rssi;
     apInfo->authmode = (uint8_t)apRecord.authmode;
     return true;
@@ -88,7 +88,7 @@ bool FDev::WiFi::getScanAPInfo(FDev::WiFi::ApRecordType *apInfo) {
     esp_err_t ret = esp_wifi_scan_get_ap_record(&apRecord);
     if(ret != ESP_OK) return false;
     memcpy(apInfo->mac, apRecord.bssid, 6);
-    strncpy((char *)apInfo->ssid, (char *)apRecord.ssid, 32);
+    memcpy(apInfo->ssid, apRecord.ssid, 32);
     apInfo->rssi = apRecord.rssi;
     apInfo->authmode = (uint8_t)apRecord.authmode;
     return true;
