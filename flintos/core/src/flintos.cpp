@@ -43,7 +43,7 @@ void FlintOS::startup() {
     FileReader reader(NULL, "/sys/startup.ini");
     if(!reader.open()) return;
 
-    while(reader.readLine(path, sizeof(path)) != -1) {
+    while(reader.readLine(path, sizeof(path)) > 0) {
         char *text = Trim(path);
         if(FlintAPI::IO::finfo(text, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
             Flint *flint = FlintOS::newFlint();

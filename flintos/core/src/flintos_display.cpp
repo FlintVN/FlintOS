@@ -144,4 +144,5 @@ void FosDisplay::showLogo(void) {
 
     reader.close();
     UpdateRequest(0, DISPLAY_HEIGHT);
+    update();
 }
