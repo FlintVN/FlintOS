@@ -11,7 +11,7 @@ project(ES3C28P_FlintOS)
 add_custom_command(
     TARGET app
     POST_BUILD
-    COMMAND ${PYTHON_EXECUTABLE} $ENV{IDF_PATH}/components/fatfs/wl_fatfsgen.py
+    COMMAND ${PYTHON} $ENV{IDF_PATH}/components/fatfs/wl_fatfsgen.py
             --output_file storage.bin
             --partition_size 0xE70000
             --sector_size 512

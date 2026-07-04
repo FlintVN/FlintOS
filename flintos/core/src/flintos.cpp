@@ -25,6 +25,39 @@ static void FlintTerminated(Flint *flint) {
     FlintAPI::System::free((FlintNode *)flint);
 }
 
+char *Trim(char *text) {
+    if(text == NULL) return NULL;
+    while(isspace(*text)) text++;
+
+    char *end = text + strlen(text) - 1;
+    while(end > text && isspace(*end)) {
+        *end = 0;
+        end--;
+    }
+    return text;
+}
+
+void FlintOS::startup() {
+    char path[FILE_NAME_BUFF_SIZE];
+
+    FileReader reader(NULL, "/sys/startup.ini");
+    if(!reader.open()) return;
+
+    while(reader.readLine(path, sizeof(path)) > 0) {
+        char *text = Trim(path);
+        if(FlintAPI::IO::finfo(text, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
+            Flint *flint = FlintOS::newFlint();
+            if(flint == NULL) {
+                reader.close();
+                return;
+            }
+            flint->setProgram(text);
+            flint->start();
+        }
+    }
+    reader.close();
+}
+
 static void DebuggerTask() {
     FosDbg::getInstance()->receiveTask();
 }
@@ -32,6 +65,7 @@ static void DebuggerTask() {
 void FlintOS::main(void) {
     FosDisplay::setBrightness(100);
     FosDisplay::showLogo();
+    FlintOS::startup();
     FlintAPI::Thread::create((void (*)(void *))DebuggerTask, NULL, 4096);
 
     uint32_t notifiValue;
