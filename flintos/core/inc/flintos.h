@@ -8,6 +8,7 @@ class FlintOS {
 public:
     static void main(void);
     static Flint *newFlint(void);
+    static void startup(void);
 private:
     FlintOS(const FlintOS &) = delete;
     void operator=(const FlintOS &) = delete;

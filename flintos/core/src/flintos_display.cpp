@@ -1,5 +1,4 @@
 
-#include <cstdlib>
 #include <stddef.h>
 #include <string.h>
 #include <stdatomic.h>
@@ -65,22 +64,25 @@ static void ConvertToRgb565(uint16_t *data, uint32_t length) {
 }
 
 static bool ReadRgb555(FileReader *reader, BitmapInfoHeader *infoHeader) {
-    int32_t w = infoHeader->biWidth;
-    int32_t h = infoHeader->biHeight;
-    uint16_t x = (DISPLAY_WIDTH - w) / 2;
-    uint16_t y = (DISPLAY_HEIGHT - std::abs(h)) / 2;
-    uint32_t rowSize = w * 2;
-    if(h > 0) for(uint32_t i = 0; i < h; i++) {
-        uint16_t *buff = &((uint16_t *)displayBuff)[((h - 1 - i) + y) * DISPLAY_WIDTH + x];
+    int32_t bitmapWidth = infoHeader->biWidth;
+    int32_t bitmapHeight = infoHeader->biHeight;
+
+    if(bitmapWidth <= 0 || bitmapHeight == 0) return false;
+
+    uint32_t width = bitmapWidth;
+    uint32_t height = bitmapHeight > 0 ? bitmapHeight : -bitmapHeight;
+    if(width > DISPLAY_WIDTH || height > DISPLAY_HEIGHT) return false;
+
+    uint16_t x = (DISPLAY_WIDTH - width) / 2;
+    uint16_t y = (DISPLAY_HEIGHT - height) / 2;
+    uint32_t rowSize = width * 2;
+
+    for(uint32_t i = 0; i < height; i++) {
+        uint32_t row = bitmapHeight > 0 ? height - 1 - i : i;
+        uint16_t *buff = &((uint16_t *)displayBuff)[(row + y) * DISPLAY_WIDTH + x];
         if(reader->read(buff, rowSize) != rowSize)
             return false;
-        ConvertToRgb565(buff, w);
-    }
-    else for(uint32_t i = 0; i < h; i++) {
-        uint16_t *buff = &((uint16_t *)displayBuff)[(i + y) * DISPLAY_WIDTH + x];
-        if(reader->read(buff, rowSize) != rowSize)
-            return false;
-        ConvertToRgb565(buff, w);
+        ConvertToRgb565(buff, width);
     }
     return true;
 }
