@@ -43,7 +43,7 @@ void FlintOS::startup() {
     FileReader reader(NULL, "/sys/startup.ini");
     if(!reader.open()) return;
 
-    while(reader.readLine(path, sizeof(path)) > 0) {
+    while(reader.readLine(path, sizeof(path)) != -1) {
         char *text = Trim(path);
         if(FlintAPI::IO::finfo(text, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
             Flint *flint = FlintOS::newFlint();
@@ -66,7 +66,7 @@ void FlintOS::main(void) {
     FosDisplay::setBrightness(100);
     FosDisplay::showLogo();
     FlintOS::startup();
-    FlintAPI::Thread::create((void (*)(void *))DebuggerTask, NULL, 4096);
+    FlintAPI::Thread::create((void (*)(void *))DebuggerTask, NULL, 6144);
 
     uint32_t notifiValue;
 
