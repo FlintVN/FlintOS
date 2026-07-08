@@ -4,7 +4,16 @@
 #include "driver/ledc.h"
 #include "flint_system_api.h"
 #include "driver/spi_master.h"
-#include "ili9341_lcd_driver.h"
+#include "flintos_devices.h"
+
+#define I2C_PORT_NUM            SPI2_HOST
+
+#define LCD_CS_PIN              10
+#define LCD_MOSI_PIN            11
+#define LCD_SCK_PIN             12
+#define LCD_MISO_PIN            13
+#define LCD_LED_PIN             45
+#define LCD_DC_PIN              46
 
 #define LEDC_TIMER              LEDC_TIMER_0
 #define LEDC_MODE               LEDC_LOW_SPEED_MODE
@@ -27,7 +36,7 @@ static void GPIO_Init(void) {
     ioCfg.pin_bit_mask = (1ULL << LCD_DC_PIN);
     ioCfg.pull_down_en = GPIO_PULLDOWN_DISABLE;
     ioCfg.pull_up_en = GPIO_PULLUP_DISABLE;
-    gpio_config(&ioCfg);
+    ESP_ERROR_CHECK(gpio_config(&ioCfg));
 
     LCD_DC(1);
 }
@@ -39,17 +48,16 @@ static void LED_Init(void) {
     ledcTimer.duty_resolution = LEDC_DUTY_RES;
     ledcTimer.freq_hz = LEDC_FREQUENCY;
     ledcTimer.clk_cfg = LEDC_AUTO_CLK;
-    ledc_timer_config(&ledcTimer);
+    ESP_ERROR_CHECK(ledc_timer_config(&ledcTimer));
 
     ledc_channel_config_t ledcChannel = {};
     ledcChannel.speed_mode = LEDC_MODE;
     ledcChannel.channel = LEDC_CHANNEL;
     ledcChannel.timer_sel = LEDC_TIMER;
-    ledcChannel.intr_type = LEDC_INTR_DISABLE;
     ledcChannel.gpio_num = LCD_LED_PIN;
     ledcChannel.duty = 0;
     ledcChannel.hpoint = 0;
-    ledc_channel_config(&ledcChannel);
+    ESP_ERROR_CHECK(ledc_channel_config(&ledcChannel));
 }
 
 static void SPI_PostCb(spi_transaction_t *t) {
@@ -65,7 +73,7 @@ static void SPI_Init(void) {
     buscfg.quadwp_io_num = -1;
     buscfg.quadhd_io_num = -1;
     buscfg.max_transfer_sz = SPI_MAX_TRANSFER_SZ;
-    spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO);
+    ESP_ERROR_CHECK(spi_bus_initialize(I2C_PORT_NUM, &buscfg, SPI_DMA_CH_AUTO));
 
     spi_device_interface_config_t devcfg = {};
     devcfg.clock_speed_hz = 60000000;
@@ -74,7 +82,7 @@ static void SPI_Init(void) {
     devcfg.queue_size = SPI_QUEUE_SIZE;
     devcfg.flags = 0;
     devcfg.post_cb = SPI_PostCb;
-    spi_bus_add_device(SPI2_HOST, &devcfg, &spiHandle);
+    ESP_ERROR_CHECK(spi_bus_add_device(I2C_PORT_NUM, &devcfg, &spiHandle));
 }
 
 static void SPI_Write(uint8_t b, bool keepCs) {
@@ -196,45 +204,44 @@ static void LCD_Clear(void) {
     spi_device_release_bus(spiHandle);
 }
 
-bool LCD_Write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data) {
+void FDev::Display::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data) {
     static spi_transaction_t trans[SPI_QUEUE_SIZE] = {};
     bool expected = false;
 
-    if(spiIsBusy.compare_exchange_strong(expected, true)) {
-        /* Column address set */
-        uint16_t tmp = x + w - 1;
-        SPI_WriteCmd(0x2A, (x >> 8), x, (tmp >> 8), tmp);
+    while(!spiIsBusy.compare_exchange_strong(expected, true))
+        FlintAPI::Thread::yield();
 
-        /* Row address set */
-        tmp = y + h - 1;
-        SPI_WriteCmd(0x2B, (y >> 8), y, (tmp >> 8), tmp);
+    /* Column address set */
+    uint16_t tmp = x + w - 1;
+    SPI_WriteCmd(0x2A, (x >> 8), x, (tmp >> 8), tmp);
 
-        /* Write to RAM */
-        uint32_t count = 0;
-        uint32_t len = w * h * 2;
-        spi_device_acquire_bus(spiHandle, portMAX_DELAY);
-        LCD_DC(0);
-        SPI_Write(0x2C, true);
-        LCD_DC(1);
-        while(len > 0) {
-            uint32_t sz = len > SPI_MAX_TRANSFER_SZ ? SPI_MAX_TRANSFER_SZ : len;
-            trans[count].length = sz * 8;
-            trans[count].rxlength = 0;
-            trans[count].tx_buffer = data;
-            len -= sz;
-            trans[count].user = len > 0 ? 0 : (void *)0xFFFFFFFF;
-            trans[count].flags = len > 0 ? SPI_TRANS_CS_KEEP_ACTIVE : 0;
-            spi_device_queue_trans(spiHandle, &trans[count], portMAX_DELAY);
-            count++;
-            data += sz;
-        }
-        spi_device_release_bus(spiHandle);
-        return true;
+    /* Row address set */
+    tmp = y + h - 1;
+    SPI_WriteCmd(0x2B, (y >> 8), y, (tmp >> 8), tmp);
+
+    /* Write to RAM */
+    uint32_t count = 0;
+    uint32_t len = w * h * 2;
+    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
+    LCD_DC(0);
+    SPI_Write(0x2C, true);
+    LCD_DC(1);
+    while(len > 0) {
+        uint32_t sz = len > SPI_MAX_TRANSFER_SZ ? SPI_MAX_TRANSFER_SZ : len;
+        trans[count].length = sz * 8;
+        trans[count].rxlength = 0;
+        trans[count].tx_buffer = data;
+        len -= sz;
+        trans[count].user = len > 0 ? 0 : (void *)0xFFFFFFFF;
+        trans[count].flags = len > 0 ? SPI_TRANS_CS_KEEP_ACTIVE : 0;
+        spi_device_queue_trans(spiHandle, &trans[count], portMAX_DELAY);
+        count++;
+        data += sz;
     }
-    return false;
+    spi_device_release_bus(spiHandle);
 }
 
-void LCD_Init(void) {
+void FDev::Display::init(void) {
     GPIO_Init();
     LED_Init();
     SPI_Init();
@@ -281,7 +288,7 @@ void LCD_Init(void) {
     LCD_Clear();
 }
 
-void LCD_Brightness(uint8_t value) {
+void FDev::Display::brightness(uint8_t value) {
     ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, value * (1 << LEDC_DUTY_RES) / 100);
     ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
 }

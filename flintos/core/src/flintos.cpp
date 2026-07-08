@@ -1,10 +1,11 @@
 
 #include "flint.h"
 #include "flintos.h"
-#include "flintos_display.h"
+#include "flintos_devices.h"
 #include "flint_system_api.h"
 #include "flintos_debugger.h"
 #include "flintos_default_conf.h"
+#include "flintos_display_service.h"
 
 class FlintNode : public ListNode, public Flint {
 public:
@@ -63,8 +64,10 @@ static void DebuggerTask() {
 }
 
 void FlintOS::main(void) {
-    FosDisplay::setBrightness(100);
-    FosDisplay::showLogo();
+    FDev::Display::init();
+    FDev::Display::brightness(100);
+    DisplaySrv::showLogo();
+    FDev::WiFi::init();
     FlintOS::startup();
     FlintAPI::Thread::create((void (*)(void *))DebuggerTask, NULL, 6144);
 
@@ -75,8 +78,8 @@ void FlintOS::main(void) {
     while(true) {
         uint32_t tick = (uint32_t)FlintAPI::System::getTimeMillis();
         if((uint32_t)(tick - screenStart) >= screenPeriodic) {
-            if(FosDisplay::update())
-                screenStart = tick;
+            DisplaySrv::update();
+            screenStart = tick;
         }
         if(FlintAPI::Thread::wait(2, &notifiValue)) {
             // TODO

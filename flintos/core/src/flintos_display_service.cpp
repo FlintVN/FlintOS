@@ -2,11 +2,11 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdatomic.h>
-#include "flintos_display.h"
 #include "flintos_devices.h"
 #include "flint_system_api.h"
 #include "flint_file_reader.h"
 #include "flintos_default_conf.h"
+#include "flintos_display_service.h"
 
 typedef struct __attribute__((packed)) {
     uint16_t bfType;
@@ -87,11 +87,11 @@ static bool ReadRgb555(FileReader *reader, BitmapInfoHeader *infoHeader) {
     return true;
 }
 
-void FosDisplay::setBrightness(uint8_t value) {
+void DisplaySrv::setBrightness(uint8_t value) {
     FDev::Display::brightness(value);
 }
 
-void FosDisplay::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data) {
+void DisplaySrv::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data) {
     if(w == DISPLAY_WIDTH)
         memcpy(&displayBuff[(y * DISPLAY_WIDTH + x) * 2], data, w * h * 2);
     else {
@@ -104,16 +104,16 @@ void FosDisplay::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *
     UpdateRequest(y, h);
 }
 
-bool FosDisplay::update(void) {
-    if(ymin > ymax) return true;
+void DisplaySrv::update(void) {
+    if(ymin > ymax) return;
 
     Display_Lock();
     uint16_t y1 = ymin;
     uint16_t y2 = ymax;
     Display_Unlock();
 
-    bool ret = FDev::Display::write(0, y1, DISPLAY_WIDTH, y2 - y1 + 1, &displayBuff[y1 * DISPLAY_WIDTH]);
-    if(ret && ymin == y1 && ymax == y2) {
+    FDev::Display::write(0, y1, DISPLAY_WIDTH, y2 - y1 + 1, &displayBuff[y1 * DISPLAY_WIDTH]);
+    if(ymin == y1 && ymax == y2) {
         Display_Lock();
         if(ymin == y1 && ymax == y2) {  /* Double-check to ensure there are no changes. */
             ymin = DISPLAY_HEIGHT - 1;
@@ -121,10 +121,9 @@ bool FosDisplay::update(void) {
         }
         Display_Unlock();
     }
-    return ret;
 }
 
-void FosDisplay::showLogo(void) {
+void DisplaySrv::showLogo(void) {
     Display_Clear();
 
     FileReader reader(NULL, "/sys/icons/flint_64x64.bmp");

@@ -6,10 +6,8 @@
 #include "tusb_console.h"
 #include "nvs_flash.h"
 #include "nvs.h"
-#include "esp_wifi.h"
 #include "esp_vfs_fat.h"
 #include "esp_usb_device.h"
-#include "ili9341_lcd_driver.h"
 #include "esp_board.h"
 
 static void GPIO_Init(void) {
@@ -23,16 +21,6 @@ static void NVS_Init(void) {
         err = nvs_flash_init();
     }
     ESP_ERROR_CHECK(err);
-}
-
-static void WiFi_Init(void) {
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    esp_netif_create_default_wifi_sta();
-    esp_netif_create_default_wifi_ap();
-    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
 }
 
 static void FS_Init() {
@@ -54,7 +42,5 @@ void Board_Init(void) {
     USB_DeviceInit();
     esp_tusb_init_console(TINYUSB_CDC_ACM_0);
     FS_Init();
-    LCD_Init();
-    WiFi_Init();
     vTaskPrioritySet(NULL, 2);
 }

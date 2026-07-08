@@ -4,7 +4,8 @@
 
 #include <stdint.h>
 namespace FDev::Display {
-    bool write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data);
+    void init(void);
+    void write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data);
     void brightness(uint8_t value);
 }
 
@@ -16,6 +17,7 @@ namespace FDev::WiFi {
         uint8_t authmode;
     } ApRecordType;
 
+    void init(void);
     bool isSupported(void);
     bool connect(const char *ssid, uint8_t ssidLen, const char *password, uint8_t passLen, uint8_t authMode);
     void disconnect(void);

@@ -1,6 +1,16 @@
 include(${CMAKE_CURRENT_SOURCE_DIR}/../main/FlintOS.cmake)
 
-set(priv_requires fatfs console esp_adc esp_driver_dac esp_timer nvs_flash esp_driver_ledc esp_wifi)
+set(priv_requires
+    fatfs
+    console
+    esp_adc
+    driver
+    esp_driver_ledc
+    esp_driver_i2s
+    esp_timer
+    nvs_flash
+    esp_wifi
+)
 
 if(CONFIG_EXAMPLE_STORAGE_MEDIA_SPIFLASH)
     list(APPEND priv_requires wear_levelling esp_partition)
@@ -10,11 +20,10 @@ idf_component_register(
     SRCS "src/main.cpp"
     SRCS "src/esp_usb_device.cpp"
     SRCS "src/esp_board_esp32_s3.cpp"
-    SRCS "src/ili9341_lcd_driver.cpp"
     SRCS "src/esp_usb_cdc_debugger.cpp"
     SRCS "src/esp_system_api.cpp"
-    SRCS "src/esp_device_wifi.cpp"
-    SRCS "src/esp_device_display.cpp"
+    SRCS "src/esp_wifi_driver.cpp"
+    SRCS "src/ili9341_lcd_driver.cpp"
 
     SRCS ${FLINTOS_SRCS}
 
