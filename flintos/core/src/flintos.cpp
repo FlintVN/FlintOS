@@ -5,6 +5,7 @@
 #include "flint_system_api.h"
 #include "flintos_debugger.h"
 #include "flintos_default_conf.h"
+#include "flintos_audio_service.h"
 #include "flintos_display_service.h"
 
 class FlintNode : public ListNode, public Flint {
@@ -67,8 +68,11 @@ void FlintOS::main(void) {
     FDev::Display::init();
     FDev::Display::brightness(100);
     DisplaySrv::showLogo();
+    FDev::Audio::init();
+    AudioSrv::setVolumn(100);
     FDev::WiFi::init();
     FlintOS::startup();
+    FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 1024);
     FlintAPI::Thread::create((void (*)(void *))DebuggerTask, NULL, 6144);
 
     uint32_t notifiValue;

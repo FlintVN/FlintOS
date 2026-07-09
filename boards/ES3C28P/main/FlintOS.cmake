@@ -66,10 +66,12 @@ set(FLINTOS_SRCS
     "../../../flintos/core/src/flintos.cpp"
     "../../../flintos/core/src/flint_system_api.cpp"
     "../../../flintos/core/src/flintos_debugger.cpp"
+    "../../../flintos/core/src/flintos_audio_service.cpp"
     "../../../flintos/core/src/flintos_display_service.cpp"
 
     "../../../flintos/native/src/flintos_native.cpp"
     "../../../flintos/native/src/flintos_native_wifi.cpp"
+    "../../../flintos/native/src/flintos_native_audio.cpp"
     "../../../flintos/native/src/flintos_native_display.cpp"
 )
 

@@ -9,6 +9,12 @@ namespace FDev::Display {
     void brightness(uint8_t value);
 }
 
+namespace  FDev::Audio {
+    void init(void);
+    uint32_t write(uint8_t *data, uint32_t length);
+    void setVolumn(uint8_t value);
+}
+
 namespace FDev::WiFi {
     typedef struct {
         uint8_t mac[6];

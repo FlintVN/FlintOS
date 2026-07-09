@@ -5,8 +5,10 @@ set(priv_requires
     console
     esp_adc
     driver
+    esp_driver_gpio
     esp_driver_ledc
     esp_driver_i2s
+    esp_driver_i2c
     esp_timer
     nvs_flash
     esp_wifi
@@ -24,6 +26,7 @@ idf_component_register(
     SRCS "src/esp_system_api.cpp"
     SRCS "src/esp_wifi_driver.cpp"
     SRCS "src/ili9341_lcd_driver.cpp"
+    SRCS "src/es8311_audio_driver.cpp"
 
     SRCS ${FLINTOS_SRCS}
 
