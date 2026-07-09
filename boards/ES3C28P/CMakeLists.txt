@@ -8,16 +8,7 @@ cmake_minimum_required(VERSION 3.16)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(ES3C28P_FlintOS)
 
-add_custom_command(
-    TARGET app
-    POST_BUILD
-    COMMAND ${PYTHON} $ENV{IDF_PATH}/components/fatfs/wl_fatfsgen.py
-            --output_file storage.bin
-            --partition_size 0xE70000
-            --sector_size 512
-            --long_name_support
-            ../../../files
-)
+fatfs_create_spiflash_image(storage ../../files FLASH_IN_PROJECT)
 
 add_custom_command(
     TARGET app
