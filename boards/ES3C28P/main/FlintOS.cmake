@@ -27,7 +27,6 @@ set(FLINTOS_SRCS
 
     "../../../flintjvm/impl/src/fatfs_system_io_api.cpp"
     "../../../flintjvm/impl/src/lwip_system_net_api.cpp"
-    "../../../flintjvm/impl/src/freertos_system_thread_api.cpp"
 
     "../../../flintjvm/native/common/src/flint_native.cpp"
     "../../../flintjvm/native/common/src/flint_native_common.cpp"
