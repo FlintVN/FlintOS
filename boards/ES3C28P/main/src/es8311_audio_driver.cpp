@@ -6,7 +6,6 @@
 #include "flint_system_api.h"
 #include "flintos_devices.h"
 #include "flintos_default_conf.h"
-
 #include "esp_codec_dev_defaults.h"
 #include "esp_codec_dev.h"
 #include "esp_codec_dev_vol.h"

@@ -9,6 +9,20 @@
 #include "esp_vfs_fat.h"
 #include "esp_usb_device.h"
 #include "esp_board.h"
+#include "wear_levelling.h"
+#include "driver/sdmmc_host.h"
+#include "sdmmc_cmd.h"
+
+#define FLASH_PARTITION_LABEL  "storage"
+
+#define SD_MOUNT_POINT         "/mnt/sd0"
+
+#define SD_PIN_CLK             GPIO_NUM_38
+#define SD_PIN_CMD             GPIO_NUM_40
+#define SD_PIN_D0              GPIO_NUM_39
+#define SD_PIN_D1              GPIO_NUM_41
+#define SD_PIN_D2              GPIO_NUM_48
+#define SD_PIN_D3              GPIO_NUM_47
 
 static void GPIO_Init(void) {
 
@@ -24,15 +38,39 @@ static void NVS_Init(void) {
 }
 
 static void FS_Init() {
-    static const esp_vfs_fat_mount_config_t mount_config = {
+    static const esp_vfs_fat_mount_config_t flash_mount_config = {
         .format_if_mount_failed = true,
-        .max_files = 16,
+        .max_files = 0,
         .allocation_unit_size = CONFIG_WL_SECTOR_SIZE,
         .disk_status_check_enable = false,
         .use_one_fat = false
     };
-    static wl_handle_t s_wl_handle = WL_INVALID_HANDLE;
-    ESP_ERROR_CHECK(esp_vfs_fat_spiflash_mount_rw_wl("", "storage", &mount_config, &s_wl_handle));
+
+    wl_handle_t s_wl_handle = WL_INVALID_HANDLE;
+    ESP_ERROR_CHECK(esp_vfs_fat_spiflash_mount_rw_wl("", FLASH_PARTITION_LABEL, &flash_mount_config, &s_wl_handle));
+}
+
+static void SD_Init() {
+    static const esp_vfs_fat_mount_config_t sd_mount_config = {
+        .format_if_mount_failed = false,
+        .max_files = 0,
+        .allocation_unit_size = 16 * 1024,
+        .disk_status_check_enable = false,
+        .use_one_fat = false
+    };
+
+    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+    sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
+    slot_config.clk = SD_PIN_CLK;
+    slot_config.cmd = SD_PIN_CMD;
+    slot_config.d0 = SD_PIN_D0;
+    slot_config.d1 = SD_PIN_D1;
+    slot_config.d2 = SD_PIN_D2;
+    slot_config.d3 = SD_PIN_D3;
+    slot_config.width = 4;
+
+    sdmmc_card_t *s_sd_card = nullptr;
+    esp_vfs_fat_sdmmc_mount(SD_MOUNT_POINT, &host, &slot_config, &sd_mount_config, &s_sd_card);
 }
 
 void Board_Init(void) {
@@ -42,5 +80,6 @@ void Board_Init(void) {
     USB_DeviceInit();
     esp_tusb_init_console(TINYUSB_CDC_ACM_0);
     FS_Init();
+    SD_Init();
     vTaskPrioritySet(NULL, 2);
 }
