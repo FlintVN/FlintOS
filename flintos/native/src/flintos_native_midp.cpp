@@ -1,5 +1,8 @@
+
 #include <stddef.h>
 #include "flint_array_object.h"
+#include "flint.h"
+#include "flint_execution.h"
 #include "flint_system_api.h"
 #include "flintos_default_conf.h"
 #include "flintos_display_service.h"
@@ -66,4 +69,11 @@ jint NativeMidpTouch_Poll(FNIEnv *env) {
 jvoid NativeMidpTouch_Boost(FNIEnv *env) {
     (void)env;
     FlintAPI::Thread::yield();
+}
+
+jstring NativeMidpResourceLoader_GetProgramPath(FNIEnv *env) {
+    const char *programPath = ((FExec *)env)->getFlint()->getProgram();
+    if(programPath == NULL)
+        return NULL;
+    return env->newString("%s", programPath);
 }

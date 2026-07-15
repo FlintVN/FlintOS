@@ -6,3 +6,5 @@ java/bin
 *.lock
 sdkconfig
 sdkconfig.old
+
+files/res/*

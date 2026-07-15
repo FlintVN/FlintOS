@@ -16,6 +16,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("board/Lcd",              midpLcdMethods),
     NATIVE_CLASS("board/Touch",            midpTouchMethods),
     NATIVE_CLASS("board/Png",              midpPngMethods),
+    NATIVE_CLASS("flint/midp/ResourceLoader", midpResourceLoaderMethods),
 };
 
 void FlintAPI::System::reset(void) {

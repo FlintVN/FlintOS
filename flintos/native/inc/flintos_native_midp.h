@@ -1,3 +1,4 @@
+
 #ifndef __FLINTOS_NATIVE_MIDP_H
 #define __FLINTOS_NATIVE_MIDP_H
 
@@ -12,6 +13,8 @@ jint NativeMidpLcd_ReadKey(FNIEnv *env);
 jvoid NativeMidpTouch_Init(FNIEnv *env);
 jint NativeMidpTouch_Poll(FNIEnv *env);
 jvoid NativeMidpTouch_Boost(FNIEnv *env);
+
+jstring NativeMidpResourceLoader_GetProgramPath(FNIEnv *env);
 
 jbyteArray NativeMidpPng_Decode(
     FNIEnv *env,
@@ -37,6 +40,14 @@ inline constexpr NativeMethod midpTouchMethods[] = {
 
 inline constexpr NativeMethod midpPngMethods[] = {
     NATIVE_METHOD("decode", "([BII[I)[B", NativeMidpPng_Decode),
+};
+
+inline constexpr NativeMethod midpResourceLoaderMethods[] = {
+    NATIVE_METHOD(
+        "getProgramPath",
+        "()Ljava/lang/String;",
+        NativeMidpResourceLoader_GetProgramPath
+    ),
 };
 
 #endif /* __FLINTOS_NATIVE_MIDP_H */
