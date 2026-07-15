@@ -73,6 +73,8 @@ set(FLINTOS_SRCS
     "../../../flintos/native/src/flintos_native_wifi.cpp"
     "../../../flintos/native/src/flintos_native_audio.cpp"
     "../../../flintos/native/src/flintos_native_display.cpp"
+    "../../../flintos/native/src/flintos_native_midp.cpp"
+    "../../../flintos/native/src/flintos_native_midp_png.cpp"
 )
 
 set(FLINTJVM_INCS

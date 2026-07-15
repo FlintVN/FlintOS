@@ -7,11 +7,15 @@
 #include "flintos_native_wifi.h"
 #include "flintos_native_audio.h"
 #include "flintos_native_display.h"
+#include "flintos_native_midp.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/net/WiFi",         wifiMethods),
     NATIVE_CLASS("flintos/device/Audio",   audioMethods),
     NATIVE_CLASS("flintos/device/Display", displayMethods),
+    NATIVE_CLASS("board/Lcd",              midpLcdMethods),
+    NATIVE_CLASS("board/Touch",            midpTouchMethods),
+    NATIVE_CLASS("board/Png",              midpPngMethods),
 };
 
 void FlintAPI::System::reset(void) {
