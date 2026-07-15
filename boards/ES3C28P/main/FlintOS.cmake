@@ -25,7 +25,6 @@ set(FLINTOS_SRCS
     "../../../flintjvm/vm/src/flint_java_string_dict_node.cpp"
     "../../../flintjvm/vm/src/flint_native_interface.cpp"
 
-    "../../../flintjvm/impl/src/fatfs_system_io_api.cpp"
     "../../../flintjvm/impl/src/lwip_system_net_api.cpp"
 
     "../../../flintjvm/native/common/src/flint_native.cpp"

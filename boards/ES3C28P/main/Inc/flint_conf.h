@@ -11,7 +11,7 @@
 
 #define FLINT_VARIANT_NAME          "FlintOS on ES3C28P"
 
-#define FILE_NAME_BUFF_SIZE         128
+#define FILE_NAME_BUFF_SIZE         256
 
 #define DEFAULT_STACK_SIZE          KILO_BYTE(64)
 #define OBJECT_COUNT_TO_GC          10000

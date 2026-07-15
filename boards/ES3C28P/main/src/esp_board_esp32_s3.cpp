@@ -54,7 +54,7 @@ static void SD_Init() {
     static const esp_vfs_fat_mount_config_t sd_mount_config = {
         .format_if_mount_failed = false,
         .max_files = 0,
-        .allocation_unit_size = 16 * 1024,
+        .allocation_unit_size = CONFIG_WL_SECTOR_SIZE,
         .disk_status_check_enable = false,
         .use_one_fat = false
     };
