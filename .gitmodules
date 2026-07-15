@@ -1,3 +1,7 @@
 [submodule "flintjvm"]
 	path = flintjvm
 	url = https://github.com/FlintVN/FlintJVM.git
+[submodule "midp"]
+	path = midp
+	url = https://github.com/FlintVN/FlintMIDP.git
+	branch = master
