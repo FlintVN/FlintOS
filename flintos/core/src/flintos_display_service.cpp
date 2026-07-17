@@ -112,7 +112,7 @@ void DisplaySrv::update(void) {
     uint16_t y2 = ymax;
     Display_Unlock();
 
-    FDev::Display::write(0, y1, DISPLAY_WIDTH, y2 - y1 + 1, &displayBuff[y1 * DISPLAY_WIDTH]);
+    FDev::Display::write(0, y1, DISPLAY_WIDTH, y2 - y1 + 1, &displayBuff[y1 * DISPLAY_WIDTH * 2]);
     if(ymin == y1 && ymax == y2) {
         Display_Lock();
         if(ymin == y1 && ymax == y2) {  /* Double-check to ensure there are no changes. */

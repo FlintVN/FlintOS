@@ -8,7 +8,12 @@ using namespace FlintAPI::Thread;
 
 ThreadHandle FlintAPI::Thread::create(void (*task)(void *), void *param, uint32_t stackSize) {
     TaskHandle_t xHandle = NULL;
-    uint32_t nativeStack = (stackSize > 6144) ? stackSize : 6144;
+    /* The Java operand stack defaults to 64 KiB, but the C++ interpreter and
+     * native MIDP calls also need their own FreeRTOS stack. Real J2ME games
+     * exceed 64 KiB on deep paint/resource-loading call chains. Match the
+     * proven ESP32-J2ME configuration: 96 KiB native stack in PSRAM, leaving
+     * internal RAM available for multiple Java task TCBs and drivers. */
+    uint32_t nativeStack = (stackSize > 98304) ? stackSize : 98304;
     if(xTaskCreateWithCaps(task, "FlintJavaThread", nativeStack, param, tskIDLE_PRIORITY + 1, &xHandle, MALLOC_CAP_SPIRAM) != pdPASS)
         return NULL;
     return (void *)xHandle;
