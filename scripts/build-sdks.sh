@@ -43,5 +43,7 @@ jar cf0m "$LIBRARY_ROOT/flintos.device.jar" "$ROOT/java/META-INF/MANIFEST.MF" \
 echo 'Delegating FlintMIDP build to its submodule...'
 bash "$MIDP_ROOT/scripts/build.sh" --library-root "$LIBRARY_ROOT"
 cp -f -- "$MIDP_ROOT/bin/run/midp.jar" "$LIBRARY_ROOT/midp.jar"
+cp -f -- "$MIDP_ROOT/bin/run/flintos.midp.jar" "$LIBRARY_ROOT/flintos.midp.jar"
+cp -f -- "$MIDP_ROOT/bin/run/m3g.jar" "$LIBRARY_ROOT/m3g.jar"
 
 echo "SDK libraries are ready in: $LIBRARY_ROOT"

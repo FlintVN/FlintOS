@@ -44,6 +44,10 @@ call "%MIDP_ROOT%\scripts\build.bat" --library-root "%LIBRARY_ROOT%"
 if errorlevel 1 exit /b 1
 copy /Y "%MIDP_ROOT%\bin\run\midp.jar" "%LIBRARY_ROOT%\midp.jar" >nul
 if errorlevel 1 exit /b 1
+copy /Y "%MIDP_ROOT%\bin\run\flintos.midp.jar" "%LIBRARY_ROOT%\flintos.midp.jar" >nul
+if errorlevel 1 exit /b 1
+copy /Y "%MIDP_ROOT%\bin\run\m3g.jar" "%LIBRARY_ROOT%\m3g.jar" >nul
+if errorlevel 1 exit /b 1
 
 echo SDK libraries are ready in: %LIBRARY_ROOT%
 endlocal

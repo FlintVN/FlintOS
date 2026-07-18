@@ -61,6 +61,8 @@ if($LASTEXITCODE -ne 0) { throw 'Failed to package flintos.device.jar.' }
 Write-Host 'Delegating FlintMIDP build to its submodule...'
 & $midpBuild -LibraryRoot $libraryRoot
 if($LASTEXITCODE -ne 0) { throw 'FlintMIDP submodule build failed.' }
-Copy-Item -LiteralPath (Join-Path $midpRoot 'bin/run/midp.jar') -Destination $libraryRoot -Force
+foreach($artifact in @('midp.jar', 'flintos.midp.jar', 'm3g.jar')) {
+    Copy-Item -LiteralPath (Join-Path $midpRoot "bin/run/$artifact") -Destination $libraryRoot -Force
+}
 
 Write-Host "SDK libraries are ready in: $libraryRoot"

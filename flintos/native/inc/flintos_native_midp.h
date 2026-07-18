@@ -50,4 +50,12 @@ inline constexpr NativeMethod midpResourceLoaderMethods[] = {
     ),
 };
 
+inline constexpr NativeMethod systemResourceMethods[] = {
+    NATIVE_METHOD(
+        "getResourceBytes0",
+        "(Ljava/lang/String;)[B",
+        NativeMidpResourceLoader_ReadProgramResource
+    ),
+};
+
 #endif /* __FLINTOS_NATIVE_MIDP_H */
