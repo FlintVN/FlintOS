@@ -1,7 +1,11 @@
 [submodule "flintjvm"]
 	path = flintjvm
-	url = https://github.com/FlintVN/FlintJVM.git
-[submodule "midp"]
-	path = midp
+	url = https://github.com/DevMeoU/FlintJVM.git
+[submodule "flintmidp"]
+	path = flintmidp
 	url = https://github.com/FlintVN/FlintMIDP.git
-	branch = master
+	branch = update_features
+[submodule "flintjdk"]
+	path = flintjdk
+	url = https://github.com/DevMeoU/FlintJDK.git
+	branch = port/esp32-j2me-to-flintos

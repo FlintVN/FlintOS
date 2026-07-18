@@ -1,12 +1,25 @@
 
 #include <stddef.h>
+#include <stdlib.h>
 #include "flint_array_object.h"
 #include "flint.h"
 #include "flint_execution.h"
+#include "flint_java_string.h"
+#include "flint_zip_file_reader.h"
 #include "flint_system_api.h"
 #include "flintos_default_conf.h"
 #include "flintos_display_service.h"
 #include "flintos_native_midp.h"
+
+extern "C" size_t tinfl_decompress_mem_to_mem(
+    void *output,
+    size_t outputLength,
+    const void *source,
+    size_t sourceLength,
+    int flags
+);
+
+static constexpr int TINFL_NON_WRAPPING_OUTPUT = 4;
 
 static void ThrowNullPointer(FNIEnv *env, const char *message) {
     env->throwNew(env->findClass("java/lang/NullPointerException"), message);
@@ -71,9 +84,50 @@ jvoid NativeMidpTouch_Boost(FNIEnv *env) {
     FlintAPI::Thread::yield();
 }
 
-jstring NativeMidpResourceLoader_GetProgramPath(FNIEnv *env) {
+jbyteArray NativeMidpResourceLoader_ReadProgramResource(FNIEnv *env, jstring name) {
+    if(name == NULL) {
+        ThrowNullPointer(env, "name");
+        return NULL;
+    }
+
     const char *programPath = ((FExec *)env)->getFlint()->getProgram();
     if(programPath == NULL)
         return NULL;
-    return env->newString("%s", programPath);
+
+    ZipFileReader zip((FExec *)env, programPath);
+    if(!zip.open())
+        return NULL;
+    if(!zip.gotoFile(name->getAscii(), name->getLength())) {
+        zip.close();
+        return NULL;
+    }
+
+    uint16_t method = zip.getCompressionMethod();
+    uint32_t packedSize = zip.getCompressedSize();
+    uint32_t unpackedSize = zip.getUncompressedSize();
+    jbyteArray output = env->newByteArray(unpackedSize);
+    if(output == NULL) {
+        zip.close();
+        return NULL;
+    }
+
+    bool success = false;
+    if(method == 0 && packedSize == unpackedSize) {
+        success = zip.read(output->getData(), unpackedSize) == (int32_t)unpackedSize;
+    }
+    else if(method == 8) {
+        uint8_t *packed = (uint8_t *)malloc(packedSize);
+        if(packed != NULL) {
+            if(zip.read(packed, packedSize) == (int32_t)packedSize) {
+                size_t decoded = tinfl_decompress_mem_to_mem(
+                    output->getData(), unpackedSize, packed, packedSize,
+                    TINFL_NON_WRAPPING_OUTPUT
+                );
+                success = decoded == unpackedSize;
+            }
+            free(packed);
+        }
+    }
+    zip.close();
+    return success ? output : NULL;
 }

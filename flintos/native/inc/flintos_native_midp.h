@@ -14,7 +14,7 @@ jvoid NativeMidpTouch_Init(FNIEnv *env);
 jint NativeMidpTouch_Poll(FNIEnv *env);
 jvoid NativeMidpTouch_Boost(FNIEnv *env);
 
-jstring NativeMidpResourceLoader_GetProgramPath(FNIEnv *env);
+jbyteArray NativeMidpResourceLoader_ReadProgramResource(FNIEnv *env, jstring name);
 
 jbyteArray NativeMidpPng_Decode(
     FNIEnv *env,
@@ -44,9 +44,9 @@ inline constexpr NativeMethod midpPngMethods[] = {
 
 inline constexpr NativeMethod midpResourceLoaderMethods[] = {
     NATIVE_METHOD(
-        "getProgramPath",
-        "()Ljava/lang/String;",
-        NativeMidpResourceLoader_GetProgramPath
+        "readProgramResource",
+        "(Ljava/lang/String;)[B",
+        NativeMidpResourceLoader_ReadProgramResource
     ),
 };
 
