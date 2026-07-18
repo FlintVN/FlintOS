@@ -9,3 +9,7 @@
 	path = flintjdk
 	url = https://github.com/DevMeoU/FlintJDK.git
 	branch = port/esp32-j2me-to-flintos
+[submodule "flintui"]
+	path = flintui
+	url = https://github.com/FlintVN/FlintJDK.git
+	branch = flint.ui

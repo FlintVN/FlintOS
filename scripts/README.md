@@ -1,8 +1,9 @@
 # SDK build scripts
 
 These scripts orchestrate the SDK build. FlintJDK and FlintMIDP are built by
-their own scripts inside each submodule; FlintOS only builds its local
-`flintos.device` API and copies runtime JARs into `files/lib`.
+their own scripts inside each submodule. FlintUI is built from the dedicated
+`flintui` submodule tracking the `flint.ui` branch. FlintOS builds its local
+`flintos.device` API and copies all runtime JARs into `files/lib`.
 
 Requirements:
 
