@@ -1,7 +1,8 @@
 Manifest-Version: 1.0
-Specification-Title: FlintOS Device API
+Specification-Title: Flint UI API
 Specification-Version: 1.0
 Specification-Vendor: FlintVN
-Implementation-Title: FlintOS flintos.device
+Implementation-Title: FlintUI flint.ui
 Implementation-Version: 1.0
 Implementation-Vendor: FlintVN
+

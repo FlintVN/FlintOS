@@ -42,7 +42,7 @@ New-Item -ItemType Directory -Force -Path $uiOutput | Out-Null
 & javac -Xlint:all '-XDstringConcat=inline' --release 17 -encoding UTF-8 -d $uiOutput `
     --module-path $libraryRoot --module-source-path (Join-Path $uiRoot 'src') --module flint.ui
 if($LASTEXITCODE -ne 0) { throw 'FlintUI compilation failed.' }
-& jar cf0m (Join-Path $libraryRoot 'flint.ui.jar') (Join-Path $jdkRoot 'META-INF/MANIFEST.MF') `
+& jar cf0m (Join-Path $libraryRoot 'flint.ui.jar') (Join-Path $root 'java/META-INF/flint.ui.MF') `
     -C (Join-Path $uiOutput 'flint.ui') .
 if($LASTEXITCODE -ne 0) { throw 'Failed to package flint.ui.jar.' }
 
@@ -64,5 +64,8 @@ if($LASTEXITCODE -ne 0) { throw 'FlintMIDP submodule build failed.' }
 foreach($artifact in @('midp.jar', 'flintos.midp.jar', 'm3g.jar')) {
     Copy-Item -LiteralPath (Join-Path $midpRoot "bin/run/$artifact") -Destination $libraryRoot -Force
 }
+
+& java (Join-Path $PSScriptRoot 'ValidateJarManifests.java') $libraryRoot
+if($LASTEXITCODE -ne 0) { throw 'SDK JAR manifest validation failed.' }
 
 Write-Host "SDK libraries are ready in: $libraryRoot"

@@ -29,7 +29,7 @@ rm -rf -- "$UI_OUTPUT"
 mkdir -p -- "$UI_OUTPUT"
 javac -Xlint:all -XDstringConcat=inline --release 17 -encoding UTF-8 -d "$UI_OUTPUT" \
   --module-path "$LIBRARY_ROOT" --module-source-path "$UI_ROOT/src" --module flint.ui
-jar cf0m "$LIBRARY_ROOT/flint.ui.jar" "$JDK_ROOT/META-INF/MANIFEST.MF" \
+jar cf0m "$LIBRARY_ROOT/flint.ui.jar" "$ROOT/java/META-INF/flint.ui.MF" \
   -C "$UI_OUTPUT/flint.ui" .
 
 echo 'Building FlintOS device API...'
@@ -45,5 +45,7 @@ bash "$MIDP_ROOT/scripts/build.sh" --library-root "$LIBRARY_ROOT"
 cp -f -- "$MIDP_ROOT/bin/run/midp.jar" "$LIBRARY_ROOT/midp.jar"
 cp -f -- "$MIDP_ROOT/bin/run/flintos.midp.jar" "$LIBRARY_ROOT/flintos.midp.jar"
 cp -f -- "$MIDP_ROOT/bin/run/m3g.jar" "$LIBRARY_ROOT/m3g.jar"
+
+java "$SCRIPT_DIR/ValidateJarManifests.java" "$LIBRARY_ROOT"
 
 echo "SDK libraries are ready in: $LIBRARY_ROOT"
