@@ -141,8 +141,11 @@ jbyteArray NativeMidpPng_Decode(
         position += chunkLength + 12;
     }
 
+    bool packedSamples = (colorType == 0 || colorType == 3)
+        && (bitDepth == 1 || bitDepth == 2 || bitDepth == 4);
     if(width <= 0 || height <= 0 || width > 2048 || height > 2048
-            || bitDepth != 8 || interlace != 0 || compressedLength == 0) {
+            || (bitDepth != 8 && !packedSamples)
+            || interlace != 0 || compressedLength == 0) {
         free(compressed);
         return NULL;
     }
@@ -159,7 +162,11 @@ jbyteArray NativeMidpPng_Decode(
             return NULL;
     }
 
-    size_t rowLength = (size_t)width * channels;
+    size_t bitsPerPixel = (size_t)channels * bitDepth;
+    size_t rowLength = ((size_t)width * bitsPerPixel + 7) / 8;
+    size_t filterBytesPerPixel = (bitsPerPixel + 7) / 8;
+    if(filterBytesPerPixel == 0)
+        filterBytesPerPixel = 1;
     if(rowLength > SIZE_MAX / height || rowLength + 1 > SIZE_MAX / height) {
         free(compressed);
         return NULL;
@@ -199,10 +206,10 @@ jbyteArray NativeMidpPng_Decode(
             return NULL;
         }
         for(size_t x = 0; x < rowLength; x++) {
-            int left = x >= (size_t)channels ? current[x - channels] : 0;
+            int left = x >= filterBytesPerPixel ? current[x - filterBytesPerPixel] : 0;
             int above = previous == NULL ? 0 : previous[x];
-            int upperLeft = previous != NULL && x >= (size_t)channels
-                ? previous[x - channels] : 0;
+            int upperLeft = previous != NULL && x >= filterBytesPerPixel
+                ? previous[x - filterBytesPerPixel] : 0;
             int value = source[x];
             if(filter == 1)
                 value += left;
@@ -238,19 +245,31 @@ jbyteArray NativeMidpPng_Decode(
         memset(alpha, 0, alphaLength);
 
     for(size_t index = 0; index < pixelCount; index++) {
-        const uint8_t *source = pixels + index * channels;
+        size_t pixelX = index % (size_t)width;
+        size_t pixelY = index / (size_t)width;
+        const uint8_t *row = pixels + pixelY * rowLength;
+        const uint8_t *source = row + pixelX * channels;
+        int packedSample = 0;
+        if(bitDepth < 8) {
+            size_t bitOffset = pixelX * bitDepth;
+            int shift = 8 - bitDepth - (int)(bitOffset & 7);
+            packedSample = (row[bitOffset >> 3] >> shift) & ((1 << bitDepth) - 1);
+        }
         int red;
         int green;
         int blue;
         int opacity = 255;
         if(colorType == 0) {
-            red = green = blue = source[0];
+            int gray = bitDepth == 8
+                ? source[0]
+                : packedSample * 255 / ((1 << bitDepth) - 1);
+            red = green = blue = gray;
         }
         else if(colorType == 2) {
             red = source[0]; green = source[1]; blue = source[2];
         }
         else if(colorType == 3) {
-            int paletteIndex = source[0];
+            int paletteIndex = bitDepth == 8 ? source[0] : packedSample;
             if(paletteIndex >= paletteEntries) {
                 red = green = blue = 0;
             }
