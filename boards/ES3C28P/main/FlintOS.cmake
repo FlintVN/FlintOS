@@ -47,6 +47,7 @@ set(FLINTOS_SRCS
     "../../../flintjvm/native/base/src/flint_native_file_descriptor.cpp"
     "../../../flintjvm/native/base/src/flint_native_file_input_stream.cpp"
     "../../../flintjvm/native/base/src/flint_native_file_output_stream.cpp"
+    "../../../flintjvm/native/base/src/flint_native_random_access_file.cpp"
 
     "../../../flintjvm/native/net/src/flint_native_flint_socket_impl.cpp"
     "../../../flintjvm/native/net/src/flint_native_flint_inet_address_impl.cpp"
