@@ -43,7 +43,7 @@ add_compile_definitions(ESP32_S3N16RX)
 add_compile_definitions(MULTI_HEAP_FREERTOS)
 
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-address)
-target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-volatile)
+target_compile_options(${COMPONENT_LIB} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wno-volatile>)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-uninitialized)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-strict-aliasing)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-implicit-fallthrough)
