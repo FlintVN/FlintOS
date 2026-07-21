@@ -43,6 +43,7 @@ set(FLINTOS_SRCS
     "../../../flintjvm/native/base/src/flint_native_character.cpp"
     "../../../flintjvm/native/base/src/flint_native_reflection.cpp"
     "../../../flintjvm/native/base/src/flint_native_constructor.cpp"
+    "../../../flintjvm/native/base/src/flint_native_crc32.cpp"
     "../../../flintjvm/native/base/src/flint_native_file.cpp"
     "../../../flintjvm/native/base/src/flint_native_file_descriptor.cpp"
     "../../../flintjvm/native/base/src/flint_native_file_input_stream.cpp"

@@ -1,14 +1,15 @@
 
 #include "flintos.h"
 #include "flintos_debugger.h"
+#include "flint_common.h"
 
 FosDbg FosDbg::dbgInstance;
 
 static bool CheckDbgMsgFormat(uint8_t *data, uint32_t length) {
     uint32_t rxLen = (data[1] >> 6) | (data[2] << 2) | (data[3] << 10);
     if(length < 6 || length != rxLen) return false;
-    uint16_t crc = data[length - 2] | (data[length - 1] << 8);
-    if(crc != Crc16(data, length - 2)) return false;
+    uint16_t rxCrc = data[length - 2] | (data[length - 1] << 8);
+    if(rxCrc != Crc16(data, length - 2)) return false;
     return true;
 }
 
