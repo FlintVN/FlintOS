@@ -8,3 +8,4 @@ sdkconfig
 sdkconfig.old
 
 files/res/*
+files/lib/*.jar
