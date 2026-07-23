@@ -5,6 +5,7 @@
 #include "flint_native.h"
 
 jvoid NativeMidpLcd_Init(FNIEnv *env);
+jvoid NativeMidpLcd_InitEx(FNIEnv *env, jint width, jint height, jstring mode);
 jint NativeMidpLcd_Width(FNIEnv *env);
 jint NativeMidpLcd_Height(FNIEnv *env);
 jvoid NativeMidpLcd_Present(FNIEnv *env, jbyteArray frameBuffer);
@@ -26,6 +27,7 @@ jbyteArray NativeMidpPng_Decode(
 
 inline constexpr NativeMethod midpLcdMethods[] = {
     NATIVE_METHOD("init",    "()V",   NativeMidpLcd_Init),
+    NATIVE_METHOD("init",    "(IILjava/lang/String;)V",   NativeMidpLcd_InitEx),
     NATIVE_METHOD("width",   "()I",   NativeMidpLcd_Width),
     NATIVE_METHOD("height",  "()I",   NativeMidpLcd_Height),
     NATIVE_METHOD("present", "([B)V", NativeMidpLcd_Present),

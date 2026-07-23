@@ -34,6 +34,14 @@ jvoid NativeMidpLcd_Init(FNIEnv *env) {
     /* FlintOS initializes the display before it starts a MIDlet. */
 }
 
+jvoid NativeMidpLcd_InitEx(FNIEnv *env, jint width, jint height, jstring mode) {
+    (void)env;
+    (void)width;
+    (void)height;
+    (void)mode;
+    /* FlintOS initializes the display before it starts a MIDlet. */
+}
+
 jint NativeMidpLcd_Width(FNIEnv *env) {
     (void)env;
     return DISPLAY_WIDTH;
