@@ -7,7 +7,7 @@ Set-StrictMode -Version Latest
 $root = Split-Path -Parent $PSScriptRoot
 $jdkRoot = Join-Path $root 'flintjdk'
 $uiRoot = Join-Path $root 'flintui'
-$midpRoot = Join-Path $root 'flintmidp'
+$midpRoot = Join-Path $root 'FlintJ2ME'
 $libraryRoot = Join-Path $root 'files/lib'
 $uiOutput = Join-Path $root 'build/sdk/flint.ui'
 $deviceOutput = Join-Path $root 'build/sdk/flintos.device'
