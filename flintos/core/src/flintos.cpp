@@ -109,13 +109,15 @@ static bool ReadAppManifest(const char *jarPath, AppManifest *manifest) {
 static bool StartApplication(Flint *flint, const char *jarPath) {
     AppManifest manifest = {};
     if(!ReadAppManifest(jarPath, &manifest)) return false;
+    if(manifest.mainClass[0] != 0)
+        return flint->start(manifest.mainClass);
     if(manifest.midletClass[0] != 0) {
         return flint->start(
             "javax/microedition/midlet/MIDletLifecycle",
             manifest.midletClass
         );
     }
-    return flint->start(manifest.mainClass[0] == 0 ? "Main" : manifest.mainClass);
+    return flint->start("Main");
 }
 
 void FlintOS::startup() {
