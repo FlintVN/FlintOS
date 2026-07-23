@@ -86,7 +86,7 @@ mkdir "%MIDP_TOOLS_DIR%"
 
 rem Build classpath from already-built JARs in files/lib
 set "MIDP_CP=%LIBRARY_ROOT%\flint.drawing.jar;%LIBRARY_ROOT%\flintos.device.jar"
-if exist "%LIBRARY_ROOT%\midp.jar" set "MIDP_CP=%MIDP_CP%;%LIBRARY_ROOT%\midp.jar"
+if exist "%LIBRARY_ROOT%\j2me.jar" set "MIDP_CP=%MIDP_CP%;%LIBRARY_ROOT%\j2me.jar"
 
 echo   Compiling MIDP sources ^(Java 8 target^)...
 rem Collect all Java sources
@@ -102,12 +102,13 @@ if errorlevel 1 exit /b 1
 java -cp "%MIDP_TOOLS_DIR%" MidpJarPackager "%MIDP_RUN_DIR%\midp" "%MIDP_ROOT%\src" "%MIDP_ROOT%\META-INF\MANIFEST.MF" "%MIDP_ROOT%\config\jsr118-api-classes.txt" "%MIDP_RUN_DIR%" run
 if errorlevel 1 exit /b 1
 
-copy /Y "%MIDP_RUN_DIR%\midp.jar" "%LIBRARY_ROOT%\midp.jar" >nul
+copy /Y "%MIDP_RUN_DIR%\j2me.jar" "%LIBRARY_ROOT%\j2me.jar" >nul
 if errorlevel 1 exit /b 1
 copy /Y "%MIDP_RUN_DIR%\flintos.midp.jar" "%LIBRARY_ROOT%\flintos.midp.jar" >nul
 if errorlevel 1 exit /b 1
 copy /Y "%MIDP_RUN_DIR%\m3g.jar" "%LIBRARY_ROOT%\m3g.jar" >nul
 if errorlevel 1 exit /b 1
+del "%LIBRARY_ROOT%\midp.jar" >nul 2>nul
 echo FlintMIDP build complete.
 
 rem ---- Validate ----

@@ -100,8 +100,8 @@ New-Item -ItemType Directory -Force -Path $midpToolsDir | Out-Null
 
 # Build classpath from already-built JARs in files/lib
 $midpCp = "$libraryRoot\flint.drawing.jar;$libraryRoot\flintos.device.jar"
-if (Test-Path -LiteralPath (Join-Path $libraryRoot 'midp.jar') -PathType Leaf) {
-    $midpCp = "$midpCp;$libraryRoot\midp.jar"
+if (Test-Path -LiteralPath (Join-Path $libraryRoot 'j2me.jar') -PathType Leaf) {
+    $midpCp = "$midpCp;$libraryRoot\j2me.jar"
 }
 
 Write-Host '  Compiling MIDP sources (Java 8 target)...'
@@ -125,9 +125,11 @@ if ($LASTEXITCODE -ne 0) { throw 'MidpJarPackager compilation failed.' }
     $midpRunDir run
 if ($LASTEXITCODE -ne 0) { throw 'MidpJarPackager execution failed.' }
 
-foreach ($artifact in @('midp.jar', 'flintos.midp.jar', 'm3g.jar')) {
+foreach ($artifact in @('j2me.jar', 'flintos.midp.jar', 'm3g.jar')) {
     Copy-Item -LiteralPath (Join-Path $midpRunDir $artifact) -Destination $libraryRoot -Force
 }
+# Remove stale midp.jar from previous builds
+Remove-Item -LiteralPath (Join-Path $libraryRoot 'midp.jar') -ErrorAction SilentlyContinue
 Write-Host 'FlintMIDP build complete.'
 
 # ---- Validate ----

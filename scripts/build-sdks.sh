@@ -87,9 +87,9 @@ mkdir -p -- "$MIDP_RUN_DIR/midp" "$MIDP_TOOLS_DIR"
 
 # Build classpath from already-built JARs in files/lib
 MIDP_CP="$LIBRARY_ROOT/flint.drawing.jar:$LIBRARY_ROOT/flintos.device.jar"
-# midp.jar may not exist on first build; include it if present for incremental builds
-if [ -f "$LIBRARY_ROOT/midp.jar" ]; then
-  MIDP_CP="$MIDP_CP:$LIBRARY_ROOT/midp.jar"
+# j2me.jar may not exist on first build; include it if present for incremental builds
+if [ -f "$LIBRARY_ROOT/j2me.jar" ]; then
+  MIDP_CP="$MIDP_CP:$LIBRARY_ROOT/j2me.jar"
 fi
 
 echo "  Compiling MIDP sources (Java 8 target)..."
@@ -107,9 +107,11 @@ java -cp "$MIDP_TOOLS_DIR" MidpJarPackager \
   "$MIDP_ROOT/config/jsr118-api-classes.txt" \
   "$MIDP_RUN_DIR" run
 
-cp -f -- "$MIDP_RUN_DIR/midp.jar" "$LIBRARY_ROOT/midp.jar"
+cp -f -- "$MIDP_RUN_DIR/j2me.jar" "$LIBRARY_ROOT/j2me.jar"
 cp -f -- "$MIDP_RUN_DIR/flintos.midp.jar" "$LIBRARY_ROOT/flintos.midp.jar"
 cp -f -- "$MIDP_RUN_DIR/m3g.jar" "$LIBRARY_ROOT/m3g.jar"
+# Remove stale midp.jar from previous builds to avoid confusion
+rm -f -- "$LIBRARY_ROOT/midp.jar"
 echo 'FlintMIDP build complete.'
 
 # ---- Validate ----
