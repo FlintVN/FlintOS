@@ -1,8 +1,8 @@
 [submodule "flintjvm"]
 	path = flintjvm
 	url = https://github.com/DevMeoU/FlintJVM.git
-[submodule "flintmidp"]
-	path = flintmidp
+[submodule "java/J2ME"]
+	path = FlintJ2ME
 	url = https://github.com/FlintVN/FlintMIDP.git
 [submodule "flintjdk"]
 	path = flintjdk
