@@ -1,3 +1,13 @@
 [submodule "flintjvm"]
 	path = flintjvm
-	url = https://github.com/FlintVN/FlintJVM.git
+	url = https://github.com/DevMeoU/FlintJVM.git
+[submodule "flintj2me"]
+	path = flintj2me
+	url = https://github.com/FlintVN/FlintJ2ME.git
+[submodule "flintjdk"]
+	path = flintjdk
+	url = https://github.com/FlintVN/FlintJDK.git
+[submodule "flintui"]
+	path = flintui
+	url = https://github.com/FlintVN/FlintJDK.git
+	branch = flint.ui
