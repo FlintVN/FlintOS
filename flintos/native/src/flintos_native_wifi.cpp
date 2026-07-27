@@ -8,7 +8,7 @@
 
 static FMutex wifiLock;
 
-static bool CheckParams(FNIEnv *env, jstring ssid, jstring password, uint32_t authMode) {
+static bool checkParams(FNIEnv *env, jstring ssid, jstring password, uint32_t authMode) {
     if((ssid == NULL) || ((password == NULL) && (authMode != 0))) {
         if(ssid == NULL) {
             env->throwNew(env->findClass("java/lang/NullPointerException"), "ssid cannot be null object");
@@ -36,9 +36,9 @@ static bool CheckParams(FNIEnv *env, jstring ssid, jstring password, uint32_t au
     return true;
 }
 
-static bool CheckReturn(FNIEnv *env, bool ret, const char *msg) {
+static bool checkReturn(FNIEnv *env, bool ret, const char *msg) {
     if(ret != true) {
-        env->throwNew(env->findClass("java/io/IOException"), msg);
+        env->throwNew(env->findClass("java/io/UncheckedIOException"), msg);
         return false;
     }
     return true;
@@ -49,7 +49,7 @@ jbool NativeWiFi_IsSupported(FNIEnv *env) {
 }
 
 jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authMode) {
-    if(!CheckParams(env, ssid, password, authMode)) return;
+    if(!checkParams(env, ssid, password, authMode)) return;
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
@@ -59,7 +59,7 @@ jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authM
     wifiLock.lock();
     bool ret = FDev::WiFi::connect(ssidText, ssidLen, passwordText, passwordLen, authMode);
     wifiLock.unlock();
-    CheckReturn(env, ret, "An error occurred while connecting to wifi");
+    checkReturn(env, ret, "An error occurred while connecting to wifi");
 }
 
 jbool NativeWiFi_IsConnected(FNIEnv *env) {
@@ -95,7 +95,7 @@ static jobject createAccessPointRecordObj(FNIEnv *env, FDev::WiFi::ApRecordType 
 jobject NativeWiFi_GetAPinfo(FNIEnv *env) {
     FDev::WiFi::ApRecordType apInfo;
     wifiLock.lock();
-    if(!FDev::WiFi::getAPinfo(&apInfo)) {
+    if(checkReturn(env, FDev::WiFi::getAPinfo(&apInfo), "getAPinfo error")) {
         wifiLock.unlock();
         jobject obj = createAccessPointRecordObj(env, &apInfo);
         return (obj != NULL) ? obj : NULL;
@@ -111,7 +111,7 @@ jvoid NativeWiFi_Disconnect(FNIEnv *env) {
 }
 
 jvoid NativeWiFi_SoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMode, jint channel, jint maxConnection) {
-    if(!CheckParams(env, ssid, password, authMode)) return;
+    if(!checkParams(env, ssid, password, authMode)) return;
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
@@ -121,7 +121,7 @@ jvoid NativeWiFi_SoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMo
     wifiLock.lock();
     bool ret = FDev::WiFi::softAP(ssidText, ssidLen, passwordText, passwordLen, authMode, channel, maxConnection);
     wifiLock.unlock();
-    CheckReturn(env, ret, "An error occurred while connecting to wifi");
+    checkReturn(env, ret, "An error occurred while connecting to wifi");
 }
 
 jvoid NativeWiFi_SoftAPdisconnect(FNIEnv *env) {
@@ -134,13 +134,13 @@ jvoid NativeWiFi_StartScan(FNIEnv *env, jbool blocked) {
     wifiLock.lock();
     bool ret = FDev::WiFi::startScan(blocked);
     wifiLock.unlock();
-    CheckReturn(env, ret, "An error occurred while starting scan");
+    checkReturn(env, ret, "An error occurred while starting scan");
 }
 
 jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
     wifiLock.lock();
     int32_t count = FDev::WiFi::getScanAPCount();
-    if(!CheckReturn(env, count >= 0, "An error occurred while getting AP number")) {
+    if(!checkReturn(env, count >= 0, "An error occurred while getting AP number")) {
         wifiLock.unlock();
         return NULL;
     }
@@ -162,7 +162,7 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
     for(uint16_t i = 0; i < count; i++) {
         FDev::WiFi::ApRecordType apRecords;
         bool ret = FDev::WiFi::getScanAPInfo(&apRecords);
-        if(!CheckReturn(env, ret, "An error occurred while getting AP record")) {
+        if(!checkReturn(env, ret, "An error occurred while getting AP record")) {
             FDev::WiFi::scanClear();
             wifiLock.unlock();
             return NULL;
