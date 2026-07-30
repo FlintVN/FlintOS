@@ -1,5 +1,5 @@
 
-MODULES         	:=  flintos.device
+MODULES         	:=  flintos.device midp
 JC                  :=  javac
 MODULE_SOURCE_PATH  :=  src
 OUT_DIR          	?=  bin
