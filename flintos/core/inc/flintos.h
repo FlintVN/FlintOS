@@ -9,6 +9,7 @@ public:
     static void main(void);
     static Flint *newFlint(void);
     static void startup(void);
+    static bool open(const char *file);
 private:
     FlintOS(const FlintOS &) = delete;
     void operator=(const FlintOS &) = delete;
