@@ -6,7 +6,7 @@ import java.io.IOException;
 public final class Manager {
     public final static String TONE_DEVICE_LOCATOR = "device://tone";
     // private final static String RADIO_CAPTURE_LOCATOR = "capture://radio";
-    // private final static String DS_ERR = "Cannot create a DataSource for: ";    
+    // private final static String DS_ERR = "Cannot create a DataSource for: ";
     private final static String PL_ERR = "Cannot create a Player for: ";
     private final static String REDIRECTED_MSG = " with exception message: ";
 
