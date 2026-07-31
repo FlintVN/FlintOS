@@ -18,7 +18,7 @@ public:
 static FList<FlintNode> flints;
 static FMutex fosMutex;
 
-static void FlintTerminated(Flint *flint) {
+static void flintTerminated(Flint *flint) {
     fosMutex.lock();
     flints.remove((FlintNode *)flint);
     fosMutex.unlock();
@@ -27,7 +27,7 @@ static void FlintTerminated(Flint *flint) {
     FlintAPI::System::free((FlintNode *)flint);
 }
 
-char *Trim(char *text) {
+char *trim(char *text) {
     if(text == NULL) return NULL;
     while(isspace(*text)) text++;
 
@@ -46,7 +46,7 @@ void FlintOS::startup() {
     if(!reader.open()) return;
 
     while(reader.readLine(path, sizeof(path)) != -1) {
-        char *text = Trim(path);
+        char *text = trim(path);
         if(FlintAPI::IO::finfo(text, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
             Flint *flint = FlintOS::newFlint();
             if(flint == NULL) {
@@ -60,7 +60,7 @@ void FlintOS::startup() {
     reader.close();
 }
 
-static void DebuggerTask() {
+static void debuggerTask() {
     FosDbg::getInstance()->receiveTask();
 }
 
@@ -73,7 +73,7 @@ void FlintOS::main(void) {
     FDev::WiFi::init();
     FlintOS::startup();
     FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 1024);
-    FlintAPI::Thread::create((void (*)(void *))DebuggerTask, NULL, 6144);
+    FlintAPI::Thread::create((void (*)(void *))debuggerTask, NULL, 6144);
 
     uint32_t notifiValue;
 
@@ -95,7 +95,7 @@ Flint *FlintOS::newFlint(void) {
     FlintNode *flint = (FlintNode *)FlintAPI::System::malloc(sizeof(FlintNode));
     if(flint == NULL) return NULL;
     new (flint)FlintNode();
-    flint->terminatedCallback(FlintTerminated);
+    flint->terminatedCallback(flintTerminated);
     fosMutex.lock();
     flints.add(flint);
     fosMutex.unlock();
