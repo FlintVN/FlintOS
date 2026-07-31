@@ -54,7 +54,7 @@ void FlintOS::startup() {
                 return;
             }
             flint->setProgram(text);
-            flint->start();
+            flint->startToMain();
         }
     }
     reader.close();
