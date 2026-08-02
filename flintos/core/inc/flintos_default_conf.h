@@ -34,6 +34,6 @@
 #ifndef AUDIO_SAMPLE_RATE
     #define AUDIO_SAMPLE_RATE           44100
     #warning "AUDIO_SAMPLE_RATE is not defined. Default value will be used"
-#endif /* AUDIO_SAMPLE_RATE */         
+#endif /* AUDIO_SAMPLE_RATE */
 
 #endif /* __FLINTOS_DEFAULT_CONF_H */
