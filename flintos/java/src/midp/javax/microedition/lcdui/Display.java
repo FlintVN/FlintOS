@@ -73,7 +73,7 @@ public class Display {
     }
 
     public static Graphics gameGraphics() {
-        return screenGfx; 
+        return screenGfx;
     }
 
     public static void flush() {

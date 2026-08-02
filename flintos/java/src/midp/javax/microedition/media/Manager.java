@@ -35,7 +35,7 @@ public final class Manager {
 
         if(type == null)
             throw new MediaException(PL_ERR + "NULL content-type");
-        
+
         throw new MediaException("Cannot create Player");
     }
 

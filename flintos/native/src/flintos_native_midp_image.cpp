@@ -57,13 +57,16 @@ jbyteArray NativeMidpImage_PngDecode(FNIEnv *env, jbyteArray inArr, jint off, ji
             W = (int)be32(cdata); H = (int)be32(cdata + 4);
             bitDepth = cdata[8]; colorType = cdata[9]; interlace = cdata[12];
             haveIHDR = true;
-        } else if(!memcmp(ctype, "PLTE", 4)) {
+        }
+        else if(!memcmp(ctype, "PLTE", 4)) {
             palCount = clen / 3; if(palCount > 256) palCount = 256;
             memcpy(palette, cdata, (size_t)palCount * 3);
-        } else if(!memcmp(ctype, "tRNS", 4)) {
+        }
+        else if(!memcmp(ctype, "tRNS", 4)) {
             trnsCount = clen > 256 ? 256 : (int)clen;
             memcpy(trns, cdata, (size_t)trnsCount);
-        } else if(!memcmp(ctype, "IDAT", 4)) {
+        }
+        else if(!memcmp(ctype, "IDAT", 4)) {
             if(idatLen + clen > idatCap) {
                 idatCap = (idatLen + clen) * 2 + 1024;
                 uint8_t *n = (uint8_t *)realloc(idat, idatCap);
@@ -71,9 +74,9 @@ jbyteArray NativeMidpImage_PngDecode(FNIEnv *env, jbyteArray inArr, jint off, ji
                 idat = n;
             }
             memcpy(idat + idatLen, cdata, clen); idatLen += clen;
-        } else if(!memcmp(ctype, "IEND", 4)) {
-            break;
         }
+        else if(!memcmp(ctype, "IEND", 4))
+            break;
         pos += 12 + clen;
     }
     if(!haveIHDR || W <= 0 || H <= 0 || W > 2048 || H > 2048 || interlace != 0 || idatLen == 0) {
@@ -149,27 +152,36 @@ jbyteArray NativeMidpImage_PngDecode(FNIEnv *env, jbyteArray inArr, jint off, ji
             if(colorType == 2) {
                 const uint8_t *p = row + (size_t)x * 3 * s;
                 r = p[0]; g = p[s]; b = p[2 * s];
-            } else if(colorType == 6) {
+            }
+            else if(colorType == 6) {
                 const uint8_t *p = row + (size_t)x * 4 * s;
                 r = p[0]; g = p[s]; b = p[2 * s]; al = p[3 * s];
-            } else if(colorType == 0) {
+            }
+            else if(colorType == 0) {
                 int gray = row[(size_t)x * s];
                 r = g = b = gray;
                 if(trnsCount >= 2 && gray == trns[1]) al = 0;   /* gray key (8-bit) */
-            } else if(colorType == 4) {
+            }
+            else if(colorType == 4) {
                 const uint8_t *p = row + (size_t)x * 2 * s;
                 r = g = b = p[0]; al = p[s];
-            } else {                                            /* colorType 3: palette */
+            }
+            else {                                            /* colorType 3: palette */
                 int idx;
-                if(bitDepth == 8) {
+                if(bitDepth == 8)
                     idx = row[x];
-                } else {
+                else {
                     int perByte = 8 / bitDepth;
                     int shift = 8 - bitDepth * ((x % perByte) + 1);
                     idx = (row[x / perByte] >> shift) & ((1 << bitDepth) - 1);
                 }
-                if(idx < palCount) { r = palette[idx * 3]; g = palette[idx * 3 + 1]; b = palette[idx * 3 + 2]; }
-                else               { r = g = b = 0; }
+                if(idx < palCount) {
+                    r = palette[idx * 3];
+                    g = palette[idx * 3 + 1];
+                    b = palette[idx * 3 + 2];
+                }
+                else
+                    r = g = b = 0;
                 if(idx < trnsCount) al = trns[idx];
             }
             int pi = y * W + x;
@@ -177,8 +189,10 @@ jbyteArray NativeMidpImage_PngDecode(FNIEnv *env, jbyteArray inArr, jint off, ji
             if(hasAlpha) {
                 int a4 = al >> 4;
                 int ai = pi >> 1;
-                if(pi & 1) ap[ai] = (uint8_t)((ap[ai] & 0x0F) | (a4 << 4));
-                else       ap[ai] = (uint8_t)((ap[ai] & 0xF0) | a4);
+                if(pi & 1)
+                    ap[ai] = (uint8_t)((ap[ai] & 0x0F) | (a4 << 4));
+                else
+                    ap[ai] = (uint8_t)((ap[ai] & 0xF0) | a4);
             }
         }
     }

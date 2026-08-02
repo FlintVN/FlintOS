@@ -14,13 +14,13 @@ public class LayerManager {
     }
 
     public void append(Layer l) {
-	    removeImpl(l);
+        removeImpl(l);
         addImpl(l, nlayers);
     }
 
     public void insert(Layer l, int index) {
-	    if((index < 0) || (index > nlayers) || (exist(l) && (index >= nlayers)))
-	        throw new IndexOutOfBoundsException();
+        if((index < 0) || (index > nlayers) || (exist(l) && (index >= nlayers)))
+            throw new IndexOutOfBoundsException();
         removeImpl(l);
         addImpl(l, index);
     }
@@ -32,20 +32,20 @@ public class LayerManager {
     }
 
     public int getSize() {
-	    return nlayers;
+        return nlayers;
     }
 
     public void remove(Layer l) {
-	    removeImpl(l);
+        removeImpl(l);
     }
 
     public void paint(Graphics g, int x, int y) {
         int clipX = g.getClipX();
-	    int clipY = g.getClipY();
+        int clipY = g.getClipY();
         int clipW = g.getClipWidth();
         int clipH =  g.getClipHeight();
 
-	    g.translate(x - viewX, y - viewY);
+        g.translate(x - viewX, y - viewY);
         g.clipRect(viewX, viewY, viewWidth, viewHeight);
 
         for(int i = nlayers; --i >= 0; ) {
@@ -54,14 +54,14 @@ public class LayerManager {
                 comp.paint(g);
         }
 
-	    g.translate(-x + viewX, -y + viewY);
+        g.translate(-x + viewX, -y + viewY);
         g.setClip(clipX, clipY, clipW, clipH);
     }
 
     public void setViewWindow(int x, int y, int width, int height) {
         if(width < 0 || height < 0)
             throw new IllegalArgumentException();
-	    viewX = x;
+        viewX = x;
         viewY = y;
         viewWidth = width;
         viewHeight = height;
@@ -85,7 +85,7 @@ public class LayerManager {
         if(l == null)
             throw new NullPointerException();
 
-	    for(int i = nlayers; --i >= 0; ) {
+        for(int i = nlayers; --i >= 0; ) {
             if(component[i] == l)
                 remove(i);
         }
@@ -103,7 +103,7 @@ public class LayerManager {
     }
 
     private void remove(int index) {
-	    System.arraycopy(component, index + 1, component, index, nlayers - index - 1);
-	    component[--nlayers] = null;
+        System.arraycopy(component, index + 1, component, index, nlayers - index - 1);
+        component[--nlayers] = null;
     }
 }

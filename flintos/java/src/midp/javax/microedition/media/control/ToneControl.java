@@ -7,7 +7,7 @@ public interface ToneControl extends javax.microedition.media.Control {
     byte RESOLUTION = -4;
     byte BLOCK_START = -5;
     byte BLOCK_END = -6;
-    byte PLAY_BLOCK = -7; 
+    byte PLAY_BLOCK = -7;
     byte SET_VOLUME = -8;
     byte REPEAT = -9;
     byte C4 = 60;

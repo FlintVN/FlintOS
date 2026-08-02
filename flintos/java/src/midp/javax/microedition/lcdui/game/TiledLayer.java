@@ -25,7 +25,7 @@ public class TiledLayer extends Layer {
             throw new IllegalArgumentException();
 
         this.columns = columns;
-	    this.rows = rows;
+        this.rows = rows;
 
         cellMatrix = new int[rows][columns];
 
@@ -35,7 +35,7 @@ public class TiledLayer extends Layer {
 
     public int createAnimatedTile(int staticTileIndex) {
         if(staticTileIndex < 0 || staticTileIndex >= numberOfTiles)
-	        throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException();
 
         if(anim_to_static == null) {
             anim_to_static = new int[4];
@@ -65,8 +65,8 @@ public class TiledLayer extends Layer {
     public int getAnimatedTile(int animatedTileIndex) {
         animatedTileIndex = - animatedTileIndex;
         if(anim_to_static == null || animatedTileIndex <= 0 || animatedTileIndex >= numOfAnimTiles)
-	        throw new IndexOutOfBoundsException();
-	
+            throw new IndexOutOfBoundsException();
+
         return anim_to_static[animatedTileIndex];
     }
 
@@ -104,7 +104,7 @@ public class TiledLayer extends Layer {
                 throw new IndexOutOfBoundsException();
         }
         else if(tileIndex < 0) {
-            if(anim_to_static == null || (-tileIndex) >= numOfAnimTiles) 
+            if(anim_to_static == null || (-tileIndex) >= numOfAnimTiles)
                 throw new IndexOutOfBoundsException();
         }
 
@@ -134,7 +134,7 @@ public class TiledLayer extends Layer {
         if(tileWidth < 1 || tileHeight < 1 || ((image.getWidth() % tileWidth) != 0) || ((image.getHeight() % tileHeight) != 0))
              throw new IllegalArgumentException();
         setWidthImpl(columns * tileWidth);
-	    setHeightImpl(rows * tileHeight);
+        setHeightImpl(rows * tileHeight);
 
         int noOfFrames = (image.getWidth() / tileWidth) * (image.getHeight() / tileHeight);
         if(noOfFrames >= (numberOfTiles - 1))
@@ -201,7 +201,7 @@ public class TiledLayer extends Layer {
         numberOfTiles = noOfFrames;
         tileSetX = new int[numberOfTiles];
         tileSetY = new int[numberOfTiles];
-	
+
         if(!maintainIndices) {
             for(rows = 0; rows < cellMatrix.length; rows++) {
                 int totalCols = cellMatrix[rows].length;

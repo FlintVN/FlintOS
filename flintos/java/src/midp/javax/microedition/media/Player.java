@@ -14,7 +14,7 @@ public interface Player extends Controllable {
     static final int CLOSED = 0;
 
     static final long TIME_UNKNOWN = -1;
-    
+
     void realize() throws MediaException;
 
     void prefetch() throws MediaException;
@@ -26,7 +26,7 @@ public interface Player extends Controllable {
     void deallocate();
 
     void close();
-    
+
     long setMediaTime(long now) throws MediaException;
 
     long getMediaTime();
