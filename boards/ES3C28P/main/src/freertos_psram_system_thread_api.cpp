@@ -8,7 +8,7 @@ using namespace FlintAPI::Thread;
 
 ThreadHandle FlintAPI::Thread::create(void (*task)(void *), void *param, uint32_t stackSize) {
     TaskHandle_t xHandle = NULL;
-    uint32_t nativeStack = (stackSize > 6144) ? stackSize : 6144;
+    uint32_t nativeStack = (stackSize > 16384) ? stackSize : 16384;
     if(xTaskCreateWithCaps(task, "FlintJavaThread", nativeStack, param, tskIDLE_PRIORITY + 1, &xHandle, MALLOC_CAP_SPIRAM) != pdPASS)
         return NULL;
     return (void *)xHandle;

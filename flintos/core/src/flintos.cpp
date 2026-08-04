@@ -178,15 +178,18 @@ static bool runApplication(const char *file) {
             if(!flint->startToMain()) break;
         }
         else {                      /* J2ME application */
-            static constexpr ConstNameAndType startAppName("startApp", "()V");
+            static constexpr ConstNameAndType startAppName("startApp", "(Ljava/lang/Class;)V");
 
             JClass *mainCls = flint->findClass(NULL, manifest.mainCls);
             if(mainCls == NULL) break;
 
-            MethodInfo *method = flint->findMethod(NULL, mainCls, (ConstNameAndType *)&startAppName);
+            JClass *ams = flint->findClass(NULL, "flintos/internal/AMS");
+            if(ams == NULL) break;
+
+            MethodInfo *method = flint->findMethod(NULL, ams, (ConstNameAndType *)&startAppName);
             if(method == NULL) break;
 
-            if(!flint->start(method)) break;
+            if(!flint->start(method, 1, mainCls)) break;
         }
 
         return true;
