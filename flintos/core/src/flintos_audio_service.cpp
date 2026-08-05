@@ -12,12 +12,12 @@ static uint8_t volumn = 0;
 static int16_t audioBuff[AUDIO_FRAME_NUM * AUDIO_FRAME_BUF_LENGTH];
 static volatile uint32_t currentPos = 0;
 
-static void Audio_Lock(void) {
+static void audioLock(void) {
     while(atomic_flag_test_and_set_explicit(&audioLocked, memory_order_acquire))
         FlintAPI::Thread::yield();
 }
 
-static void Audio_Unlock(void) {
+static void audioUnlock(void) {
     atomic_flag_clear_explicit(&audioLocked, memory_order_release);
 }
 
@@ -40,7 +40,7 @@ uint32_t AudioSrv::write(int32_t *pos, int16_t *frame, uint32_t length) {
     int32_t localPos = *pos;
     if(localPos == currentPos) return 0;
     uint32_t count = 0;
-    Audio_Lock();
+    audioLock();
     for(; (count < length) && (localPos != currentPos); count++) {
         int32_t tmp = audioBuff[localPos] + *frame++;
         if(tmp > 32767) tmp = 32767;
@@ -48,7 +48,7 @@ uint32_t AudioSrv::write(int32_t *pos, int16_t *frame, uint32_t length) {
         audioBuff[localPos] = tmp;
         localPos = (localPos + 1) % LENGTH(audioBuff);
     }
-    Audio_Unlock();
+    audioUnlock();
     *pos = localPos;
     return count;
 }

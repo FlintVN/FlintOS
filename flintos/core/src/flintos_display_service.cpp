@@ -35,12 +35,12 @@ static uint16_t ymin = DISPLAY_HEIGHT - 1;
 static uint16_t ymax = 0;
 alignas(2) static uint8_t displayBuff[DISPLAY_WIDTH * DISPLAY_HEIGHT * 2];
 
-static void Display_Lock(void) {
+static void displayLock(void) {
     while(atomic_flag_test_and_set_explicit(&displayLocked, memory_order_acquire))
         FlintAPI::Thread::yield();
 }
 
-static void Display_Unlock(void) {
+static void displayUnlock(void) {
     atomic_flag_clear_explicit(&displayLocked, memory_order_release);
 }
 
@@ -48,22 +48,22 @@ static void Display_Clear(void) {
     memset(displayBuff, 0, sizeof(displayBuff));
 }
 
-static void UpdateRequest(uint16_t y, uint16_t h) {
+static void updateRequest(uint16_t y, uint16_t h) {
     uint16_t y2 = y + h - 1;
-    Display_Lock();
+    displayLock();
     if(y < ymin) ymin = y;
     if(y2 > ymax) ymax = y2;
-    Display_Unlock();
+    displayUnlock();
 }
 
-static void ConvertToRgb565(uint16_t *data, uint32_t length) {
+static void convertToRgb565(uint16_t *data, uint32_t length) {
     for(uint32_t i = 0; i < length; i++) {
         uint16_t tmp = ((data[i] << 1) & 0xFFC0) | (data[i] & 0x1F);
         data[i] = __builtin_bswap16(tmp);
     }
 }
 
-static bool ReadRgb555(FileReader *reader, BitmapInfoHeader *infoHeader) {
+static bool readRgb555(FileReader *reader, BitmapInfoHeader *infoHeader) {
     int32_t bitmapWidth = infoHeader->biWidth;
     int32_t bitmapHeight = infoHeader->biHeight;
 
@@ -82,7 +82,7 @@ static bool ReadRgb555(FileReader *reader, BitmapInfoHeader *infoHeader) {
         uint16_t *buff = &((uint16_t *)displayBuff)[(row + y) * DISPLAY_WIDTH + x];
         if(reader->read(buff, rowSize) != rowSize)
             return false;
-        ConvertToRgb565(buff, width);
+        convertToRgb565(buff, width);
     }
     return true;
 }
@@ -101,25 +101,25 @@ void DisplaySrv::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *
             data += rowSz;
         }
     }
-    UpdateRequest(y, h);
+    updateRequest(y, h);
 }
 
 void DisplaySrv::update(void) {
     if(ymin > ymax) return;
 
-    Display_Lock();
+    displayLock();
     uint16_t y1 = ymin;
     uint16_t y2 = ymax;
-    Display_Unlock();
+    displayUnlock();
 
     FDev::Display::write(0, y1, DISPLAY_WIDTH, y2 - y1 + 1, &displayBuff[y1 * DISPLAY_WIDTH * 2]);
     if(ymin == y1 && ymax == y2) {
-        Display_Lock();
+        displayLock();
         if(ymin == y1 && ymax == y2) {  /* Double-check to ensure there are no changes. */
             ymin = DISPLAY_HEIGHT - 1;
             ymax = 0;
         }
-        Display_Unlock();
+        displayUnlock();
     }
 }
 
@@ -138,10 +138,10 @@ void DisplaySrv::showLogo(void) {
 
         if(infoHeader.biCompression != 0 || infoHeader.biBitCount != 16 || !reader.seek(fileHeader.bfOffBits)) break;
 
-        if(!ReadRgb555(&reader, &infoHeader)) break;
+        if(!readRgb555(&reader, &infoHeader)) break;
     } while(0);
 
     reader.close();
-    UpdateRequest(0, DISPLAY_HEIGHT);
+    updateRequest(0, DISPLAY_HEIGHT);
     update();
 }
