@@ -10,7 +10,8 @@ jint NativeAudio_GetFrameSize(FNIEnv *env);
 jint NativeAudio_GetVolumn(FNIEnv *env);
 jvoid NativeAudio_SetVolumn(FNIEnv *env, jint value);
 jvoid NativeAudio_Open(FNIEnv *env, jobject obj);
-jvoid NativeAudio_Write(FNIEnv *env, jobject obj, jbyteArray b);
+jvoid NativeAudio_Write1(FNIEnv *env, jobject obj, jbyteArray b);
+jvoid NativeAudio_Write2(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint len);
 jvoid NativeAudio_Close(FNIEnv *env, jobject obj);
 
 inline constexpr NativeMethod audioMethods[] = {
@@ -20,7 +21,8 @@ inline constexpr NativeMethod audioMethods[] = {
     NATIVE_METHOD("getVolumn",     "()I",     NativeAudio_GetVolumn),
     NATIVE_METHOD("setVolumn",     "(I)V",    NativeAudio_SetVolumn),
     NATIVE_METHOD("open",          "()V",     NativeAudio_Open),
-    NATIVE_METHOD("write",         "([B)V",   NativeAudio_Write),
+    NATIVE_METHOD("write",         "([B)V",   NativeAudio_Write1),
+    NATIVE_METHOD("write",         "([BII)V", NativeAudio_Write2),
     NATIVE_METHOD("close",         "()V",     NativeAudio_Close),
 };
 

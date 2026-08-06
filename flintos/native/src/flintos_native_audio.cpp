@@ -33,7 +33,7 @@ jvoid NativeAudio_Open(FNIEnv *env, jobject obj) {
     obj->getFieldByIndex(0)->setInt32(AudioSrv::open());
 }
 
-jvoid NativeAudio_Write(FNIEnv *env, jobject obj, jbyteArray b) {
+jvoid NativeAudio_Write1(FNIEnv *env, jobject obj, jbyteArray b) {
     int32_t pos = obj->getFieldByIndex(0)->getInt32();
     if(pos < 0)
         return env->throwNew(env->findClass("java/io/IOException"), "Audio has not been opened");
@@ -49,6 +49,35 @@ jvoid NativeAudio_Write(FNIEnv *env, jobject obj, jbyteArray b) {
         else {
             buf += w;
             len -= w;
+        }
+    }
+    obj->getFieldByIndex(0)->setInt32(pos);
+}
+
+jvoid NativeAudio_Write2(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint len) {
+    int32_t pos = obj->getFieldByIndex(0)->getInt32();
+    if(pos < 0)
+        return env->throwNew(env->findClass("java/io/IOException"), "Audio has not been opened");
+    if(b == NULL)
+        return env->throwNew(env->findClass("java/lang/NullPointerException"));
+
+    if(!CheckArrayIndexSize(env, b, off, len)) return;
+    if((off & 1) || (len & 1))
+        return env->throwNew(
+            env->findClass("java/lang/IllegalArgumentException"),
+            "PCM S16LE offset and length must be even"
+        );
+
+    int16_t *buf = (int16_t *)(((jbyteArray)b)->getData() + off);
+    uint32_t samples = (uint32_t) len / sizeof(int16_t);
+
+    while(samples > 0) {
+        uint32_t w = AudioSrv::write(&pos, buf, samples);
+        if(w == 0)
+            FlintAPI::Thread::yield();
+        else {
+            buf += w;
+            samples -= w;
         }
     }
     obj->getFieldByIndex(0)->setInt32(pos);

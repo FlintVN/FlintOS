@@ -22,5 +22,7 @@ public class Audio implements AutoCloseable {
 
     public native void write(byte[] b);
 
+    public native void write(byte[] b, int off, int len);
+
     public native void close();
 }
