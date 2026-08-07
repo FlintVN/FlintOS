@@ -7,7 +7,7 @@ const char *FlintAPI::System::getClassPath(uint32_t index) {
         "/lib/java.base.jar",
         "/lib/flint.net.jar",
         "/lib/flint.drawing.jar",
-        "/lib/flintos.device.jar",
+        "/lib/flintos.jar",
         "/lib/flint.ui.jar",
         "/lib/midp.jar",
     };

@@ -1,5 +1,5 @@
 
-MODULES             :=  flintos.device midp
+MODULES             :=  flintos midp
 JC                  :=  javac
 JDK_MODULE_SRC_PATH := ../../flintjdk/src
 MODULE_SRC_PATH     :=  src

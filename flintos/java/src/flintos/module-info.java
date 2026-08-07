@@ -1,5 +1,5 @@
 
-module flintos.device {
+module flintos {
     requires java.base;
     exports flintos.device;
 }
