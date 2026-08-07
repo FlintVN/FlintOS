@@ -1,9 +1,12 @@
 package javax.microedition.lcdui;
 
 import javax.microedition.midlet.MIDlet;
+import com.sun.midp.events.EventQueue;
+import com.sun.midp.lcdui.RepaintEventProducer;
 
 public class Display {
     static final Object LCDUILock = new Object();
+    static RepaintEventProducer repaintEventProducer;
     private static Display instance;
     private static int WIDTH;
     private static int HEIGHT;
@@ -18,6 +21,8 @@ public class Display {
         flint.drawing.Graphics fg = flint.drawing.Graphics.create(WIDTH, HEIGHT, screenBuf);
         screenGfx = new Graphics(fg);
         instance = new Display();
+
+        repaintEventProducer = new RepaintEventProducer(EventQueue.getEventQueue());
     }
 
     private Display() {
@@ -32,9 +37,9 @@ public class Display {
 
     public void setCurrent(Displayable d) {
         current = d;
-        if(d instanceof Canvas) {
-            ((Canvas)d).showNotify();
-            requestPaint((Canvas)d);
+        if(d instanceof Canvas canvas) {
+            canvas.showNotify();
+            repaintEventProducer.scheduleRepaint(0, 0, WIDTH, HEIGHT, canvas);
         }
     }
 
@@ -104,19 +109,11 @@ public class Display {
         return instance == null ? null : instance.current;
     }
 
-    static synchronized void requestPaint(Canvas c) {
-        if(c == null)
+    public static void handleRepaintEvent(int x1, int y1, int x2, int y2, Canvas target) {
+        if(target == null)
             return;
         screenGfx.reset();
-        c.paint(screenGfx);
-        flintos.device.Display.write(0, 0, WIDTH, HEIGHT, screenBuf);
-    }
-
-    static synchronized void requestPaint(Canvas c, int x, int y, int width, int height) {
-        if(c == null)
-            return;
-        screenGfx.reset();
-        c.paint(screenGfx);
-        flintos.device.Display.write(x, y, width, height, screenBuf);
+        target.paint(screenGfx);
+        flintos.device.Display.write(x1, y1, x2 - x1, y2 - y1, screenBuf);
     }
 }

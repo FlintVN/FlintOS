@@ -183,7 +183,7 @@ static bool runApplication(const char *file) {
             JClass *mainCls = flint->findClass(NULL, manifest.mainCls);
             if(mainCls == NULL) break;
 
-            JClass *ams = flint->findClass(NULL, "flintos/internal/AMS");
+            JClass *ams = flint->findClass(NULL, "flintos/midp/AMS");
             if(ams == NULL) break;
 
             MethodInfo *method = flint->findMethod(NULL, ams, (ConstNameAndType *)&startAppName);

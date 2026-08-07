@@ -99,15 +99,15 @@ public abstract class Canvas extends Displayable {
     }
 
     public final void repaint(int x, int y, int width, int height) {
-        Display.requestPaint(this, x, y, width, height);
+        Display.repaintEventProducer.scheduleRepaint(x, y, width, height, this);
     }
 
     public final void repaint() {
-        Display.requestPaint(this);
+        repaint(0, 0, Display.getPrimaryDisplayWidth(), Display.getPrimaryDisplayHeight());
     }
 
     public final void serviceRepaints() {
-        Display.requestPaint(this);
+        Display.repaintEventProducer.serviceRepaints();
     }
 
     protected void showNotify() {
