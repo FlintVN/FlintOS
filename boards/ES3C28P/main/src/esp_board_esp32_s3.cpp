@@ -60,6 +60,7 @@ static void SD_Init() {
     };
 
     sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+    host.max_freq_khz = SDMMC_FREQ_HIGHSPEED;
     sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
     slot_config.clk = SD_PIN_CLK;
     slot_config.cmd = SD_PIN_CMD;

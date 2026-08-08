@@ -44,7 +44,7 @@ static void displayUnlock(void) {
     atomic_flag_clear_explicit(&displayLocked, memory_order_release);
 }
 
-static void Display_Clear(void) {
+static void displayClear(void) {
     memset(displayBuff, 0, sizeof(displayBuff));
 }
 
@@ -124,7 +124,7 @@ void DisplaySrv::update(void) {
 }
 
 void DisplaySrv::showLogo(void) {
-    Display_Clear();
+    displayClear();
 
     FileReader reader(NULL, "/sys/icons/flint_64x64.bmp");
     if(!reader.open()) return;
