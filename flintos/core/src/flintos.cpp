@@ -60,8 +60,8 @@ static void debuggerTask() {
 
 void FlintOS::main(void) {
     FDev::Display::init();
-    FDev::Display::brightness(100);
     DisplaySrv::showLogo();
+    FDev::Display::brightness(100);
     FDev::Audio::init();
     AudioSrv::setVolumn(100);
     FDev::WiFi::init();
@@ -98,8 +98,6 @@ Flint *FlintOS::newFlint(void) {
 
 typedef struct {
     uint8_t type;
-    const char *name;
-    const char *icon;
     const char *mainCls;
 } Manifest;
 
@@ -125,8 +123,6 @@ static bool readManifest(Flint *flint, const char *jarPath, Manifest *manifest) 
                 if(mainCls[i] == '.') mainCls[i] = '/';
 
             manifest->type = 0;
-            manifest->name = NULL;
-            manifest->icon = NULL;
             manifest->mainCls = flint->getUtf8(NULL, mainCls, len);
 
             if(manifest->mainCls == NULL) goto exit;
@@ -135,21 +131,7 @@ static bool readManifest(Flint *flint, const char *jarPath, Manifest *manifest) 
             manifest->type = 1;
 
             char *name = getNextValue(&line[9], ',', &len);
-            if(len > 0) {
-                manifest->name = flint->getUtf8(NULL, name, len);
-                if(manifest->name == NULL) goto exit;
-            }
-            else
-                manifest->name = NULL;
-
             char *icon = getNextValue(&name[len], ',', &len);
-            if(len > 0) {
-                manifest->icon = flint->getUtf8(NULL, icon, len);
-                if(manifest->icon == NULL) goto exit;
-            }
-            else
-                manifest->icon = NULL;
-
             char *mainCls = getNextValue(&icon[len], ',', &len);
             if(len > 0) {
                 manifest->mainCls = flint->getUtf8(NULL, mainCls, len);
