@@ -5,15 +5,15 @@
 #include "flint_class_loader.h"
 #include "flint_native.h"
 #include "flintos_native_wifi.h"
-#include "flintos_native_audio.h"
 #include "flintos_native_display.h"
 #include "flintos_native_midp_image.h"
+#include "flintos_native_audio_track.h"
 #include "flintos_native_midp_key_converter.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/net/WiFi",                        wifiMethods),
-    NATIVE_CLASS("flintos/device/Audio",                  audioMethods),
     NATIVE_CLASS("flintos/device/Display",                displayMethods),
+    NATIVE_CLASS("flintos/device/AudioTrack",             audioTrackMethods),
 
     /*
      * This function can be removed and replaced with Java code based on java.util.zip.Inflater

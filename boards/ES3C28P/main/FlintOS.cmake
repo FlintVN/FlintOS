@@ -71,9 +71,9 @@ set(FLINTOS_SRCS
 
     "../../../flintos/native/src/flintos_native.cpp"
     "../../../flintos/native/src/flintos_native_wifi.cpp"
-    "../../../flintos/native/src/flintos_native_audio.cpp"
     "../../../flintos/native/src/flintos_native_display.cpp"
     "../../../flintos/native/src/flintos_native_midp_image.cpp"
+    "../../../flintos/native/src/flintos_native_audio_track.cpp"
     "../../../flintos/native/src/flintos_native_midp_key_converter.cpp"
 )
 
