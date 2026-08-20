@@ -20,8 +20,11 @@ bool FosDbg::receivedDataHandler(uint8_t *data, uint32_t length) {
     DbgCmd cmd = (DbgCmd)(data[1] & 0x3F);
     if(cmd == DBG_CMD_START_DEBUG_SESSION) {
         if(checkDbgMsgFormat(data, length)) {
-            Flint *flint = FlintOS::newFlint();
-            if(flint != NULL) setTarget(flint);
+            FProcess *process = FlintOS::newProcess();
+            if(process != NULL) {
+                setTarget((Flint *)process);
+                FlintOS::setForeground(process);
+            }
         }
     }
     return FDbg::receivedDataHandler(data, length);

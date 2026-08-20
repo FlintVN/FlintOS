@@ -9,23 +9,31 @@
 #include "flint_zip_file_reader.h"
 #include "flintos_display_service.h"
 
-class FlintNode : public ListNode, public Flint {
-public:
-    FlintNode() : ListNode(), Flint() {
+static FProcess *homeApp = NULL;
+static FProcess *allowForeground = NULL;
+static FProcess *currentForeground = NULL;
 
-    }
-};
+FProcess::FProcess(void) : ListNode(), Flint() {
 
-static FList<FlintNode> flints;
+}
+
+static FList<FProcess> processList;
 static FMutex fosMutex;
 
 static void flintTerminated(Flint *flint) {
+    FProcess *process = (FProcess *)flint;
+    if(process == homeApp)
+        homeApp = NULL;
+    if(process == allowForeground)
+        allowForeground = homeApp;
+    if(process == currentForeground)
+        currentForeground = homeApp;
     fosMutex.lock();
-    flints.remove((FlintNode *)flint);
+    processList.remove(process);
     fosMutex.unlock();
-    flint->freeAll();
+    process->freeAll();
     FosDbg::getInstance()->setTarget(NULL);
-    FlintAPI::System::free((FlintNode *)flint);
+    FlintAPI::System::free(process);
 }
 
 char *trim(char *text) {
@@ -41,6 +49,7 @@ char *trim(char *text) {
 }
 
 void FlintOS::startup() {
+    bool isFirst = true;
     char path[FILE_NAME_BUFF_SIZE];
 
     FileReader reader(NULL, "/sys/startup.ini");
@@ -48,8 +57,13 @@ void FlintOS::startup() {
 
     while(reader.readLine(path, sizeof(path)) != -1) {
         char *text = trim(path);
-        if(FlintAPI::IO::finfo(text, NULL) == FlintAPI::IO::FILE_RESULT_OK)
-            FlintOS::open(text);
+        if(FlintAPI::IO::finfo(text, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
+            FProcess *process = FlintOS::open(text);
+            if(isFirst) {
+                setHomeApp(process);
+                isFirst = false;
+            }
+        }
     }
     reader.close();
 }
@@ -85,15 +99,15 @@ void FlintOS::main(void) {
     }
 }
 
-Flint *FlintOS::newFlint(void) {
-    FlintNode *flint = (FlintNode *)FlintAPI::System::malloc(sizeof(FlintNode));
-    if(flint == NULL) return NULL;
-    new (flint)FlintNode();
-    flint->terminatedCallback(flintTerminated);
+FProcess *FlintOS::newProcess(void) {
+    FProcess *process = (FProcess *)FlintAPI::System::malloc(sizeof(FProcess));
+    if(process == NULL) return NULL;
+    new (process)FProcess();
+    process->terminatedCallback(flintTerminated);
     fosMutex.lock();
-    flints.add(flint);
+    processList.add(process);
     fosMutex.unlock();
-    return (Flint *)flint;
+    return process;
 }
 
 typedef struct {
@@ -147,38 +161,39 @@ exit:
     return ret;
 }
 
-static bool runApplication(const char *file) {
-    Flint *flint = FlintOS::newFlint();
-    if(flint == NULL) return false;
+static FProcess *runApplication(const char *file) {
+    FProcess *process = FlintOS::newProcess();
+    if(process == NULL) return NULL;
 
     do {
         Manifest manifest;
-        if(!readManifest(flint, file, &manifest)) break;
-        if(!flint->setProgram(file)) break;
+        if(!readManifest(process, file, &manifest)) break;
+        if(!process->setProgram(file)) break;
 
         if(manifest.type == 0) {    /* Normal application */
-            if(!flint->startToMain()) break;
+            if(!process->startToMain()) break;
         }
         else {                      /* J2ME application */
             static constexpr ConstNameAndType startAppName("startApp", "(Ljava/lang/Class;)V");
 
-            JClass *mainCls = flint->findClass(NULL, manifest.mainCls);
+            JClass *mainCls = process->findClass(NULL, manifest.mainCls);
             if(mainCls == NULL) break;
 
-            JClass *ams = flint->findClass(NULL, "flintos/midp/AMS");
+            JClass *ams = process->findClass(NULL, "flintos/midp/AMS");
             if(ams == NULL) break;
 
-            MethodInfo *method = flint->findMethod(NULL, ams, (ConstNameAndType *)&startAppName);
+            MethodInfo *method = process->findMethod(NULL, ams, (ConstNameAndType *)&startAppName);
             if(method == NULL) break;
 
-            if(!flint->start(method, 1, mainCls)) break;
+            if(!process->start(method, 1, mainCls)) break;
         }
 
-        return true;
+        FlintOS::setForeground(process);
+        return process;
     } while(0);
 
-    flintTerminated(flint);
-    return false;
+    flintTerminated(process);
+    return NULL;
 }
 
 static const char *getExtensionName(const char *fileName) {
@@ -187,10 +202,28 @@ static const char *getExtensionName(const char *fileName) {
     return (endIdx >= 0) ? &fileName[endIdx] : NULL;
 }
 
-bool FlintOS::open(const char *file) {
-    if(file == NULL) return false;
+FProcess *FlintOS::open(const char *file) {
+    if(file == NULL) return NULL;
     const char *extName = getExtensionName(file);
     if(strcasecmp(extName, ".jar") == 0)
         return runApplication(file);
+    return NULL;
+}
+
+void FlintOS::setHomeApp(FProcess *process) {
+    homeApp = process;
+}
+
+bool FlintOS::isForeground(FProcess *process) {
+    if(process == currentForeground)
+        return true;
+    if(process == allowForeground) {
+        currentForeground = allowForeground;
+        return true;
+    }
     return false;
+}
+
+void FlintOS::setForeground(FProcess *process) {
+    allowForeground = process;
 }
