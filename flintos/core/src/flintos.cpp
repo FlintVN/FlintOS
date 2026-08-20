@@ -214,10 +214,10 @@ void FlintOS::setHomeApp(FProcess *process) {
     homeApp = process;
 }
 
-bool FlintOS::isForeground(FProcess *process) {
+bool FlintOS::isForeground(FProcess *process, bool checkOnly) {
     if(process == currentForeground)
         return true;
-    if(process == allowForeground) {
+    if(!checkOnly && process == allowForeground) {
         currentForeground = allowForeground;
         return true;
     }

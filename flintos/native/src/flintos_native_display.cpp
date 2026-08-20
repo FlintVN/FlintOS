@@ -16,7 +16,7 @@ jint NativeDisplay_GetHeight(FNIEnv *env) {
 }
 
 jvoid NativeDisplay_Write(FNIEnv *env, jint x, jint y, jint w, jint h, jbyteArray data) {
-    if(FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint())) {
+    if(FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint(), false)) {
         if(x < 0 || y < 0 || (x + w) > DISPLAY_WIDTH || (y + h) > DISPLAY_HEIGHT) {
             env->throwNew(env->findClass("java/lang/IllegalArgumentException"), "Writing area extends beyond the screen");
             return;
@@ -25,6 +25,10 @@ jvoid NativeDisplay_Write(FNIEnv *env, jint x, jint y, jint w, jint h, jbyteArra
     }
     else
         FlintAPI::Thread::sleep(1);
+}
+
+jbool NativeDisplay_IsForeground(FNIEnv *env) {
+    return FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint());
 }
 
 jvoid NativeDisplay_SetBrightness(FNIEnv *env, jint value) {

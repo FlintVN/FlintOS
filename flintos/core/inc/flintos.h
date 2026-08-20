@@ -18,7 +18,7 @@ public:
 
     static void setHomeApp(FProcess *process);
 
-    static bool isForeground(FProcess *process);
+    static bool isForeground(FProcess *process, bool checkOnly = true);
     static void setForeground(FProcess *process);
 private:
     FlintOS(const FlintOS &) = delete;
