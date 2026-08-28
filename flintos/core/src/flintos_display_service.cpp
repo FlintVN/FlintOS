@@ -35,6 +35,8 @@ static uint16_t ymin = DISPLAY_HEIGHT - 1;
 static uint16_t ymax = 0;
 alignas(2) static uint8_t displayBuff[DISPLAY_WIDTH * DISPLAY_HEIGHT * 2];
 
+// static uint8_t *displayBuff = (uint8_t *)heap_caps_malloc(DISPLAY_WIDTH * DISPLAY_HEIGHT * 2, MALLOC_CAP_SPIRAM);
+
 static void displayLock(void) {
     while(atomic_flag_test_and_set_explicit(&displayLocked, memory_order_acquire))
         FlintAPI::Thread::yield();
@@ -112,7 +114,7 @@ void DisplaySrv::update(void) {
     uint16_t y2 = ymax;
     displayUnlock();
 
-    FDev::Display::write(0, y1, DISPLAY_WIDTH, y2 - y1 + 1, &displayBuff[y1 * DISPLAY_WIDTH * 2]);
+    FDev::Display::write(0, y1, DISPLAY_WIDTH, y2 - y1 + 1, &displayBuff[y1 * DISPLAY_WIDTH * 2], DISPLAY_WIDTH);
     if(ymin == y1 && ymax == y2) {
         displayLock();
         if(ymin == y1 && ymax == y2) {  /* Double-check to ensure there are no changes. */

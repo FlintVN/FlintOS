@@ -4,7 +4,7 @@
 
 #define DISPLAY_WIDTH               240
 #define DISPLAY_HEIGHT              320
-#define DISPLAY_FREQ                40
+#define DISPLAY_FREQ                30
 
 #define AUDIO_FRAME_BUF_SIZE        1024
 #define AUDIO_FRAME_NUM             10
