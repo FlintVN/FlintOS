@@ -25,8 +25,13 @@ void AudioSrv::mainTask(void) {
     while(1) {
         uint8_t *frame = (uint8_t *)&audioBuff[currentPos];
         uint32_t bw = 0;
-        while(bw < AUDIO_FRAME_BUF_SIZE)
-            bw += FDev::Audio::write(&frame[bw], AUDIO_FRAME_BUF_SIZE - bw);
+        while(bw < AUDIO_FRAME_BUF_SIZE) {
+            uint32_t tmp = FDev::Audio::write(&frame[bw], AUDIO_FRAME_BUF_SIZE - bw);
+            if(tmp == 0)
+                FlintAPI::Thread::yield();
+            else
+                bw += tmp;
+        }
         memset(frame, 0, AUDIO_FRAME_BUF_SIZE);
         currentPos = (currentPos + AUDIO_FRAME_BUF_LENGTH) % LENGTH(audioBuff);
     }

@@ -80,7 +80,7 @@ void FlintOS::main(void) {
     AudioSrv::setVolumn(100);
     FDev::WiFi::init();
     FlintOS::startup();
-    FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 1024);
+    FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 512);
     FlintAPI::Thread::create((void (*)(void *))debuggerTask, NULL, 6144);
 
     uint32_t notifiValue;
