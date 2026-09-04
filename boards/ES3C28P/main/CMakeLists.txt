@@ -24,10 +24,12 @@ idf_component_register(
     SRCS "src/esp_board_esp32_s3.cpp"
     SRCS "src/esp_usb_cdc_debugger.cpp"
     SRCS "src/esp_system_api.cpp"
-    SRCS "src/esp_wifi_driver.cpp"
-    SRCS "src/ili9341_lcd_driver.cpp"
-    SRCS "src/es8311_audio_driver.cpp"
     SRCS "src/fatfs_system_io_api.cpp"
+
+    SRCS "src/flintos_hal_devices.cpp"
+    SRCS "src/flintos_hal_wifi_esp.cpp"
+    SRCS "src/flintos_hal_audio_es8311.cpp"
+    SRCS "src/flintos_hal_display_ili9341.cpp"
     SRCS "src/freertos_psram_system_thread_api.cpp"
 
     SRCS ${FLINTOS_SRCS}

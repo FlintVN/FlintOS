@@ -1,5 +1,4 @@
 
-#include "flintos_devices.h"
 #include "flint_system_api.h"
 
 const char *FlintAPI::System::getClassPath(uint32_t index) {

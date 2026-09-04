@@ -1,7 +1,7 @@
 
 #include "flint_mutex.h"
-#include "flintos_devices.h"
 #include "flint_system_api.h"
+#include "flintos_hal_devices.h"
 #include "flintos_default_conf.h"
 #include "flintos_audio_service.h"
 
@@ -22,11 +22,12 @@ static void audioUnlock(void) {
 }
 
 void AudioSrv::mainTask(void) {
+    const HAL::Audio *audio = HAL::Devices::audio();
     while(1) {
         uint8_t *frame = (uint8_t *)&audioBuff[currentPos];
         uint32_t bw = 0;
         while(bw < AUDIO_FRAME_BUF_SIZE) {
-            uint32_t tmp = FDev::Audio::write(&frame[bw], AUDIO_FRAME_BUF_SIZE - bw);
+            uint32_t tmp = audio->write(&frame[bw], AUDIO_FRAME_BUF_SIZE - bw);
             if(tmp == 0)
                 FlintAPI::Thread::yield();
             else
@@ -42,6 +43,7 @@ uint32_t AudioSrv::open(void) {
 }
 
 uint32_t AudioSrv::write(int32_t *pos, int16_t *frame, uint32_t length) {
+    if(HAL::Devices::audio() == NULL) return length;
     int32_t localPos = *pos;
     if(localPos == currentPos) return 0;
     uint32_t count = 0;
@@ -63,6 +65,8 @@ uint8_t AudioSrv::getVolumn(void) {
 }
 
 void AudioSrv::setVolumn(uint8_t value) {
+    const HAL::Audio *audio = HAL::Devices::audio();
     volumn = value;
-    FDev::Audio::setVolumn(value);
+    if(audio != NULL)
+        audio->setVolumn(value);
 }

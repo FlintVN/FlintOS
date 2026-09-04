@@ -1,9 +1,9 @@
 
 #include "flint.h"
 #include "flintos.h"
-#include "flintos_devices.h"
 #include "flint_system_api.h"
 #include "flintos_debugger.h"
+#include "flintos_hal_devices.h"
 #include "flintos_default_conf.h"
 #include "flintos_audio_service.h"
 #include "flint_zip_file_reader.h"
@@ -73,14 +73,19 @@ static void debuggerTask() {
 }
 
 void FlintOS::main(void) {
-    FDev::Display::init();
-    DisplaySrv::showLogo();
-    FDev::Display::brightness(100);
-    FDev::Audio::init();
-    AudioSrv::setVolumn(100);
-    FDev::WiFi::init();
+    if(HAL::Devices::display() != NULL) {
+        HAL::Devices::display()->init();
+        HAL::Devices::display()->brightness(100);
+        DisplaySrv::showLogo();
+    }
+    if(HAL::Devices::audio() != NULL) {
+        HAL::Devices::audio()->init();
+        AudioSrv::setVolumn(100);
+        FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 512);
+    }
+    if(HAL::Devices::wifi() != NULL)
+        HAL::Devices::wifi()->init();
     FlintOS::startup();
-    FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 512);
     FlintAPI::Thread::create((void (*)(void *))debuggerTask, NULL, 6144);
 
     uint32_t notifiValue;

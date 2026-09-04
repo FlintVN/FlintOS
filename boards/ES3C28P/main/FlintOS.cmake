@@ -87,6 +87,7 @@ set(FLINTJVM_INCS
     INCLUDE_DIRS "../../../flintjvm/native/common/inc"
     INCLUDE_DIRS "../../../flintjvm/native/draw/inc"
 
+    INCLUDE_DIRS "../../../flintos/hal"
     INCLUDE_DIRS "../../../flintos/core/inc"
     INCLUDE_DIRS "../../../flintos/native/inc"
 )

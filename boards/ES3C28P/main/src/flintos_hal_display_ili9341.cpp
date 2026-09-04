@@ -5,7 +5,7 @@
 #include "flintos_conf.h"
 #include "flint_system_api.h"
 #include "driver/spi_master.h"
-#include "flintos_devices.h"
+#include "flintos_hal_display_ili9341.h"
 
 #define LCD_SPI_PORT            SPI2_HOST
 
@@ -198,8 +198,55 @@ static void LCD_Clear(void) {
     spi_device_release_bus(spiHandle);
 }
 
-void FDev::Display::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data, uint16_t stride) {
-    static spi_transaction_t trans[2] = {};
+void ILI9341::init(void) const {
+    GPIO_Init();
+    LED_Init();
+    SPI_Init();
+
+    /* SOFTWARE RESET */
+    SPI_WriteCmd(0x01);
+    FlintAPI::Thread::sleep(10);
+    SPI_WriteCmd(0xCF, 0x00, 0xC1, 0x30);
+    SPI_WriteCmd(0xED, 0x64, 0x03, 0X12, 0X81);
+    SPI_WriteCmd(0xE8, 0x85, 0x00, 0x78);
+    SPI_WriteCmd(0xCB, (uint8_t []) {0x39, 0x2C, 0x00, 0x34, 0x02}, 5);
+    SPI_WriteCmd(0xF7, 0x20);
+    SPI_WriteCmd(0xEA, (uint8_t)0x00, 0x00);
+    // Power control, VRH[5:0]
+    SPI_WriteCmd(0xC0, 0x13);
+    // Power control, SAP[2:0], BT[3:0]
+    SPI_WriteCmd(0xC1, 0x13);
+    // VCM control
+    SPI_WriteCmd(0xC5, 0x22, 0x35);
+    // VCM control2
+    SPI_WriteCmd(0xC7, 0xBD);
+    SPI_WriteCmd(0x21);
+    // Memory Access Control
+    SPI_WriteCmd(0x36, 0x08);
+    SPI_WriteCmd(0xB6, 0x0A, 0xA2);
+    SPI_WriteCmd(0x3A, 0x55);
+    // Interface Control
+    SPI_WriteCmd(0xF6, 0x01, 0x30);
+    // VCM control
+    SPI_WriteCmd(0xB1, (uint8_t)0x00, 0x1B);
+    // Gamma Function Disable
+    SPI_WriteCmd(0xF2, 0x00);
+    // Gamma curve selected
+    SPI_WriteCmd(0x26, 0x01);
+    // Set Gamma
+    SPI_WriteCmd(0xE0, (uint8_t []) {0x0F, 0x35, 0x31, 0x0B, 0x0E, 0x06, 0x49, 0xA7, 0x33, 0x07, 0x0F, 0x03, 0x0C, 0x0A, 0x00}, 15);
+    // Set Gamma
+    SPI_WriteCmd(0XE1, (uint8_t []) {0x00, 0x0A, 0x0F, 0x04, 0x11, 0x08, 0x36, 0x58, 0x4D, 0x07, 0x10, 0x0C, 0x32, 0x34, 0x0F}, 15);
+    /* Exit sleep */
+    SPI_WriteCmd(0x11);
+    /* Turn on display */
+    SPI_WriteCmd(0x29);
+
+    LCD_Clear();
+}
+
+void ILI9341::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data, uint16_t stride) const {
+    spi_transaction_t trans[2] = {};
 
     /* Column address set */
     uint16_t tmp = x + w - 1;
@@ -248,54 +295,7 @@ void FDev::Display::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_
     spi_device_release_bus(spiHandle);
 }
 
-void FDev::Display::init(void) {
-    GPIO_Init();
-    LED_Init();
-    SPI_Init();
-
-    /* SOFTWARE RESET */
-    SPI_WriteCmd(0x01);
-    FlintAPI::Thread::sleep(10);
-    SPI_WriteCmd(0xCF, 0x00, 0xC1, 0x30);
-    SPI_WriteCmd(0xED, 0x64, 0x03, 0X12, 0X81);
-    SPI_WriteCmd(0xE8, 0x85, 0x00, 0x78);
-    SPI_WriteCmd(0xCB, (uint8_t []) {0x39, 0x2C, 0x00, 0x34, 0x02}, 5);
-    SPI_WriteCmd(0xF7, 0x20);
-    SPI_WriteCmd(0xEA, (uint8_t)0x00, 0x00);
-    // Power control, VRH[5:0]
-    SPI_WriteCmd(0xC0, 0x13);
-    // Power control, SAP[2:0], BT[3:0]
-    SPI_WriteCmd(0xC1, 0x13);
-    // VCM control
-    SPI_WriteCmd(0xC5, 0x22, 0x35);
-    // VCM control2
-    SPI_WriteCmd(0xC7, 0xBD);
-    SPI_WriteCmd(0x21);
-    // Memory Access Control
-    SPI_WriteCmd(0x36, 0x08);
-    SPI_WriteCmd(0xB6, 0x0A, 0xA2);
-    SPI_WriteCmd(0x3A, 0x55);
-    // Interface Control
-    SPI_WriteCmd(0xF6, 0x01, 0x30);
-    // VCM control
-    SPI_WriteCmd(0xB1, (uint8_t)0x00, 0x1B);
-    // Gamma Function Disable
-    SPI_WriteCmd(0xF2, 0x00);
-    // Gamma curve selected
-    SPI_WriteCmd(0x26, 0x01);
-    // Set Gamma
-    SPI_WriteCmd(0xE0, (uint8_t []) {0x0F, 0x35, 0x31, 0x0B, 0x0E, 0x06, 0x49, 0xA7, 0x33, 0x07, 0x0F, 0x03, 0x0C, 0x0A, 0x00}, 15);
-    // Set Gamma
-    SPI_WriteCmd(0XE1, (uint8_t []) {0x00, 0x0A, 0x0F, 0x04, 0x11, 0x08, 0x36, 0x58, 0x4D, 0x07, 0x10, 0x0C, 0x32, 0x34, 0x0F}, 15);
-    /* Exit sleep */
-    SPI_WriteCmd(0x11);
-    /* Turn on display */
-    SPI_WriteCmd(0x29);
-
-    LCD_Clear();
-}
-
-void FDev::Display::brightness(uint8_t value) {
+void ILI9341::brightness(uint8_t value) const {
     ledc_set_duty(LEDC_MODE, LEDC_CHANNEL, value * (1 << LEDC_DUTY_RES) / 100);
     ledc_update_duty(LEDC_MODE, LEDC_CHANNEL);
 }

@@ -3,9 +3,9 @@
 #include <string.h>
 #include <stdatomic.h>
 #include "flintos_logo.h"
-#include "flintos_devices.h"
 #include "flint_system_api.h"
 #include "flint_file_reader.h"
+#include "flintos_hal_devices.h"
 #include "flintos_default_conf.h"
 #include "flintos_display_service.h"
 
@@ -23,7 +23,9 @@ static void displayUnlock(void) {
 }
 
 void DisplaySrv::setBrightness(uint8_t value) {
-    FDev::Display::brightness(value);
+    const HAL::Display *disp = HAL::Devices::display();
+    if(disp != NULL)
+        disp->brightness(value);
 }
 
 void DisplaySrv::present(Surface *surf) {
@@ -45,7 +47,8 @@ void DisplaySrv::present(Surface *surf) {
 }
 
 void DisplaySrv::flush(void) {
-    if(surface.buffer == NULL) return;
+    const HAL::Display *disp = HAL::Devices::display();
+    if(disp == NULL || surface.buffer == NULL) return;
 
     displayLock();
     DisplaySrv::Surface surf = surface;
@@ -54,7 +57,7 @@ void DisplaySrv::flush(void) {
 
     if(surf.buffer == NULL) return;
 
-    FDev::Display::write(
+    disp->write(
         surf.invalid.x, surf.invalid.y,
         surf.invalid.width, surf.invalid.height,
         &surf.buffer[surf.invalid.x << 1], surf.width
@@ -62,9 +65,12 @@ void DisplaySrv::flush(void) {
 }
 
 void DisplaySrv::showLogo(void) {
+    const HAL::Display *disp = HAL::Devices::display();
+    if(disp == NULL) return;
+
     if(flintosLogo.format == IMG_RGB565) {
         uint16_t x = (DISPLAY_WIDTH - flintosLogo.width) / 2;
         uint16_t y = (DISPLAY_HEIGHT - flintosLogo.height) / 2;
-        FDev::Display::write(x, y, flintosLogo.width, flintosLogo.height, (uint8_t *)flintosLogo.data, flintosLogo.width);
+        disp->write(x, y, flintosLogo.width, flintosLogo.height, (uint8_t *)flintosLogo.data, flintosLogo.width);
     }
 }

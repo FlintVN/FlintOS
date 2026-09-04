@@ -1,9 +1,9 @@
 
 #include <string.h>
 #include "esp_wifi.h"
-#include "flintos_devices.h"
+#include "flintos_hal_wifi_esp.h"
 
-void FDev::WiFi::init(void) {
+void EspWiFi::init(void) const {
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -13,11 +13,7 @@ void FDev::WiFi::init(void) {
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
 }
 
-bool FDev::WiFi::isSupported(void) {
-    return true;
-}
-
-bool FDev::WiFi::connect(const char *ssid, uint8_t ssidLen, const char *password, uint8_t passLen, uint8_t authMode) {
+bool EspWiFi::connect(const char *ssid, uint8_t ssidLen, const char *password, uint8_t passLen, uint8_t authMode) const {
     wifi_config_t wifiConfig = {};
     memcpy(wifiConfig.sta.ssid, ssid, ssidLen);
     memcpy(wifiConfig.sta.password, password, passLen);
@@ -34,11 +30,11 @@ bool FDev::WiFi::connect(const char *ssid, uint8_t ssidLen, const char *password
     return ret == ESP_OK;
 }
 
-void FDev::WiFi::disconnect(void) {
+void EspWiFi::disconnect(void) const {
     esp_wifi_disconnect();
 }
 
-bool FDev::WiFi::isConnected(void) {
+bool EspWiFi::isConnected(void) const {
     wifi_ap_record_t ap_info;
     if(esp_wifi_sta_get_ap_info(&ap_info) != ESP_OK)
         return false;
@@ -49,7 +45,7 @@ bool FDev::WiFi::isConnected(void) {
     return ip_info.ip.addr ? true : false;
 }
 
-bool FDev::WiFi::getAPinfo(FDev::WiFi::ApRecordType *apInfo) {
+bool EspWiFi::getAPinfo(EspWiFi::ApRecordType *apInfo) const {
     wifi_ap_record_t apRecord;
     esp_err_t ret = esp_wifi_sta_get_ap_info(&apRecord);
     if(ret != ESP_OK) return false;
@@ -60,7 +56,7 @@ bool FDev::WiFi::getAPinfo(FDev::WiFi::ApRecordType *apInfo) {
     return true;
 }
 
-bool FDev::WiFi::softAP(const char *ssid, uint8_t ssidLen, const char *password, uint8_t passLen, uint8_t authMode, uint8_t channel, uint8_t maxConnection) {
+bool EspWiFi::softAP(const char *ssid, uint8_t ssidLen, const char *password, uint8_t passLen, uint8_t authMode, uint8_t channel, uint8_t maxConnection) const {
     wifi_config_t wifiConfig = {};
     wifiConfig.ap.ssid_len = ssidLen;
     wifiConfig.ap.channel = channel;
@@ -79,21 +75,21 @@ bool FDev::WiFi::softAP(const char *ssid, uint8_t ssidLen, const char *password,
     return ret == ESP_OK;
 }
 
-void FDev::WiFi::softAPDisconnect(void) {
+void EspWiFi::softAPDisconnect(void) const {
     esp_wifi_set_mode(WIFI_MODE_STA);
 }
 
-bool FDev::WiFi::startScan(bool blocked) {
+bool EspWiFi::startScan(bool blocked) const {
     return esp_wifi_scan_start(NULL, blocked ? true : false) == ESP_OK;
 }
 
-int32_t FDev::WiFi::getScanAPCount(void) {
+int32_t EspWiFi::getScanAPCount(void) const {
     uint16_t count = 0;
     esp_err_t ret = esp_wifi_scan_get_ap_num(&count);
     return (ret == ESP_OK) ? count : -1;
 }
 
-bool FDev::WiFi::getScanAPInfo(FDev::WiFi::ApRecordType *apInfo) {
+bool EspWiFi::getScanAPInfo(EspWiFi::ApRecordType *apInfo) const {
     wifi_ap_record_t apRecord;
     esp_err_t ret = esp_wifi_scan_get_ap_record(&apRecord);
     if(ret != ESP_OK) return false;
@@ -104,10 +100,10 @@ bool FDev::WiFi::getScanAPInfo(FDev::WiFi::ApRecordType *apInfo) {
     return true;
 }
 
-void FDev::WiFi::scanClear(void) {
+void EspWiFi::scanClear(void) const {
     esp_wifi_clear_ap_list();
 }
 
-void FDev::WiFi::stopScan(void) {
+void EspWiFi::stopScan(void) const {
     esp_wifi_scan_stop();
 }
