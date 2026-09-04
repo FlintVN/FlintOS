@@ -5,26 +5,21 @@
 #include "flintos_native_display.h"
 #include "flintos_display_service.h"
 
-jint NativeDisplay_GetWidth(FNIEnv *env) {
+class JDisplay : public JObject {
+public:
+    jint getWidth() { return getFieldByIndex(0)->getInt32(); }
+    jint getHeight() { return getFieldByIndex(1)->getInt32(); }
+    jbyteArray getBuffer() { return (jbyteArray)getFieldByIndex(2)->getObj(); }
+};
+
+jint NativeDisplay_GetPrimaryWidth(FNIEnv *env) {
     (void)env;
     return DISPLAY_WIDTH;
 }
 
-jint NativeDisplay_GetHeight(FNIEnv *env) {
+jint NativeDisplay_GetPrimaryHeight(FNIEnv *env) {
     (void)env;
     return DISPLAY_HEIGHT;
-}
-
-jvoid NativeDisplay_Write(FNIEnv *env, jint x, jint y, jint w, jint h, jbyteArray data) {
-    if(FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint(), false)) {
-        if(x < 0 || y < 0 || (x + w) > DISPLAY_WIDTH || (y + h) > DISPLAY_HEIGHT) {
-            env->throwNew(env->findClass("java/lang/IllegalArgumentException"), "Writing area extends beyond the screen");
-            return;
-        }
-        DisplaySrv::write(x, y, w, h, (uint8_t *)data->getData());
-    }
-    else
-        FlintAPI::Thread::sleep(1);
 }
 
 jbool NativeDisplay_IsForeground(FNIEnv *env) {
@@ -37,4 +32,38 @@ jvoid NativeDisplay_SetBrightness(FNIEnv *env, jint value) {
         else if(value > 100) value = 100;
         DisplaySrv::setBrightness(value);
     }
+}
+
+jvoid NativeDisplay_Present1(FNIEnv *env, jobject obj) {
+    if(FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint(), false)) {
+        JDisplay *disp = (JDisplay *)obj;
+        DisplaySrv::Surface surf;
+        surf.invalid.x = 0;
+        surf.invalid.y = 0;
+        surf.invalid.width = disp->getWidth();
+        surf.invalid.height = disp->getHeight();
+        surf.width = disp->getWidth();
+        surf.height = disp->getHeight();
+        surf.buffer = (uint8_t *)disp->getBuffer()->getData();
+        DisplaySrv::present(&surf);
+    }
+    else
+        FlintAPI::Thread::sleep(1);
+}
+
+jvoid NativeDisplay_Present2(FNIEnv *env, jobject obj, jint x, jint y, jint w, jint h) {
+    if(FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint(), false)) {
+        JDisplay *disp = (JDisplay *)obj;
+        DisplaySrv::Surface surf;
+        surf.invalid.x = x;
+        surf.invalid.y = y;
+        surf.invalid.width = w;
+        surf.invalid.height = h;
+        surf.width = disp->getWidth();
+        surf.height = disp->getHeight();
+        surf.buffer = (uint8_t *)disp->getBuffer()->getData();
+        DisplaySrv::present(&surf);
+    }
+    else
+        FlintAPI::Thread::sleep(1);
 }

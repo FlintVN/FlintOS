@@ -90,7 +90,7 @@ void FlintOS::main(void) {
     while(true) {
         uint32_t tick = (uint32_t)FlintAPI::System::getTimeMillis();
         if((uint32_t)(tick - screenStart) >= screenPeriodic) {
-            DisplaySrv::update();
+            DisplaySrv::flush();
             screenStart = tick;
         }
         if(FlintAPI::Thread::wait(2, &notifiValue)) {
@@ -217,8 +217,9 @@ void FlintOS::setHomeApp(FProcess *process) {
 bool FlintOS::isForeground(FProcess *process, bool checkOnly) {
     if(process == currentForeground)
         return true;
-    if(!checkOnly && process == allowForeground) {
-        currentForeground = allowForeground;
+    if(process == allowForeground) {
+        if(!checkOnly)
+            currentForeground = allowForeground;
         return true;
     }
     return false;

@@ -10,18 +10,16 @@ public class Display {
     private static Display instance;
     private static int WIDTH;
     private static int HEIGHT;
-    private static byte[] screenBuf;
+    private static flintos.device.Display flintDisplay;
     private static Graphics screenGfx;
     private Displayable current;
 
     static {
-        WIDTH = flintos.device.Display.getWidth();
-        HEIGHT = flintos.device.Display.getHeight();
-        screenBuf = new byte[WIDTH * HEIGHT * 2];
-        flint.drawing.Graphics fg = flint.drawing.Graphics.create(WIDTH, HEIGHT, screenBuf);
-        screenGfx = new Graphics(fg);
+        WIDTH = flintos.device.Display.getPrimaryWidth();
+        HEIGHT = flintos.device.Display.getPrimaryHeight();
+        flintDisplay = new flintos.device.Display(WIDTH, HEIGHT);
+        screenGfx = new Graphics(flint.drawing.Graphics.create(WIDTH, HEIGHT, flintDisplay.getBuffer()));
         instance = new Display();
-
         repaintEventProducer = new RepaintEventProducer(EventQueue.getEventQueue());
     }
 
@@ -82,11 +80,11 @@ public class Display {
     }
 
     public static void flush() {
-        flintos.device.Display.write(0, 0, WIDTH, HEIGHT, screenBuf);
+        flintDisplay.present();
     }
 
     public static void flush(int x, int y, int width, int height) {
-        flintos.device.Display.write(x, y, width, height, screenBuf);
+        flintDisplay.present(x, y, width, height);
     }
 
     int getDisplayWidth() {
@@ -114,6 +112,6 @@ public class Display {
             return;
         screenGfx.reset();
         target.paint(screenGfx);
-        flintos.device.Display.write(x1, y1, x2 - x1, y2 - y1, screenBuf);
+        flintDisplay.present(x1, y1, x2 - x1, y2 - y1);
     }
 }
