@@ -69,6 +69,7 @@ static void SD_Init() {
     slot_config.d2 = SD_PIN_D2;
     slot_config.d3 = SD_PIN_D3;
     slot_config.width = 4;
+    slot_config.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
 
     sdmmc_card_t *s_sd_card = nullptr;
     esp_vfs_fat_sdmmc_mount(SD_MOUNT_POINT, &host, &slot_config, &sd_mount_config, &s_sd_card);
