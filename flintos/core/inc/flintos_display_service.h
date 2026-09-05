@@ -19,10 +19,9 @@ public:
         uint8_t *buffer;
     } Surface;
 
+    static void mainTask(void);
     static void setBrightness(uint8_t value);
     static void present(Surface *surf);
-    static void flush(void);
-    static void showLogo(void);
 };
 
 #endif /* __DISPLAY_SERVICE_H */

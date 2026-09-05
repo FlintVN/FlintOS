@@ -76,7 +76,7 @@ void FlintOS::main(void) {
     if(HAL::Devices::display() != NULL) {
         HAL::Devices::display()->init();
         HAL::Devices::display()->brightness(100);
-        DisplaySrv::showLogo();
+        FlintAPI::Thread::create((void (*)(void *))DisplaySrv::mainTask, NULL, 512);
     }
     if(HAL::Devices::audio() != NULL) {
         HAL::Devices::audio()->init();
@@ -87,21 +87,6 @@ void FlintOS::main(void) {
         HAL::Devices::wifi()->init();
     FlintOS::startup();
     FlintAPI::Thread::create((void (*)(void *))debuggerTask, NULL, 6144);
-
-    uint32_t notifiValue;
-
-    uint32_t screenPeriodic = (1000 + DISPLAY_FREQ / 2) / DISPLAY_FREQ;
-    uint32_t screenStart = (uint32_t)FlintAPI::System::getTimeMillis();
-    while(true) {
-        uint32_t tick = (uint32_t)FlintAPI::System::getTimeMillis();
-        if((uint32_t)(tick - screenStart) >= screenPeriodic) {
-            DisplaySrv::flush();
-            screenStart = tick;
-        }
-        if(FlintAPI::Thread::wait(2, &notifiValue)) {
-            // TODO
-        }
-    }
 }
 
 FProcess *FlintOS::newProcess(void) {

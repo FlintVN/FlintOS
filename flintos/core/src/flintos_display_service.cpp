@@ -22,6 +22,47 @@ static void displayUnlock(void) {
     atomic_flag_clear_explicit(&displayLocked, memory_order_release);
 }
 
+static void showLogo(void) {
+    const HAL::Display *disp = HAL::Devices::display();
+    if(disp == NULL) return;
+
+    if(flintosLogo.format == IMG_RGB565) {
+        uint16_t x = (DISPLAY_WIDTH - flintosLogo.width) / 2;
+        uint16_t y = (DISPLAY_HEIGHT - flintosLogo.height) / 2;
+        disp->write(x, y, flintosLogo.width, flintosLogo.height, (uint8_t *)flintosLogo.data, flintosLogo.width);
+    }
+}
+
+static void displayFlush(void) {
+    const HAL::Display *disp = HAL::Devices::display();
+    if(disp == NULL || surface.buffer == NULL) return;
+
+    displayLock();
+    DisplaySrv::Surface surf = surface;
+    surface.buffer = NULL;
+    displayUnlock();
+
+    if(surf.buffer == NULL) return;
+
+    disp->write(
+        surf.invalid.x, surf.invalid.y,
+        surf.invalid.width, surf.invalid.height,
+        &surf.buffer[surf.invalid.x << 1], surf.width
+    );
+}
+
+void DisplaySrv::mainTask(void) {
+    static const uint32_t screenPeriodic = (1000 + DISPLAY_FREQ / 2) / DISPLAY_FREQ;
+    showLogo();
+    while(true) {
+        uint32_t tick = (uint32_t)FlintAPI::System::getTimeMillis();
+        displayFlush();
+        int32_t remaining = screenPeriodic - (uint32_t)((uint32_t)FlintAPI::System::getTimeMillis() - tick);
+        if(remaining > 0)
+            FlintAPI::Thread::sleep(remaining);
+    }
+}
+
 void DisplaySrv::setBrightness(uint8_t value) {
     const HAL::Display *disp = HAL::Devices::display();
     if(disp != NULL)
@@ -44,33 +85,4 @@ void DisplaySrv::present(Surface *surf) {
         surface.buffer = surf->buffer;
     }
     displayUnlock();
-}
-
-void DisplaySrv::flush(void) {
-    const HAL::Display *disp = HAL::Devices::display();
-    if(disp == NULL || surface.buffer == NULL) return;
-
-    displayLock();
-    DisplaySrv::Surface surf = surface;
-    surface.buffer = NULL;
-    displayUnlock();
-
-    if(surf.buffer == NULL) return;
-
-    disp->write(
-        surf.invalid.x, surf.invalid.y,
-        surf.invalid.width, surf.invalid.height,
-        &surf.buffer[surf.invalid.x << 1], surf.width
-    );
-}
-
-void DisplaySrv::showLogo(void) {
-    const HAL::Display *disp = HAL::Devices::display();
-    if(disp == NULL) return;
-
-    if(flintosLogo.format == IMG_RGB565) {
-        uint16_t x = (DISPLAY_WIDTH - flintosLogo.width) / 2;
-        uint16_t y = (DISPLAY_HEIGHT - flintosLogo.height) / 2;
-        disp->write(x, y, flintosLogo.width, flintosLogo.height, (uint8_t *)flintosLogo.data, flintosLogo.width);
-    }
 }
