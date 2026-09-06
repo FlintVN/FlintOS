@@ -37,7 +37,7 @@ static void NVS_Init(void) {
     ESP_ERROR_CHECK(err);
 }
 
-static void FS_Init() {
+static void FS_Init(void) {
     static const esp_vfs_fat_mount_config_t flash_mount_config = {
         .format_if_mount_failed = true,
         .max_files = 0,
@@ -50,7 +50,7 @@ static void FS_Init() {
     ESP_ERROR_CHECK(esp_vfs_fat_spiflash_mount_rw_wl("", FLASH_PARTITION_LABEL, &flash_mount_config, &s_wl_handle));
 }
 
-static void SD_Init() {
+static void SD_Init(void) {
     static const esp_vfs_fat_mount_config_t sd_mount_config = {
         .format_if_mount_failed = false,
         .max_files = 0,
@@ -61,6 +61,8 @@ static void SD_Init() {
 
     sdmmc_host_t host = SDMMC_HOST_DEFAULT();
     host.max_freq_khz = SDMMC_FREQ_HIGHSPEED;
+    host.unaligned_multi_block_rw_max_chunk_size = 32;
+
     sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
     slot_config.clk = SD_PIN_CLK;
     slot_config.cmd = SD_PIN_CMD;
