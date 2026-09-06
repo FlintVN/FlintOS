@@ -76,17 +76,17 @@ void FlintOS::main(void) {
     if(HAL::Devices::display() != NULL) {
         HAL::Devices::display()->init();
         HAL::Devices::display()->brightness(100);
-        FlintAPI::Thread::create((void (*)(void *))DisplaySrv::mainTask, NULL, 512);
+        FlintAPI::Thread::create((void (*)(void *))DisplaySrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     }
     if(HAL::Devices::audio() != NULL) {
         HAL::Devices::audio()->init();
         AudioSrv::setVolumn(100);
-        FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 512);
+        FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     }
     if(HAL::Devices::wifi() != NULL)
         HAL::Devices::wifi()->init();
     FlintOS::startup();
-    FlintAPI::Thread::create((void (*)(void *))debuggerTask, NULL, 6144);
+    FlintAPI::Thread::create((void (*)(void *))debuggerTask, NULL, 6144, FlintAPI::Thread::THREAD_PRIORITY_MEDIUM);
 }
 
 FProcess *FlintOS::newProcess(void) {
