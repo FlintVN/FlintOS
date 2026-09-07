@@ -1,4 +1,4 @@
-package flintos.device;
+package flintos.media;
 
 public class AudioTrack implements AutoCloseable {
     private int pos = -1;

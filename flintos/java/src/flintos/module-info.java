@@ -1,5 +1,5 @@
 
 module flintos {
     requires java.base;
-    exports flintos.device;
+    exports flintos.media;
 }

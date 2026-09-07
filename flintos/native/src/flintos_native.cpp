@@ -12,8 +12,8 @@
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/net/WiFi",                        wifiMethods),
-    NATIVE_CLASS("flintos/device/Display",                displayMethods),
-    NATIVE_CLASS("flintos/device/AudioTrack",             audioTrackMethods),
+    NATIVE_CLASS("flintos/media/Display",                 displayMethods),
+    NATIVE_CLASS("flintos/media/AudioTrack",              audioTrackMethods),
 
     /*
      * This function can be removed and replaced with Java code based on java.util.zip.Inflater
