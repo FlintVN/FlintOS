@@ -13,10 +13,6 @@ static FProcess *homeApp = NULL;
 static FProcess *allowForeground = NULL;
 static FProcess *currentForeground = NULL;
 
-FProcess::FProcess(void) : ListNode(), Flint() {
-
-}
-
 static FList<FProcess> processList;
 static FMutex fosMutex;
 
@@ -30,10 +26,10 @@ static void flintTerminated(Flint *flint) {
         currentForeground = homeApp;
     fosMutex.lock();
     processList.remove(process);
-    fosMutex.unlock();
     process->freeAll();
     FosDbg::getInstance()->setTarget(NULL);
     FlintAPI::System::free(process);
+    fosMutex.unlock();
 }
 
 char *trim(char *text) {
@@ -217,4 +213,15 @@ bool FlintOS::isForeground(FProcess *process, bool checkOnly) {
 
 void FlintOS::setForeground(FProcess *process) {
     allowForeground = process;
+}
+
+bool FlintOS::postEvent(const FEvent *event) {
+    if(currentForeground == NULL) return false;
+
+    bool ret = false;
+    fosMutex.lock();
+    if(currentForeground != NULL)
+        ret = currentForeground->getEventQueue()->postEvent(event);
+    fosMutex.unlock();
+    return ret;
 }

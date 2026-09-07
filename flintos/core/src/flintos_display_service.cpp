@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdatomic.h>
+#include "flintos.h"
 #include "flintos_logo.h"
 #include "flint_system_api.h"
 #include "flint_file_reader.h"
@@ -52,11 +53,13 @@ static void displayFlush(void) {
 }
 
 void DisplaySrv::mainTask(void) {
+    static const FEvent monitorEvent = {.type = 3, .data = {0}};
     static const uint32_t screenPeriodic = (1000 + DISPLAY_FREQ / 2) / DISPLAY_FREQ;
     showLogo();
     while(true) {
         uint32_t tick = (uint32_t)FlintAPI::System::getTimeMillis();
         displayFlush();
+        FlintOS::postEvent(&monitorEvent);
         int32_t remaining = screenPeriodic - (uint32_t)((uint32_t)FlintAPI::System::getTimeMillis() - tick);
         if(remaining > 0)
             FlintAPI::Thread::sleep(remaining);

@@ -2,12 +2,8 @@
 #ifndef __FLINTOS_H
 #define __FLINTOS_H
 
-#include "flint.h"
-
-class FProcess : public ListNode, public Flint {
-public:
-    FProcess(void);
-};
+#include "flintos_process.h"
+#include "flintos_event_queue.h"
 
 class FlintOS {
 public:
@@ -20,6 +16,8 @@ public:
 
     static bool isForeground(FProcess *process, bool checkOnly = true);
     static void setForeground(FProcess *process);
+
+    static bool postEvent(const FEvent *event);
 private:
     FlintOS(const FlintOS &) = delete;
     void operator=(const FlintOS &) = delete;

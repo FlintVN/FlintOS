@@ -9,11 +9,14 @@
 #include "flintos_native_midp_image.h"
 #include "flintos_native_audio_track.h"
 #include "flintos_native_midp_key_converter.h"
+#include "flintos_native_native_event_receiver.h"
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/net/WiFi",                        wifiMethods),
     NATIVE_CLASS("flintos/media/Display",                 displayMethods),
     NATIVE_CLASS("flintos/media/AudioTrack",              audioTrackMethods),
+
+    NATIVE_CLASS("flintos/system/NativeEventReceiver",    nativeEventReceiverMethods),
 
     /*
      * This function can be removed and replaced with Java code based on java.util.zip.Inflater

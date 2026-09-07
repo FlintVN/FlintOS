@@ -65,8 +65,10 @@ set(FLINTOS_SRCS
 
     "../../../flintos/core/src/flintos.cpp"
     "../../../flintos/core/src/flintos_logo.cpp"
+    "../../../flintos/core/src/flintos_process.cpp"
     "../../../flintos/core/src/flint_system_api.cpp"
     "../../../flintos/core/src/flintos_debugger.cpp"
+    "../../../flintos/core/src/flintos_event_queue.cpp"
     "../../../flintos/core/src/flintos_audio_service.cpp"
     "../../../flintos/core/src/flintos_display_service.cpp"
 
@@ -76,6 +78,7 @@ set(FLINTOS_SRCS
     "../../../flintos/native/src/flintos_native_midp_image.cpp"
     "../../../flintos/native/src/flintos_native_audio_track.cpp"
     "../../../flintos/native/src/flintos_native_midp_key_converter.cpp"
+    "../../../flintos/native/src/flintos_native_native_event_receiver.cpp"
 )
 
 set(FLINTJVM_INCS
