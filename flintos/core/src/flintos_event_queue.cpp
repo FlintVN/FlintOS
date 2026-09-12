@@ -9,6 +9,14 @@ FEventQueue::FEventQueue(void) : eventLock() {
 }
 
 bool FEventQueue::postEvent(const FEvent *event) {
+    if(event == NULL) {
+        eventLock.lock();
+        if(owner != NULL)
+            FlintAPI::Thread::notify(owner->getOwnerThread()->getHandle(), FlintAPI::Thread::THREAD_NOTIFY_SYSTEM_EVENT);
+        eventLock.unlock();
+        return true;
+    }
+
     if(count == LENGTH(events)) return false;
 
     eventLock.lock();

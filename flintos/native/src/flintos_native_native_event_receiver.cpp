@@ -40,3 +40,9 @@ jbool NativeInputEvent_WaitEvent2(FNIEnv *env, jobject event, jlong millis) {
 
     return true;
 }
+
+jvoid NativeInputEvent_NotifyEvent(FNIEnv *env) {
+    FExec *ctx = (FExec *)env;
+    FEventQueue *eventQueue = ((FProcess *)(ctx->getFlint()))->getEventQueue();
+    eventQueue->postEvent(NULL);
+}
