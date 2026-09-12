@@ -55,20 +55,23 @@ void ES8311::init(void) const {
 
     /* Initialize I2C peripheral */
     i2c_master_bus_handle_t i2cBusHandle = NULL;
-    i2c_master_bus_config_t i2cMstCfg = {};
-    i2cMstCfg.i2c_port = I2C_PORT_NUM;
-    i2cMstCfg.sda_io_num = (gpio_num_t)ES8311_SDA;
-    i2cMstCfg.scl_io_num = (gpio_num_t)ES8311_SCL;
-    i2cMstCfg.clk_source = I2C_CLK_SRC_DEFAULT;
-    i2cMstCfg.glitch_ignore_cnt = 7;
-    i2cMstCfg.flags.enable_internal_pullup = true;
-    ESP_ERROR_CHECK(i2c_new_master_bus(&i2cMstCfg, &i2cBusHandle));
+    if(i2c_master_get_bus_handle(I2C_PORT_NUM, &i2cBusHandle) != ESP_OK) {
+        i2c_master_bus_config_t i2cMstCfg = {};
+        i2cMstCfg.i2c_port = I2C_PORT_NUM;
+        i2cMstCfg.sda_io_num = (gpio_num_t)ES8311_SDA;
+        i2cMstCfg.scl_io_num = (gpio_num_t)ES8311_SCL;
+        i2cMstCfg.clk_source = I2C_CLK_SRC_DEFAULT;
+        i2cMstCfg.glitch_ignore_cnt = 7;
+        i2cMstCfg.flags.enable_internal_pullup = true;
+        ESP_ERROR_CHECK(i2c_new_master_bus(&i2cMstCfg, &i2cBusHandle));
+    }
 
     /* Create control interface with I2C bus handle */
     audio_codec_i2c_cfg_t i2cCfg = {};
     i2cCfg.port = (uint8_t)I2C_PORT_NUM;
     i2cCfg.addr = ES8311_CODEC_DEFAULT_ADDR;
     i2cCfg.bus_handle = i2cBusHandle;
+    i2cCfg.clock_speed_hz = 400000;
     const audio_codec_ctrl_if_t *ctrlIf = audio_codec_new_i2c_ctrl(&i2cCfg);
     assert(ctrlIf);
 

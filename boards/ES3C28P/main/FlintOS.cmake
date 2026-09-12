@@ -70,6 +70,7 @@ set(FLINTOS_SRCS
     "../../../flintos/core/src/flintos_debugger.cpp"
     "../../../flintos/core/src/flintos_event_queue.cpp"
     "../../../flintos/core/src/flintos_audio_service.cpp"
+    "../../../flintos/core/src/flintos_input_service.cpp"
     "../../../flintos/core/src/flintos_display_service.cpp"
 
     "../../../flintos/native/src/flintos_native.cpp"

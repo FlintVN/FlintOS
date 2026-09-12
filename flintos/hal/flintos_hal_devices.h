@@ -4,6 +4,7 @@
 
 #include "flintos_hal_wifi.h"
 #include "flintos_hal_audio.h"
+#include "flintos_hal_touch.h"
 #include "flintos_hal_display.h"
 
 namespace HAL {
@@ -11,6 +12,7 @@ namespace HAL {
     public:
         static const WiFi *wifi(void);
         static const Audio *audio(void);
+        static const Touch *touch(void);
         static const Display *display(void);
     };
 }

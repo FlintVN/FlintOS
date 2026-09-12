@@ -5,8 +5,9 @@
 #include "flintos_debugger.h"
 #include "flintos_hal_devices.h"
 #include "flintos_default_conf.h"
-#include "flintos_audio_service.h"
 #include "flint_zip_file_reader.h"
+#include "flintos_audio_service.h"
+#include "flintos_input_service.h"
 #include "flintos_display_service.h"
 
 static FProcess *homeApp = NULL;
@@ -74,6 +75,9 @@ void FlintOS::main(void) {
         HAL::Devices::display()->brightness(100);
         FlintAPI::Thread::create((void (*)(void *))DisplaySrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     }
+    if(HAL::Devices::touch())
+        HAL::Devices::touch()->init();
+    FlintAPI::Thread::create((void (*)(void *))InputSrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     if(HAL::Devices::audio() != NULL) {
         HAL::Devices::audio()->init();
         AudioSrv::setVolumn(100);
