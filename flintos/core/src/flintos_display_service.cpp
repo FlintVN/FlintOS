@@ -34,22 +34,24 @@ static void showLogo(void) {
     }
 }
 
-static void displayFlush(void) {
+static bool displayFlush(void) {
     const HAL::Display *disp = HAL::Devices::display();
-    if(disp == NULL || surface.buffer == NULL) return;
+    if(disp == NULL || surface.buffer == NULL) return false;
 
     displayLock();
     DisplaySrv::Surface surf = surface;
     surface.buffer = NULL;
     displayUnlock();
 
-    if(surf.buffer == NULL) return;
+    if(surf.buffer == NULL) return false;
 
     disp->write(
         surf.invalid.x, surf.invalid.y,
         surf.invalid.width, surf.invalid.height,
         &surf.buffer[surf.invalid.x << 1], surf.width
     );
+
+    return true;
 }
 
 void DisplaySrv::mainTask(void) {
@@ -58,8 +60,8 @@ void DisplaySrv::mainTask(void) {
     showLogo();
     while(true) {
         uint32_t tick = (uint32_t)FlintAPI::System::getTimeMillis();
-        displayFlush();
-        FlintOS::postEvent(&monitorEvent);
+        if(displayFlush())
+            FlintOS::postEvent(&monitorEvent);
         int32_t remaining = screenPeriodic - (uint32_t)((uint32_t)FlintAPI::System::getTimeMillis() - tick);
         if(remaining > 0)
             FlintAPI::Thread::sleep(remaining);
