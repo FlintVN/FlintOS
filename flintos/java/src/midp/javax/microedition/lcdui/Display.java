@@ -18,7 +18,7 @@ public class Display {
         WIDTH = flint.media.Display.getPrimaryWidth();
         HEIGHT = flint.media.Display.getPrimaryHeight();
         flintDisplay = new flint.media.Display(WIDTH, HEIGHT);
-        screenGfx = new Graphics(flint.drawing.Graphics.create(WIDTH, HEIGHT, flintDisplay.getBuffer()));
+        screenGfx = new Graphics(flintDisplay.createGraphics());
         instance = new Display();
         repaintEventProducer = new RepaintEventProducer(EventQueue.getEventQueue());
     }

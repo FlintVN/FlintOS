@@ -1,9 +1,12 @@
 package flint.media;
 
+import flint.drawing.Graphics;
+
 public class Display {
     private int width;
     private int height;
     private byte[] buffer;
+    private Graphics g;
 
     public Display(int width, int height) {
         if(width < 0 || height < 0)
@@ -36,4 +39,10 @@ public class Display {
     public native void present();
 
     public native void present(int x, int y, int w, int h);
+
+    public Graphics createGraphics() {
+        if(g == null)
+            g = Graphics.create(width, height, buffer);
+        return g;
+    }
 }
