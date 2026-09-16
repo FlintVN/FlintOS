@@ -169,7 +169,7 @@ static FProcess *runApplication(const char *file) {
             JClass *mainCls = process->findClass(NULL, manifest.mainCls);
             if(mainCls == NULL) break;
 
-            JClass *ams = process->findClass(NULL, "flintos/midp/AMS");
+            JClass *ams = process->findClass(NULL, "flint/midp/AMS");
             if(ams == NULL) break;
 
             MethodInfo *method = process->findMethod(NULL, ams, (ConstNameAndType *)&startAppName);

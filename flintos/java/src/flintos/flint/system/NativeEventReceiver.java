@@ -1,4 +1,4 @@
-package flintos.system;
+package flint.system;
 
 public class NativeEventReceiver {
     private NativeEventReceiver() {

@@ -1,4 +1,4 @@
-package flintos.system;
+package flint.system;
 
 public class NativeEvent extends Event {
     private int[] data;

@@ -1,4 +1,4 @@
-package flintos.media;
+package flint.media;
 
 public class AudioFormat {
     public static final int ENCODING_PCM_8BIT = 0;

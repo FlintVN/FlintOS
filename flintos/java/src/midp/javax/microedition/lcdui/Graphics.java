@@ -122,11 +122,11 @@ public class Graphics {
     }
 
     public void drawRect(int x, int y, int w, int h) {
-        fg.drawRect(color, 1, x, y, w, h);
+        fg.drawRect(color, x, y, w, h);
     }
 
     public void drawLine(int x1, int y1, int x2, int y2) {
-        fg.drawLine(color, 1, x1, y1, x2, y2);
+        fg.drawLine(color, x1, y1, x2, y2);
     }
 
     public void fillRoundRect(int x, int y, int w, int h, int aw, int ah) {
@@ -134,7 +134,7 @@ public class Graphics {
     }
 
     public void drawRoundRect(int x, int y, int w, int h, int aw, int ah) {
-        fg.drawRoundRect(color, 1, x, y, w, h, aw, aw, aw, aw);
+        fg.drawRoundRect(color, x, y, w, h, aw, aw, aw, aw);
     }
 
     public void fillArc(int x, int y, int w, int h, int sa, int aa) {
@@ -142,15 +142,15 @@ public class Graphics {
     }
 
     public void drawArc(int x, int y, int w, int h, int sa, int aa) {
-        fg.drawEllipse(color, 1, x, y, w, h);
+        fg.drawEllipse(color, x, y, w, h);
     }
 
 
     public void fillTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
         // TODO
-        fg.drawLine(color, 1, x1, y1, x2, y2);
-        fg.drawLine(color, 1, x2, y2, x3, y3);
-        fg.drawLine(color, 1, x3, y3, x1, y1);
+        fg.drawLine(color, x1, y1, x2, y2);
+        fg.drawLine(color, x2, y2, x3, y3);
+        fg.drawLine(color, x3, y3, x1, y1);
     }
 
     public void drawString(String s, int x, int y, int anchor) {

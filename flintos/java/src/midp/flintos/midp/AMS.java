@@ -1,4 +1,4 @@
-package flintos.midp;
+package flint.midp;
 
 import javax.microedition.midlet.MIDlet;
 import javax.microedition.midlet.MIDletStateChangeException;

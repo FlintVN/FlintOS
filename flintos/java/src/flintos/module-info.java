@@ -1,6 +1,6 @@
 
 module flintos {
     requires java.base;
-    exports flintos.media;
-    exports flintos.system;
+    exports flint.media;
+    exports flint.system;
 }

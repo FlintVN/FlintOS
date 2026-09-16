@@ -1,4 +1,4 @@
-package flintos.system;
+package flint.system;
 
 public class EventTypes {
     public static final int KEY_EVENT = 1;

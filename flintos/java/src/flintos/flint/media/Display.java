@@ -1,4 +1,4 @@
-package flintos.media;
+package flint.media;
 
 public class Display {
     private int width;

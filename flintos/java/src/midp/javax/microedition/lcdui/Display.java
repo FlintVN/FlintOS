@@ -10,14 +10,14 @@ public class Display {
     private static Display instance;
     private static int WIDTH;
     private static int HEIGHT;
-    private static flintos.media.Display flintDisplay;
+    private static flint.media.Display flintDisplay;
     private static Graphics screenGfx;
     private Displayable current;
 
     static {
-        WIDTH = flintos.media.Display.getPrimaryWidth();
-        HEIGHT = flintos.media.Display.getPrimaryHeight();
-        flintDisplay = new flintos.media.Display(WIDTH, HEIGHT);
+        WIDTH = flint.media.Display.getPrimaryWidth();
+        HEIGHT = flint.media.Display.getPrimaryHeight();
+        flintDisplay = new flint.media.Display(WIDTH, HEIGHT);
         screenGfx = new Graphics(flint.drawing.Graphics.create(WIDTH, HEIGHT, flintDisplay.getBuffer()));
         instance = new Display();
         repaintEventProducer = new RepaintEventProducer(EventQueue.getEventQueue());
