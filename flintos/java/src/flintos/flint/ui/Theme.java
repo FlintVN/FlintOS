@@ -29,6 +29,7 @@ public abstract class Theme {
     public abstract Color primaryColor();
     public abstract Color secondaryColor();
     public abstract Color accentColor();
+    public abstract Color thumbColor();
 
     /* Text */
     public abstract Color textColor();

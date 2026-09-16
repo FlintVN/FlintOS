@@ -3,22 +3,23 @@ package flint.ui;
 import flint.drawing.Color;
 
 public class DarkTheme extends Theme {
-    private final static Color backgroundColor = new Color(0xFF121212);     // #121212
-    private final static Color primaryColor = new Color(0xFF2196F3);        // #2196F3
-    private final static Color secondaryColor = new Color(0xFF9C27B0);      // #9C27B0
-    private final static Color accentColor = new Color(0xFF03A9F4);         // #03A9F4
-    private final static Color textColor = new Color(0xFFE0E0E0);           // #E0E0E0
-    private final static Color secondaryTextColor = new Color(0xFFAAAAAA);  // #AAAAAA
-    private final static Color disabledTextColor = new Color(0xFF5A5A5A);   // #5A5A5A
-    private final static Color hintTextColor = new Color(0xFF787878);       // #787878
-    private final static Color disabledColor = new Color(0xFF373737);       // #373737
-    private final static Color pressedColor = new Color(0xFF1976BE);        // #1976BE
-    private final static Color focusedColor = new Color(0xFF42A5F5);        // #42A5F5
-    private final static Color selectedColor = new Color(0xFF2D2D2D);       // #2D2D2D
-    private final static Color hoverColor = new Color(0xFF282828);          // #282828
-    private final static Color borderColor = new Color(0xFF4B4B4B);         // #4B4B4B
-    private final static Color surfaceColor = new Color(0xFF1E1E1E);        // #1E1E1E
-    private final static Color overlayColor = new Color(0x80000000);        // #000000
+    private static final Color backgroundColor = new Color(0xFF121212);     // #121212
+    private static final Color primaryColor = new Color(0xFF2196F3);        // #2196F3
+    private static final Color secondaryColor = new Color(0xFF9C27B0);      // #9C27B0
+    private static final Color accentColor = new Color(0xFF03A9F4);         // #03A9F4
+    private static final Color thumbColor = new Color(0xFFDCDCDC);          // #DCDCDC
+    private static final Color textColor = new Color(0xFFE0E0E0);           // #E0E0E0
+    private static final Color secondaryTextColor = new Color(0xFFAAAAAA);  // #AAAAAA
+    private static final Color disabledTextColor = new Color(0xFF5A5A5A);   // #5A5A5A
+    private static final Color hintTextColor = new Color(0xFF787878);       // #787878
+    private static final Color disabledColor = new Color(0xFF373737);       // #373737
+    private static final Color pressedColor = new Color(0xFF1976BE);        // #1976BE
+    private static final Color focusedColor = new Color(0xFF42A5F5);        // #42A5F5
+    private static final Color selectedColor = new Color(0xFF2D2D2D);       // #2D2D2D
+    private static final Color hoverColor = new Color(0xFF282828);          // #282828
+    private static final Color borderColor = new Color(0xFF4B4B4B);         // #4B4B4B
+    private static final Color surfaceColor = new Color(0xFF1E1E1E);        // #1E1E1E
+    private static final Color overlayColor = new Color(0x80000000);        // #000000
 
     public DarkTheme() {
 
@@ -38,6 +39,10 @@ public class DarkTheme extends Theme {
 
     public Color accentColor() {
         return accentColor;
+    }
+
+    public Color thumbColor() {
+        return thumbColor;
     }
 
     public Color textColor() {
