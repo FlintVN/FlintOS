@@ -38,6 +38,14 @@ public abstract class View {
 
     protected abstract void onDraw(Graphics g);
 
+    protected boolean containsPoint(int x, int y) {
+        return this.x <= x && x < (this.x + actualWidth) && this.y <= y && y < (this.y + actualHeight);
+    }
+
+    protected View hitTest(int x, int y) {
+        return containsPoint(x, y) ? this : null;
+    }
+
     public int getWidth() {
         return width;
     }
