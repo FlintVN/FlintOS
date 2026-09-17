@@ -32,6 +32,7 @@ public abstract class View {
     protected HorizontalAlignment hAlignment = HorizontalAlignment.LEFT;
     protected VerticalAlignment vAlignment = VerticalAlignment.TOP;
 
+    protected OnTouchListener onTouchListener;
     protected OnClickListener onClickListener;
 
     public View() {
@@ -53,6 +54,10 @@ public abstract class View {
     }
 
     protected void onTouchEvent(MotionEvent event) {
+        if(onTouchListener != null) {
+            if(onTouchListener.onTouch(this, event))
+                return;
+        }
         switch(event.getAction()) {
             case MotionEvent.ACTION_UP: {
                 if(onClickListener != null && containsPoint(event.x, event.y))
@@ -183,6 +188,14 @@ public abstract class View {
 
     public void setOnClickListener(OnClickListener listener) {
         onClickListener = listener;
+    }
+
+    public void setOnTouchListener(OnTouchListener listener) {
+        onTouchListener = listener;
+    }
+
+    public static interface OnTouchListener {
+        boolean onTouch(View v, MotionEvent event);
     }
 
     public static interface OnClickListener {
