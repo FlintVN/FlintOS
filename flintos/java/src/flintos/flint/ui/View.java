@@ -46,6 +46,14 @@ public abstract class View {
         return containsPoint(x, y) ? this : null;
     }
 
+    protected void onKeyEvent(KeyEvent event) {
+
+    }
+
+    protected void onTouchEvent(MotionEvent event) {
+
+    }
+
     public int getWidth() {
         return width;
     }

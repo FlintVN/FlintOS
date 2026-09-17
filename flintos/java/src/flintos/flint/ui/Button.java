@@ -16,9 +16,10 @@ public class Button extends PanelView {
     protected int paddingRight;
     protected int paddingBottom;
 
+    private Object backgroundOld;
+
     public Button() {
         background = Theme.defaultTheme.primaryColor();
-        borderColor = Theme.defaultTheme.borderColor();
 
         font = Theme.defaultTheme.defaultFont();
         textColor = Theme.defaultTheme.textColor();
@@ -70,6 +71,19 @@ public class Button extends PanelView {
         g.drawString(text, font, textColor, x, y);
 
         g.setClip(gClipX, gClipY, gClipW, gClipH, ClipMode.REPLACE);
+    }
+
+    @Override
+    protected void onTouchEvent(MotionEvent event) {
+        switch(event.action) {
+            case MotionEvent.ACTION_DOWN:
+                backgroundOld = background;
+                background = Theme.defaultTheme.pressedColor();
+                break;
+            case MotionEvent.ACTION_UP:
+                background = backgroundOld;
+                break;
+        }
     }
 
     @Override
