@@ -77,6 +77,16 @@ public class CheckBox extends View {
     }
 
     @Override
+    protected void onTouchEvent(MotionEvent event) {
+        switch(event.action) {
+            case MotionEvent.ACTION_UP:
+                if(containsPoint(event.x, event.y))
+                    checked = !checked;
+                break;
+        }
+    }
+
+    @Override
     protected void updateActualWidth(int availableW) {
         if(width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
             int contentW = paddingLeft + paddingRight;
