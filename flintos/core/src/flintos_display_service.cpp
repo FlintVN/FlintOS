@@ -48,7 +48,7 @@ static bool displayFlush(void) {
     disp->write(
         surf.invalid.x, surf.invalid.y,
         surf.invalid.width, surf.invalid.height,
-        &surf.buffer[surf.invalid.x << 1], surf.width
+        &surf.buffer[(surf.invalid.y * surf.width + surf.invalid.x) << 1], surf.width
     );
 
     return true;
@@ -60,8 +60,8 @@ void DisplaySrv::mainTask(void) {
     showLogo();
     while(true) {
         uint32_t tick = (uint32_t)FlintAPI::System::getTimeMillis();
-        if(displayFlush())
-            FlintOS::postEvent(&monitorEvent);
+        displayFlush();
+        FlintOS::postEvent(&monitorEvent);
         int32_t remaining = screenPeriodic - (uint32_t)((uint32_t)FlintAPI::System::getTimeMillis() - tick);
         if(remaining > 0)
             FlintAPI::Thread::sleep(remaining);
