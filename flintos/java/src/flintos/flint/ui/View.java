@@ -39,6 +39,14 @@ public abstract class View {
 
     }
 
+    public final void invalidateVisual() {
+        FlintUI.setInvalidateVisual(this);
+    }
+
+    public final void invalidateLayout() {
+        FlintUI.setInvalidateLayout();
+    }
+
     protected abstract void onDraw(Graphics g);
 
     protected boolean containsPoint(int x, int y) {
@@ -82,6 +90,7 @@ public abstract class View {
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
+        invalidateLayout();
     }
 
     protected void updateLocation(int x, int y) {
@@ -132,6 +141,7 @@ public abstract class View {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+        invalidateVisual();
     }
 
     public Margin getMargin() {
@@ -151,6 +161,7 @@ public abstract class View {
         marginTop = top;
         marginRight = right;
         marginBottom = bottom;
+        invalidateLayout();
     }
 
     public Object getBackground() {
@@ -164,6 +175,7 @@ public abstract class View {
             background = bg;
         else
             throw new IllegalArgumentException("background must be an instance of Color or Image");
+        invalidateVisual();
     }
 
     public HorizontalAlignment getHorizontalAlignment() {
@@ -174,6 +186,7 @@ public abstract class View {
         if(alignment == null)
             throw new NullPointerException("alignment cannot be null");
         hAlignment = alignment;
+        invalidateLayout();
     }
 
     public VerticalAlignment getVerticalAlignment() {
@@ -184,6 +197,7 @@ public abstract class View {
         if(alignment == null)
             throw new NullPointerException("alignment cannot be null");
         vAlignment = alignment;
+        invalidateLayout();
     }
 
     public void setOnClickListener(OnClickListener listener) {

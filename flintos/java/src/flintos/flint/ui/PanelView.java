@@ -59,6 +59,7 @@ class PanelView extends View {
 
     public void setBorderColor(Color color) {
         borderColor = color;
+        invalidateVisual();
     }
 
     public CornerRadius getCornerRadius() {
@@ -78,5 +79,6 @@ class PanelView extends View {
         this.topRightRadius = topRight;
         this.bottomLeftRadius = bottomLeft;
         this.bottomRightRadius = bottomRight;
+        invalidateVisual();
     }
 }

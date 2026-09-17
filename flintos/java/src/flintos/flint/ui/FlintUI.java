@@ -8,10 +8,15 @@ import flint.system.NativeEvent;
 import flint.system.NativeEventReceiver;
 
 public abstract class FlintUI extends View {
+    private static FlintUI currentUI;
+
     protected View content;
 
     private boolean doubleBuffer = true;
     private Display disp, disp1, disp2;
+
+    private boolean invLayout = true;
+    private int invX, invY, invW, invH;
 
     private View actView;
 
@@ -25,7 +30,44 @@ public abstract class FlintUI extends View {
     protected FlintUI(int w, int h) {
         width = w;
         height = h;
+        invX = 0;
+        invY = 0;
+        invW = w;
+        invH = h;
         background = Theme.defaultTheme.backgroundColor();
+    }
+
+    static final void setInvalidateVisual(View v) {
+        FlintUI ui = currentUI;
+        if(ui == null)
+            return;
+        if(ui.invW == 0 || ui.invH == 0) {
+            ui.invX = v.x;
+            ui.invY = v.y;
+            ui.invW = v.actualWidth;
+            ui.invH = v.actualHeight;
+        }
+        else {
+            int invX2 = ui.invX + ui.invW;
+            int invY2 = ui.invY + ui.invH;
+            int x2 = v.x + v.actualWidth;
+            int y2 = v.y + v.actualHeight;
+            if(ui.invX < v.x) ui.invX = v.x;
+            if(ui.invY < v.y) ui.invY = v.y;
+            if(invX2 < x2) ui.invW = x2 - ui.invX;
+            if(invY2 < y2) ui.invH = y2 - ui.invY;
+        }
+    }
+
+    static final void setInvalidateLayout() {
+        FlintUI ui = currentUI;
+        if(ui == null)
+            return;
+        ui.invX = 0;
+        ui.invY = 0;
+        ui.invW = ui.actualWidth;
+        ui.invH = ui.actualHeight;
+        ui.invLayout = true;
     }
 
     @Override
@@ -153,8 +195,8 @@ public abstract class FlintUI extends View {
     }
 
     public void show() {
+        currentUI = this;
         NativeEvent event = new NativeEvent();
-        updateLayout();
         initGraphics();
         draw();
         while(true) {
@@ -175,14 +217,23 @@ public abstract class FlintUI extends View {
     }
 
     private void draw() {
-        disp = (doubleBuffer && disp == disp1) ? disp2 : disp1;
-        Color bg = background != null ? (Color)background : Theme.defaultTheme.backgroundColor();
-        Graphics g = disp.createGraphics();
+        int w = invW;
+        int h = invH;
+        if(invLayout || (w > 0 && h > 0)) {
+            invH = 0;
+            invW = 0;
+            if(invLayout) {
+                invLayout = false;
+                updateLayout();
+            }
 
-        g.setTransform(-x, -y);
-        g.clear(bg);
-        onDraw(g);
-
-        disp.present();
+            disp = (doubleBuffer && disp == disp1) ? disp2 : disp1;
+            Color bg = background != null ? (Color)background : Theme.defaultTheme.backgroundColor();
+            Graphics g = disp.createGraphics();
+            g.setClip(invX, invY, w, h);
+            g.clear(bg);
+            onDraw(g);
+            disp.present(invX, invY, w, h);
+        }
     }
 }
