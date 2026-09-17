@@ -10,6 +10,19 @@ public class GroupView extends PanelView {
         children = new View[MIN_CAPACITY];
     }
 
+    @Override
+    protected View hitTest(int x, int y) {
+        if(containsPoint(x, y)) {
+            for(int i = childrenCount - 1; i >= 0; i--) {
+                View v = children[i].hitTest(x, y);
+                if(v != null)
+                    return v;
+            }
+            return this;
+        }
+        return null;
+    }
+
     public void addView(View v) {
         if(v == null)
             throw new NullPointerException("view cannot be null");
