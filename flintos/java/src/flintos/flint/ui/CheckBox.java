@@ -79,10 +79,14 @@ public class CheckBox extends View {
     @Override
     protected void onTouchEvent(MotionEvent event) {
         switch(event.action) {
-            case MotionEvent.ACTION_UP:
-                if(containsPoint(event.x, event.y))
+            case MotionEvent.ACTION_UP: {
+                if(containsPoint(event.x, event.y)) {
                     checked = !checked;
-                break;
+                    if(onClickListener != null)
+                        onClickListener.onClick(this);
+                }
+                return;
+            }
         }
     }
 
