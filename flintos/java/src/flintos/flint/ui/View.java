@@ -32,6 +32,8 @@ public abstract class View {
     protected HorizontalAlignment hAlignment = HorizontalAlignment.LEFT;
     protected VerticalAlignment vAlignment = VerticalAlignment.TOP;
 
+    protected OnClickListener onClickListener;
+
     public View() {
 
     }
@@ -51,7 +53,13 @@ public abstract class View {
     }
 
     protected void onTouchEvent(MotionEvent event) {
-
+        switch(event.getAction()) {
+            case MotionEvent.ACTION_UP: {
+                if(onClickListener != null && containsPoint(event.x, event.y))
+                    onClickListener.onClick(this);
+                return;
+            }
+        }
     }
 
     public int getWidth() {
@@ -171,5 +179,13 @@ public abstract class View {
         if(alignment == null)
             throw new NullPointerException("alignment cannot be null");
         vAlignment = alignment;
+    }
+
+    public void setOnClickListener(OnClickListener listener) {
+        onClickListener = listener;
+    }
+
+    public static interface OnClickListener {
+        void onClick(View v);
     }
 }
