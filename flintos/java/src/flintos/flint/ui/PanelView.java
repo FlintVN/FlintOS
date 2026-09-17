@@ -49,7 +49,7 @@ class PanelView extends View {
         actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? 0 : availableH);
     }
 
-    int getBorderThickness() {
+    final int getBorderThickness() {
         return (borderColor != null && borderColor.getAlpha() > 0) ? 1 : 0;
     }
 
