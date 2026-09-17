@@ -32,6 +32,11 @@ public class GroupView extends PanelView {
         v.parent = this;
         children[childrenCount] = v;
         childrenCount++;
+
+        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+            invalidateLayout();
+        else
+            invalidateVisual();
     }
 
     public void removeView(View v) {
@@ -52,6 +57,11 @@ public class GroupView extends PanelView {
             System.arraycopy(children, index + 1, children, index, childrenCount - index);
         else
             children[index] = null;
+
+        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+            invalidateLayout();
+        else
+            invalidateVisual();
     }
 
     public void removeAllView() {

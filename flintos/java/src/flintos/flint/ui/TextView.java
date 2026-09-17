@@ -84,6 +84,10 @@ public class TextView extends View {
 
     public void setText(String text) {
         this.text = text;
+        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+            invalidateLayout();
+        else
+            invalidateVisual();
     }
 
     public Font getFont() {
@@ -94,6 +98,10 @@ public class TextView extends View {
         if(font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
+        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+            invalidateLayout();
+        else
+            invalidateVisual();
     }
 
     public Color getTextColor() {
@@ -102,6 +110,7 @@ public class TextView extends View {
 
     public void setTextColor(Color color) {
         textColor = color;
+        invalidateVisual();
     }
 
     public CornerRadius getCornerRadius() {
@@ -121,6 +130,7 @@ public class TextView extends View {
         this.topRightRadius = topRight;
         this.bottomLeftRadius = bottomLeft;
         this.bottomRightRadius = bottomRight;
+        invalidateVisual();
     }
 
     public Padding getPading() {
@@ -142,5 +152,6 @@ public class TextView extends View {
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
+        invalidateLayout();
     }
 }

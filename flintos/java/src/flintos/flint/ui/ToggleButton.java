@@ -63,6 +63,7 @@ public class ToggleButton extends View {
             case MotionEvent.ACTION_UP:
                 if(containsPoint(event.x, event.y)) {
                     checked = !checked;
+                    invalidateVisual();
                     if(onClickListener != null)
                         onClickListener.onClick(this);
                 }
@@ -94,6 +95,7 @@ public class ToggleButton extends View {
             background = bg;
         else
             throw new IllegalArgumentException("background must be an instance of Color");
+        invalidateVisual();
     }
 
     public boolean isChecked() {
@@ -102,6 +104,7 @@ public class ToggleButton extends View {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+        invalidateVisual();
     }
 
     public Color getOnColor() {
@@ -110,6 +113,8 @@ public class ToggleButton extends View {
 
     public void setOnColor(Color color) {
         onColor = color;
+        if(checked)
+            invalidateVisual();
     }
 
     public Color getThumbColor() {
@@ -118,6 +123,7 @@ public class ToggleButton extends View {
 
     public void setThumbColor(Color color) {
         thumbColor = color;
+        invalidateVisual();
     }
 
     public Color getBorderColor() {
@@ -126,6 +132,7 @@ public class ToggleButton extends View {
 
     public void setBorderColor(Color color) {
         borderColor = color;
+        invalidateVisual();
     }
 
     public int getCornerRadius() {
@@ -134,5 +141,6 @@ public class ToggleButton extends View {
 
     public void setCornerRadius(int radius) {
         cornerRadius = radius;
+        invalidateVisual();
     }
 }

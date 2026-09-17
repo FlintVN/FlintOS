@@ -239,5 +239,6 @@ public class StackView extends GroupView {
 
     public void setOrientation(Orientation orientation) {
         this.orientation = orientation;
+        invalidateLayout();
     }
 }

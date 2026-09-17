@@ -83,10 +83,12 @@ public class Button extends PanelView {
             case MotionEvent.ACTION_DOWN: {
                 backgroundOld = background;
                 background = Theme.defaultTheme.pressedColor();
+                invalidateVisual();
                 return;
             }
             case MotionEvent.ACTION_UP: {
                 background = backgroundOld;
+                invalidateVisual();
                 if(onClickListener != null && containsPoint(event.x, event.y))
                     onClickListener.onClick(this);
                 return;
@@ -132,6 +134,10 @@ public class Button extends PanelView {
 
     public void setText(String text) {
         this.text = text;
+        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+            invalidateLayout();
+        else
+            invalidateVisual();
     }
 
     public Font getFont() {
@@ -142,6 +148,10 @@ public class Button extends PanelView {
         if(font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
+        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+            invalidateLayout();
+        else
+            invalidateVisual();
     }
 
     public Color getTextColor() {
@@ -150,6 +160,7 @@ public class Button extends PanelView {
 
     public void setTextColor(Color color) {
         textColor = color;
+        invalidateVisual();
     }
 
     public Padding getPading() {
@@ -169,5 +180,6 @@ public class Button extends PanelView {
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
+        invalidateLayout();
     }
 }
