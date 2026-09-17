@@ -106,6 +106,10 @@ public class EditText extends PanelView {
 
     public void setText(String text) {
         this.text = text;
+        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+            invalidateLayout();
+        else
+            invalidateVisual();
     }
 
     public Font getFont() {
@@ -116,6 +120,10 @@ public class EditText extends PanelView {
         if(font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
+        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+            invalidateLayout();
+        else
+            invalidateVisual();
     }
 
     public Color getTextColor() {
@@ -124,6 +132,7 @@ public class EditText extends PanelView {
 
     public void setTextColor(Color color) {
         textColor = color;
+        invalidateVisual();
     }
 
     public Padding getPading() {
@@ -145,5 +154,6 @@ public class EditText extends PanelView {
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
+        invalidateLayout();
     }
 }

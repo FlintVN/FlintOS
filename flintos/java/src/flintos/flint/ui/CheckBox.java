@@ -86,6 +86,7 @@ public class CheckBox extends View {
             case MotionEvent.ACTION_UP: {
                 if(containsPoint(event.x, event.y)) {
                     checked = !checked;
+                    invalidateVisual();
                     if(onClickListener != null)
                         onClickListener.onClick(this);
                 }
@@ -130,6 +131,7 @@ public class CheckBox extends View {
             background = bg;
         else
             throw new IllegalArgumentException("background must be an instance of Color");
+        invalidateVisual();
     }
 
     public String getText() {
@@ -138,6 +140,10 @@ public class CheckBox extends View {
 
     public void setText(String text) {
         this.text = text;
+        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+            invalidateLayout();
+        else
+            invalidateVisual();
     }
 
     public Font getFont() {
@@ -148,6 +154,10 @@ public class CheckBox extends View {
         if(font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
+        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+            invalidateLayout();
+        else
+            invalidateVisual();
     }
 
     public Color getTextColor() {
@@ -156,6 +166,7 @@ public class CheckBox extends View {
 
     public void setTextColor(Color color) {
         textColor = color;
+        invalidateVisual();
     }
 
     public boolean isChecked() {
@@ -164,6 +175,7 @@ public class CheckBox extends View {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+        invalidateVisual();
     }
 
     public Color getColor() {
@@ -172,6 +184,7 @@ public class CheckBox extends View {
 
     public void setColor(Color color) {
         this.color = color;
+        invalidateVisual();
     }
 
     public CornerRadius getCornerRadius() {
@@ -191,6 +204,7 @@ public class CheckBox extends View {
         this.topRightRadius = topRight;
         this.bottomLeftRadius = bottomLeft;
         this.bottomRightRadius = bottomRight;
+        invalidateVisual();
     }
 
     public Padding getPading() {
@@ -212,5 +226,6 @@ public class CheckBox extends View {
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
+        invalidateLayout();
     }
 }
