@@ -76,13 +76,17 @@ public class Button extends PanelView {
     @Override
     protected void onTouchEvent(MotionEvent event) {
         switch(event.action) {
-            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_DOWN: {
                 backgroundOld = background;
                 background = Theme.defaultTheme.pressedColor();
-                break;
-            case MotionEvent.ACTION_UP:
+                return;
+            }
+            case MotionEvent.ACTION_UP: {
                 background = backgroundOld;
-                break;
+                if(onClickListener != null && containsPoint(event.x, event.y))
+                    onClickListener.onClick(this);
+                return;
+            }
         }
     }
 
