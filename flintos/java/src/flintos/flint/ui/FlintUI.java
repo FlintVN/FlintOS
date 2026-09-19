@@ -107,7 +107,7 @@ public abstract class FlintUI extends View {
                     motionEvent.action = action;
                     motionEvent.x = event.getData(1);
                     motionEvent.y = event.getData(2);
-                    actView.onTouchEvent(motionEvent);
+                    actView.dispatchTouchEvent(motionEvent);
                 }
                 return;
             }
