@@ -9,6 +9,8 @@ public abstract class View {
     public static final int MATCH_PARENT = -1;
     public static final int WRAP_CONTENT = -2;
 
+    private static final int SCROLL_LIMIT = 10;
+
     protected View parent;
 
     protected boolean visible = true;
@@ -32,8 +34,11 @@ public abstract class View {
     protected HorizontalAlignment hAlignment = HorizontalAlignment.LEFT;
     protected VerticalAlignment vAlignment = VerticalAlignment.TOP;
 
-    protected OnTouchListener onTouchListener;
-    protected OnClickListener onClickListener;
+    private OnTouchListener onTouchListener;
+    private OnClickListener onClickListener;
+
+    protected boolean isPressing;
+    protected int startX, startY;
 
     public View() {
 
@@ -62,14 +67,31 @@ public abstract class View {
     }
 
     protected void onTouchEvent(MotionEvent event) {
+
+    }
+
+    protected final void dispatchTouchEvent(MotionEvent event) {
         if(onTouchListener != null) {
             if(onTouchListener.onTouch(this, event))
                 return;
         }
-        switch(event.getAction()) {
+        if(event.action == MotionEvent.ACTION_DOWN) {
+            isPressing = true;
+            startX = event.x;
+            startY = event.y;
+        }
+        onTouchEvent(event);
+        switch(event.action) {
             case MotionEvent.ACTION_UP: {
-                if(onClickListener != null && containsPoint(event.x, event.y))
+                if(isPressing && onClickListener != null && containsPoint(event.x, event.y))
                     onClickListener.onClick(this);
+                return;
+            }
+            case MotionEvent.ACTION_MOVE: {
+                int diffX = event.x > startX ? event.x - startX : startX - event.x;
+                int diffY = event.y > startY ? event.y - startY : startY - event.y;
+                if(diffX > SCROLL_LIMIT || diffY > SCROLL_LIMIT || !containsPoint(event.x, event.y))
+                    isPressing = false;
                 return;
             }
         }

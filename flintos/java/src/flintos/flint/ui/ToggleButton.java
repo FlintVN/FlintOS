@@ -55,19 +55,14 @@ public class ToggleButton extends View {
 
     @Override
     protected void onTouchEvent(MotionEvent event) {
-        if(onTouchListener != null) {
-            if(onTouchListener.onTouch(this, event))
-                return;
-        }
         switch(event.action) {
-            case MotionEvent.ACTION_UP:
-                if(containsPoint(event.x, event.y)) {
+            case MotionEvent.ACTION_UP: {
+                if(isPressing && containsPoint(event.x, event.y)) {
                     checked = !checked;
                     invalidateVisual();
-                    if(onClickListener != null)
-                        onClickListener.onClick(this);
                 }
                 break;
+            }
         }
     }
 
