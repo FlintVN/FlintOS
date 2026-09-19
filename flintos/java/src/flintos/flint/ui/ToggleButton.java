@@ -9,6 +9,8 @@ public class ToggleButton extends View {
     private static final int DEFAULT_HEIGHT = 24;
     private static final int DEFAULT_RADIUS = 12;
 
+    private static final int ANIMATION_DURATION = 100;
+
     protected boolean checked;
 
     protected Color onColor;
@@ -17,6 +19,9 @@ public class ToggleButton extends View {
     protected Color borderColor;
 
     protected int cornerRadius;
+
+    private boolean changing = false;
+    private int startTimeChange = 0;
 
     public ToggleButton() {
         onColor = Theme.defaultTheme.primaryColor();
@@ -31,8 +36,18 @@ public class ToggleButton extends View {
 
     @Override
     protected void onDraw(Graphics g) {
+        int time = 0;
         int r = cornerRadius;
-        Object bgColor = checked ? onColor : background;
+        Object bgColor;
+        if(changing) {
+            time = (int)System.currentTimeMillis() - startTimeChange;
+            if(time >= ANIMATION_DURATION / 2)
+                bgColor = checked ? onColor : background;
+            else
+                bgColor = checked ? background : onColor;
+        }
+        else
+            bgColor = checked ? onColor : background;
         if(bgColor != null)
             g.fillRoundRect((Color)bgColor, this.x, this.y, actualWidth, actualHeight, r, r, r, r);
 
@@ -47,7 +62,21 @@ public class ToggleButton extends View {
             int thk = (borderColor != null && borderColor.getAlpha() > 0) ? 1 : 0;
             int h = actualHeight - (thk << 1) - 6;
             int y = thk + 3;
-            int x = checked ? (actualWidth - y - h) : y;
+            int x2 = actualWidth - y - h;
+            int x;
+            if(changing) {
+                if(time >= ANIMATION_DURATION) {
+                    changing = false;
+                    x = checked ? x2 : y;
+                }
+                else if(checked)
+                    x = y + time * (x2 - y) / ANIMATION_DURATION;
+                else
+                    x = x2 - time * (x2 - y) / ANIMATION_DURATION;
+                invalidateVisual();
+            }
+            else
+                x = checked ? x2 : y;
             r = cornerRadius - thk - 3;
             g.fillRoundRect(c, this.x + x, this.y + y, h, h, r, r, r, r);
         }
@@ -59,6 +88,8 @@ public class ToggleButton extends View {
             case MotionEvent.ACTION_UP: {
                 if(isPressing && containsPoint(event.x, event.y)) {
                     checked = !checked;
+                    changing = true;
+                    startTimeChange = (int)System.currentTimeMillis();
                     invalidateVisual();
                 }
                 break;
