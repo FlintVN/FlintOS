@@ -9,6 +9,9 @@ import flint.drawing.Graphics;
 
 public class CheckBox extends View {
     private static final int BOX_SIZE = 18;
+    private static final int ANIMATION_DURATION = 150;
+    private static final int PRESS_OFFSET = 2;
+    private static final int PRESS_OFFSET_X2 = PRESS_OFFSET << 1;
 
     protected String text;
     protected Font font;
@@ -28,6 +31,10 @@ public class CheckBox extends View {
     protected int paddingRight;
     protected int paddingBottom;
 
+    private boolean animStatus = false;
+    private boolean isReleased = true;
+    private int startTime;
+
     public CheckBox() {
         font = Theme.defaultTheme.defaultFont();
         textColor = Theme.defaultTheme.textColor();
@@ -39,33 +46,57 @@ public class CheckBox extends View {
     }
 
     @Override
+    public void invalidateVisual() {
+        FlintUI.setInvalidateVisual(x - PRESS_OFFSET, y - PRESS_OFFSET, actualWidth + PRESS_OFFSET_X2, actualHeight + PRESS_OFFSET_X2);
+    }
+
+    @Override
     protected void onDraw(Graphics g) {
         if(background != null) {
             Color bgColor = (Color)background;
             g.fillRoundRect(bgColor, this.x, this.y, actualWidth, actualHeight, topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
         }
 
+        Color c = color;
+        if(c != null && c.getAlpha() > 0) {
+            int r = 4;
+
+            int x = this.x + paddingLeft;
+            int y = this.y + paddingTop;
+            int boxSize = BOX_SIZE;
+
+            if(animStatus) {
+                int tmp, time = (int)System.currentTimeMillis() - startTime;
+                if(time < ANIMATION_DURATION)
+                    tmp = time * PRESS_OFFSET / ANIMATION_DURATION;
+                else {
+                    tmp = PRESS_OFFSET;
+                    animStatus = false;
+                }
+                if(isReleased) tmp = PRESS_OFFSET - tmp;
+                x -= tmp;
+                y -= tmp;
+                boxSize += tmp << 1;
+                invalidateVisual();
+            }
+            else if(!isReleased) {
+                x -= PRESS_OFFSET;
+                y -= PRESS_OFFSET;
+                boxSize += PRESS_OFFSET_X2;
+            }
+
+            g.drawRoundRect(c, x, y, boxSize, boxSize, r, r, r, r);
+            if(checked) {
+                r -= 2;
+                g.fillRoundRect(c, x + 3, y + 3, boxSize - 5, boxSize - 5, r, r, r, r);
+            }
+        }
+
         int gClipX = g.getClipX();
         int gClipY = g.getClipY();
         int gClipW = g.getClipWidth();
         int gClipH = g.getClipHeight();
-
-        int x1 = paddingLeft;
-        int y1 = paddingTop;
-        int x2 = actualWidth - paddingRight;
-        int y2 = actualHeight - paddingBottom;
-
-        g.setClip(this.x + x1, this.y + y1, x2 - x1, y2 - y1, ClipMode.INTERSECT);
-
-        Color c = color;
-        if(c != null && c.getAlpha() > 0) {
-            int r = 4;
-            g.drawRoundRect(c, this.x + paddingLeft, this.y + paddingTop, BOX_SIZE, BOX_SIZE, r, r, r, r);
-            if(checked) {
-                r -= 2;
-                g.fillRoundRect(c, this.x + paddingLeft + 3, this.y + paddingTop + 3, BOX_SIZE - 5, BOX_SIZE - 5, r, r, r, r);
-            }
-        }
+        g.setClip(this.x, this.y, actualWidth, actualHeight, ClipMode.INTERSECT);
 
         if(text != null) {
             int x = paddingLeft + BOX_SIZE + 6 + this.x;
@@ -79,11 +110,20 @@ public class CheckBox extends View {
     @Override
     protected void onTouchEvent(MotionEvent event) {
         switch(event.action) {
+            case MotionEvent.ACTION_DOWN: {
+                animStatus = true;
+                isReleased = false;
+                startTime = (int)System.currentTimeMillis();
+                invalidateVisual();
+                return;
+            }
             case MotionEvent.ACTION_UP: {
-                if(isPressing && containsPoint(event.x, event.y)) {
+                animStatus = true;
+                isReleased = true;
+                startTime = (int)System.currentTimeMillis();
+                if(isPressing && containsPoint(event.x, event.y))
                     checked = !checked;
-                    invalidateVisual();
-                }
+                invalidateVisual();
                 return;
             }
         }
@@ -95,7 +135,7 @@ public class CheckBox extends View {
             int contentW = paddingLeft + paddingRight;
 
             int strW = Graphics.measureStringWidth(text, font);
-            contentW += strW + BOX_SIZE + 5;
+            contentW += strW + BOX_SIZE + 6;
 
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
