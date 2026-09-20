@@ -218,6 +218,8 @@ public abstract class FlintUI extends View {
         int w = invW;
         int h = invH;
         if(invLayout || (w > 0 && h > 0)) {
+            int x = invX;
+            int y = invY;
             invW = 0;
             invH = 0;
             if(invLayout) {
@@ -228,10 +230,10 @@ public abstract class FlintUI extends View {
             disp = (doubleBuffer && disp == disp1) ? disp2 : disp1;
             Color bg = background != null ? (Color)background : Theme.defaultTheme.backgroundColor();
             Graphics g = disp.createGraphics();
-            g.setClip(invX, invY, w, h);
+            g.setClip(x, y, w, h);
             g.clear(bg);
             onDraw(g);
-            disp.present(invX, invY, w, h);
+            disp.present(x, y, w, h);
         }
     }
 }
