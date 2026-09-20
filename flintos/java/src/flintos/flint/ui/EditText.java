@@ -50,13 +50,10 @@ public class EditText extends PanelView {
         int gClipH = g.getClipHeight();
 
         int thk = getBorderThickness();
-
         int x1 = thk + paddingLeft;
-        int y1 = thk + paddingTop;
         int x2 = actualWidth - thk - paddingRight;
-        int y2 = actualHeight - thk - paddingBottom;
 
-        g.setClip(this.x + x1, this.y + y1, x2 - x1, y2 - y1, ClipMode.INTERSECT);
+        g.setClip(this.x + x1, this.y + thk, x2 - x1, actualHeight - (thk << 1), ClipMode.INTERSECT);
 
         int txtW = Graphics.measureStringWidth(text, font);
         int txtH = Graphics.measureStringHeight(null, font);
