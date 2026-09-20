@@ -44,11 +44,11 @@ public abstract class View {
 
     }
 
-    public final void invalidateVisual() {
-        FlintUI.setInvalidateVisual(this);
+    public void invalidateVisual() {
+        FlintUI.setInvalidateVisual(x, y, actualWidth, actualHeight);
     }
 
-    public final void invalidateLayout() {
+    public void invalidateLayout() {
         FlintUI.setInvalidateLayout();
     }
 
