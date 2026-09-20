@@ -37,25 +37,23 @@ public abstract class FlintUI extends View {
         background = Theme.defaultTheme.backgroundColor();
     }
 
-    static final void setInvalidateVisual(View v) {
+    static final void setInvalidateVisual(int x, int y, int w, int h) {
         FlintUI ui = currentUI;
         if(ui == null)
             return;
-        if(ui.invW == 0 || ui.invH == 0) {
-            ui.invX = v.x;
-            ui.invY = v.y;
-            ui.invW = v.actualWidth;
-            ui.invH = v.actualHeight;
+        if(ui.invH == 0) {
+            ui.invX = x;
+            ui.invY = y;
+            ui.invW = w;
+            ui.invH = h;
         }
         else {
-            int invX2 = ui.invX + ui.invW;
-            int invY2 = ui.invY + ui.invH;
-            int x2 = v.x + v.actualWidth;
-            int y2 = v.y + v.actualHeight;
-            if(ui.invX < v.x) ui.invX = v.x;
-            if(ui.invY < v.y) ui.invY = v.y;
-            if(invX2 < x2) ui.invW = x2 - ui.invX;
-            if(invY2 < y2) ui.invH = y2 - ui.invY;
+            int x2 = x + w;
+            int y2 = y + h;
+            if(ui.invX > x) ui.invX = x;
+            if(ui.invY > y) ui.invY = y;
+            if((ui.invX + ui.invW) < x2) ui.invW = x2 - ui.invX;
+            if((ui.invY + ui.invH) < y2) ui.invH = y2 - ui.invY;
         }
     }
 
@@ -220,8 +218,8 @@ public abstract class FlintUI extends View {
         int w = invW;
         int h = invH;
         if(invLayout || (w > 0 && h > 0)) {
-            invH = 0;
             invW = 0;
+            invH = 0;
             if(invLayout) {
                 invLayout = false;
                 updateLayout();
