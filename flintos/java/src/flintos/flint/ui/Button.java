@@ -109,18 +109,8 @@ public class Button extends PanelView {
         int gClipH = g.getClipHeight();
 
         int thk = getBorderThickness();
-
-        int x1 = thk;
-        int y1 = thk;
-        int x2 = w - thk;
-        int y2 = h - thk;
-
-        if(paddingLeft > 0) x1 += paddingLeft;
-        if(paddingTop > 0) y1 += paddingTop;
-        if(paddingRight > 0) x2 -= paddingRight;
-        if(paddingBottom > 0) y2 -= paddingBottom;
-
-        g.setClip(x + x1, y + y1, x2 - x1, y2 - y1, ClipMode.INTERSECT);
+        int thk2 = thk << 1;
+        g.setClip(x + thk, y + thk, w - thk2, h - thk2, ClipMode.INTERSECT);
 
         int txtW = Graphics.measureStringWidth(text, font);
         int txtH = Graphics.measureStringHeight(null, font);

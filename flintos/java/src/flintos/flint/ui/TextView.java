@@ -46,15 +46,10 @@ public class TextView extends View {
         int gClipY = g.getClipY();
         int gClipW = g.getClipWidth();
         int gClipH = g.getClipHeight();
+        g.setClip(this.x, this.y, actualWidth, actualHeight, ClipMode.INTERSECT);
 
-        int x1 = paddingLeft;
-        int y1 = paddingTop;
-        int x2 = actualWidth - paddingRight;
-        int y2 = actualHeight - paddingBottom;
-
-        g.setClip(this.x + x1, this.y + y1, x2 - x1, y2 - y1, ClipMode.INTERSECT);
         g.drawString(text, font, textColor, x + paddingLeft, y + paddingTop);
-
+    
         g.setClip(gClipX, gClipY, gClipW, gClipH, ClipMode.REPLACE);
     }
     
