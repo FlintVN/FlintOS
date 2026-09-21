@@ -62,6 +62,10 @@ public abstract class View {
         return containsPoint(x, y) ? this : null;
     }
 
+    protected boolean manipulationMode() {
+        return false;
+    }
+
     protected void onKeyEvent(KeyEvent event) {
 
     }
