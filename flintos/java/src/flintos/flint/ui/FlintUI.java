@@ -68,6 +68,12 @@ public abstract class FlintUI extends View {
         ui.invLayout = true;
     }
 
+    static final void setInvalidateLayout(int x, int y, int w, int h) {
+        setInvalidateVisual(x, y, w, h);
+        if(currentUI != null)
+            currentUI.invLayout = true;
+    }
+
     @Override
     protected void onDraw(Graphics g) {
         if(content != null && content.isVisible(g))

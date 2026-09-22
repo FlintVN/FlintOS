@@ -52,6 +52,10 @@ public abstract class View {
         FlintUI.setInvalidateLayout();
     }
 
+    public void invalidateInternalLayout() {
+        FlintUI.setInvalidateLayout(x, y, actualWidth, actualHeight);
+    }
+
     protected abstract void onDraw(Graphics g);
 
     protected boolean containsPoint(int x, int y) {

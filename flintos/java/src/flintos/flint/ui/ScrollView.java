@@ -47,7 +47,7 @@ public class ScrollView extends PanelView {
                 requestUpdate |= elasticEffectY();
 
             if(requestUpdate)
-                invalidateLayout();
+                invalidateInternalLayout();
             else
                 scrolling = false;
         }
@@ -225,7 +225,7 @@ public class ScrollView extends PanelView {
                     actView = null;
                 }
                 isPressed = false;
-                invalidateLayout();
+                invalidateInternalLayout();
                 return;
             }
             case MotionEvent.ACTION_MOVE: {
@@ -248,7 +248,7 @@ public class ScrollView extends PanelView {
                 }
 
                 scrolling = true;
-                invalidateLayout();
+                invalidateInternalLayout();
                 if(actView != null)
                     actView.dispatchTouchEvent(event);
                 return;
