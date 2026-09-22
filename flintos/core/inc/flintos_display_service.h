@@ -8,14 +8,14 @@ class DisplaySrv {
 public:
     typedef struct {
         struct {
-            uint16_t x;
-            uint16_t y;
-            uint16_t width;
-            uint16_t height;
+            int32_t x;
+            int32_t y;
+            int32_t width;
+            int32_t height;
         } invalid;
 
-        uint16_t width;
-        uint16_t height;
+        int32_t width;
+        int32_t height;
         uint8_t *buffer;
     } Surface;
 

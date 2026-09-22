@@ -1,6 +1,7 @@
 
 #include <stddef.h>
 #include <string.h>
+#include <algorithm>
 #include <stdatomic.h>
 #include "flintos.h"
 #include "flintos_logo.h"
@@ -76,18 +77,37 @@ void DisplaySrv::setBrightness(uint8_t value) {
 
 void DisplaySrv::present(Surface *surf) {
     displayLock();
-    if(surface.buffer != surf->buffer || surface.width != surf->width)
-        surface = *surf;
+    if(surface.buffer != surf->buffer || surface.width != surf->width) {
+        int32_t x1 = std::max<int32_t>(0, surf->invalid.x);
+        int32_t y1 = std::max<int32_t>(0, surf->invalid.y);
+        int32_t x2 = std::min<int32_t>(surf->invalid.x + surf->invalid.width, std::min<int32_t>(surf->width, DISPLAY_WIDTH));
+        int32_t y2 = std::min<int32_t>(surf->invalid.y + surf->invalid.height, std::min<int32_t>(surf->height, DISPLAY_HEIGHT));
+
+        if(x1 < x2 && y1 < y2) {
+            surface.invalid.x = x1;
+            surface.invalid.y = y1;
+            surface.invalid.width = x2 - x1;
+            surface.invalid.height = y2 - y1;
+            surface.width = surf->width;
+            surface.height = surf->height;
+            surface.buffer = surf->buffer;
+        }
+    }
     else {
-        uint16_t x2 = surf->invalid.x + surf->invalid.width;
-        uint16_t y2 = surf->invalid.y + surf->invalid.height;
-        if(surface.invalid.x > surf->invalid.x) surface.invalid.x = surf->invalid.x;
-        if(surface.invalid.y > surf->invalid.y) surface.invalid.y = surf->invalid.y;
-        if((surface.invalid.x + surface.invalid.width) < x2) surface.invalid.width = x2 - surface.invalid.x;
-        if((surface.invalid.y + surface.invalid.height) < x2) surface.invalid.height = y2 - surface.invalid.y;
-        surface.width = surf->width;
-        surface.height = surf->height;
-        surface.buffer = surf->buffer;
+        int32_t x1 = std::max<int32_t>(0, std::min(surface.invalid.x, surf->invalid.x));
+        int32_t y1 = std::max<int32_t>(0, std::min(surface.invalid.y, surf->invalid.y));
+        int32_t x2 = std::max<int32_t>(surface.invalid.x + surface.invalid.width, surf->invalid.x + surf->invalid.width);
+        int32_t y2 = std::max<int32_t>(surface.invalid.x + surface.invalid.height, surf->invalid.y + surf->invalid.height);
+        x2 = std::min<int32_t>(x2, std::min<int32_t>(surf->width, DISPLAY_WIDTH));
+        y2 = std::min<int32_t>(y2, std::min<int32_t>(surf->height, DISPLAY_HEIGHT));
+
+        if(x1 < x2 && y1 < y2) {
+            surface.invalid.x = x1;
+            surface.invalid.y = y1;
+            surface.invalid.width = x2 - x1;
+            surface.invalid.height = y2 - y1;
+            surface.height = surf->height;
+        }
     }
     displayUnlock();
 }

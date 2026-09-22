@@ -17,6 +17,10 @@ DEV_JAR_OUT_DIR     ?=  $(DEV_OUT_DIR)
 
 all: run dev
 
+rebuild:
+	@"$(MAKE)" --no-print-directory clean
+	@"$(MAKE)" --no-print-directory all
+
 run: $(foreach m,$(MODULES),$(RUN_OUT_DIR)/$(m))
 
 dev: $(foreach m,$(MODULES),$(DEV_OUT_DIR)/$(m))

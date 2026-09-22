@@ -20,6 +20,7 @@ void InputSrv::mainTask(void) {
             bool status = touch->read(&x, &y);
             if(status || lastStatus != status) {
                 if(lastStatus != status) {
+                    lastStatus = status;
                     touchEvent.data[0] = !status;
                     if(status) {
                         touchEvent.data[1] = x;
@@ -33,7 +34,6 @@ void InputSrv::mainTask(void) {
                     touchEvent.data[2] = y;
                     FlintOS::postEvent(&touchEvent);
                 }
-                lastStatus = status;
             }
         }
         int32_t remaining = delay - (uint32_t)((uint32_t)FlintAPI::System::getTimeMillis() - tick);
