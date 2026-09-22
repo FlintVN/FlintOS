@@ -233,12 +233,4 @@ public abstract class View {
     public void setOnTouchListener(OnTouchListener listener) {
         onTouchListener = listener;
     }
-
-    public static interface OnTouchListener {
-        boolean onTouch(View v, MotionEvent event);
-    }
-
-    public static interface OnClickListener {
-        void onClick(View v);
-    }
 }

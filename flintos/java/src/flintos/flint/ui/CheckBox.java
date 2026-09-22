@@ -31,6 +31,8 @@ public class CheckBox extends View {
     protected int paddingRight;
     protected int paddingBottom;
 
+    private OnCheckedChangeListener onCheckedChangeListener;
+
     private boolean animStatus = false;
     private boolean isReleased = true;
     private int startTime;
@@ -121,8 +123,11 @@ public class CheckBox extends View {
                 animStatus = true;
                 isReleased = true;
                 startTime = (int)System.currentTimeMillis();
-                if(isPressing && containsPoint(event.x, event.y))
+                if(isPressing && containsPoint(event.x, event.y)) {
                     checked = !checked;
+                    if(onCheckedChangeListener != null)
+                        onCheckedChangeListener.onCheckedChanged(this, checked);
+                }
                 invalidateVisual();
                 return;
             }
@@ -208,8 +213,12 @@ public class CheckBox extends View {
     }
 
     public void setChecked(boolean checked) {
-        this.checked = checked;
-        invalidateVisual();
+        if(this.checked != checked) {
+            this.checked = checked;
+            if(onCheckedChangeListener != null)
+                onCheckedChangeListener.onCheckedChanged(this, checked);
+            invalidateVisual();
+        }
     }
 
     public Color getColor() {
@@ -261,5 +270,9 @@ public class CheckBox extends View {
         paddingRight = right;
         paddingBottom = bottom;
         invalidateLayout();
+    }
+
+    public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {
+        onCheckedChangeListener = listener;
     }
 }

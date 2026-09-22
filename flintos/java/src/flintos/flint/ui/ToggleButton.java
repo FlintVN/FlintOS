@@ -20,6 +20,8 @@ public class ToggleButton extends View {
 
     protected int cornerRadius;
 
+    private OnCheckedChangeListener onCheckedChangeListener;
+
     private boolean changing = false;
     private int startTimeChange = 0;
 
@@ -90,6 +92,8 @@ public class ToggleButton extends View {
                     checked = !checked;
                     changing = true;
                     startTimeChange = (int)System.currentTimeMillis();
+                    if(onCheckedChangeListener != null)
+                        onCheckedChangeListener.onCheckedChanged(this, checked);
                     invalidateVisual();
                 }
                 break;
@@ -129,8 +133,12 @@ public class ToggleButton extends View {
     }
 
     public void setChecked(boolean checked) {
-        this.checked = checked;
-        invalidateVisual();
+        if(this.checked != checked) {
+            this.checked = checked;
+            if(onCheckedChangeListener != null)
+                onCheckedChangeListener.onCheckedChanged(this, checked);
+            invalidateVisual();
+        }
     }
 
     public Color getOnColor() {
@@ -168,5 +176,9 @@ public class ToggleButton extends View {
     public void setCornerRadius(int radius) {
         cornerRadius = radius;
         invalidateVisual();
+    }
+
+    public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {
+        onCheckedChangeListener = listener;
     }
 }
