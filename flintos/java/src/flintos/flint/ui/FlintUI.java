@@ -25,6 +25,8 @@ public abstract class FlintUI extends View {
     private KeyEvent keyEvent = new KeyEvent();
     private MotionEvent motionEvent = new MotionEvent();
 
+    private TaskQueue taskQueue = new TaskQueue();
+
     protected FlintUI() {
         this(240, 320);
     }
@@ -211,6 +213,7 @@ public abstract class FlintUI extends View {
             try {
                 if(NativeEventReceiver.waitEvent(event))
                     processEvent(event);
+                taskQueue.runAll();
             }
             catch(InterruptedException e) {
                 
@@ -244,6 +247,68 @@ public abstract class FlintUI extends View {
             g.clear(bg);
             onDraw(g);
             disp.present(x, y, w, h);
+        }
+    }
+
+    public final void runOnUiThread(Runnable task) {
+        if(mThread == Thread.currentThread())
+            task.run();
+        else {
+            taskQueue.post(task);
+            NativeEventReceiver.notifyEvent();
+        }
+    }
+
+    private class TaskQueue {
+        Object queueLock;
+
+        Task head;
+        Task last;
+
+        public TaskQueue() {
+            queueLock = new Object();
+        }
+
+        public void post(Runnable task) {
+            Task t = new Task(task);
+            synchronized(queueLock) {
+                if(last != null)
+                    last.next = t;
+                else
+                    head = t;
+                last = t;
+            }
+        }
+
+        public void runAll() {
+            Task task;
+            if(head == null)
+                return;
+            synchronized(queueLock) {
+                task = head;
+                head = null;
+                last = null;
+            }
+
+            while(task != null) {
+                task.run();
+                task = task.next;
+            }
+        }
+
+        private class Task {
+            Runnable task;
+            Task next;
+
+            public Task(Runnable task) {
+                if(task == null)
+                    throw new NullPointerException();
+                this.task = task;
+            }
+
+            public void run() {
+                task.run();
+            }
         }
     }
 }
