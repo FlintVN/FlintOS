@@ -47,7 +47,7 @@ public class ScrollView extends PanelView {
                 requestUpdate |= elasticEffectY();
 
             if(requestUpdate)
-                invalidateInternalLayout();
+                invalidate(true);
             else
                 scrolling = false;
         }
@@ -225,7 +225,7 @@ public class ScrollView extends PanelView {
                     actView = null;
                 }
                 isPressed = false;
-                invalidateInternalLayout();
+                invalidate(true);
                 return;
             }
             case MotionEvent.ACTION_MOVE: {
@@ -248,7 +248,7 @@ public class ScrollView extends PanelView {
                 }
 
                 scrolling = true;
-                invalidateInternalLayout();
+                invalidate(true);
                 if(actView != null)
                     actView.dispatchTouchEvent(event);
                 return;
@@ -311,6 +311,7 @@ public class ScrollView extends PanelView {
     }
 
     public void setContent(View v) {
+        FlintUI.checkThread();
         if(v != null) {
             if(v.parent != null)
                 throw new IllegalStateException("The specified child already has a parent");
@@ -326,12 +327,13 @@ public class ScrollView extends PanelView {
     }
 
     public void setHorizontalScrollMode(boolean enabled) {
+        FlintUI.checkThread();
         if(enabled)
             mode |= 1;
         else {
             mode &= ~1;
             offsetX = 0;
-            invalidateVisual();
+            invalidate(false);
         }
     }
 
@@ -340,12 +342,13 @@ public class ScrollView extends PanelView {
     }
 
     public void setVerticalScrollMode(boolean enabled) {
+        FlintUI.checkThread();
         if(enabled)
             mode |= 2;
         else {
             mode &= ~2;
             offsetY = 0;
-            invalidateVisual();
+            invalidate(false);
         }
     }
 }
