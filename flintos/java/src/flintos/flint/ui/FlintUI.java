@@ -10,6 +10,8 @@ import flint.system.NativeEventReceiver;
 public abstract class FlintUI extends View {
     private static FlintUI currentUI;
 
+    private Thread mThread;
+
     protected View content;
 
     private boolean doubleBuffer = true;
@@ -28,6 +30,7 @@ public abstract class FlintUI extends View {
     }
 
     protected FlintUI(int w, int h) {
+        mThread = Thread.currentThread();
         width = w;
         height = h;
         invX = 0;
@@ -37,7 +40,12 @@ public abstract class FlintUI extends View {
         background = Theme.defaultTheme.backgroundColor();
     }
 
-    static final void setInvalidateVisual(int x, int y, int w, int h) {
+    public static void checkThread() {
+        if(currentUI != null && currentUI.mThread != Thread.currentThread())
+            throw new CalledFromWrongThreadException("Only the original thread that created a view hierarchy can touch its views");
+    }
+
+    static final void setInvalidate(int x, int y, int w, int h, boolean layout) {
         FlintUI ui = currentUI;
         if(ui == null)
             return;
@@ -55,9 +63,11 @@ public abstract class FlintUI extends View {
             if((ui.invX + ui.invW) < x2) ui.invW = x2 - ui.invX;
             if((ui.invY + ui.invH) < y2) ui.invH = y2 - ui.invY;
         }
+        if(layout)
+            ui.invLayout = layout;
     }
 
-    static final void setInvalidateLayout() {
+    static final void setInvalidateAll() {
         FlintUI ui = currentUI;
         if(ui == null)
             return;
@@ -66,12 +76,6 @@ public abstract class FlintUI extends View {
         ui.invW = ui.actualWidth;
         ui.invH = ui.actualHeight;
         ui.invLayout = true;
-    }
-
-    static final void setInvalidateLayout(int x, int y, int w, int h) {
-        setInvalidateVisual(x, y, w, h);
-        if(currentUI != null)
-            currentUI.invLayout = true;
     }
 
     @Override
