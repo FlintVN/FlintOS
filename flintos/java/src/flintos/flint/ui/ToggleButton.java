@@ -75,7 +75,7 @@ public class ToggleButton extends View {
                     x = y + time * (x2 - y) / ANIMATION_DURATION;
                 else
                     x = x2 - time * (x2 - y) / ANIMATION_DURATION;
-                invalidateVisual();
+                invalidate(false);
             }
             else
                 x = checked ? x2 : y;
@@ -94,7 +94,7 @@ public class ToggleButton extends View {
                     startTimeChange = (int)System.currentTimeMillis();
                     if(onCheckedChangeListener != null)
                         onCheckedChangeListener.onCheckedChanged(this, checked);
-                    invalidateVisual();
+                    invalidate(false);
                 }
                 break;
             }
@@ -119,13 +119,14 @@ public class ToggleButton extends View {
 
     @Override
     public void setBackground(Object bg) {
+        FlintUI.checkThread();
         if(bg == null)
             background = null;
         else if(bg instanceof Color)
             background = bg;
         else
             throw new IllegalArgumentException("background must be an instance of Color");
-        invalidateVisual();
+        invalidate(false);
     }
 
     public boolean isChecked() {
@@ -133,11 +134,12 @@ public class ToggleButton extends View {
     }
 
     public void setChecked(boolean checked) {
+        FlintUI.checkThread();
         if(this.checked != checked) {
             this.checked = checked;
             if(onCheckedChangeListener != null)
                 onCheckedChangeListener.onCheckedChanged(this, checked);
-            invalidateVisual();
+            invalidate(false);
         }
     }
 
@@ -146,9 +148,10 @@ public class ToggleButton extends View {
     }
 
     public void setOnColor(Color color) {
+        FlintUI.checkThread();
         onColor = color;
         if(checked)
-            invalidateVisual();
+            invalidate(false);
     }
 
     public Color getThumbColor() {
@@ -156,8 +159,9 @@ public class ToggleButton extends View {
     }
 
     public void setThumbColor(Color color) {
+        FlintUI.checkThread();
         thumbColor = color;
-        invalidateVisual();
+        invalidate(false);
     }
 
     public Color getBorderColor() {
@@ -165,8 +169,9 @@ public class ToggleButton extends View {
     }
 
     public void setBorderColor(Color color) {
+        FlintUI.checkThread();
         borderColor = color;
-        invalidateVisual();
+        invalidate(false);
     }
 
     public int getCornerRadius() {
@@ -174,8 +179,9 @@ public class ToggleButton extends View {
     }
 
     public void setCornerRadius(int radius) {
+        FlintUI.checkThread();
         cornerRadius = radius;
-        invalidateVisual();
+        invalidate(false);
     }
 
     public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {

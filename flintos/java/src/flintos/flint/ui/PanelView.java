@@ -58,8 +58,9 @@ class PanelView extends View {
     }
 
     public void setBorderColor(Color color) {
+        FlintUI.checkThread();
         borderColor = color;
-        invalidateVisual();
+        invalidate(false);
     }
 
     public CornerRadius getCornerRadius() {
@@ -75,10 +76,11 @@ class PanelView extends View {
     }
 
     public void setCornerRadius(int topLeft, int topRight, int bottomRight, int bottomLeft) {
+        FlintUI.checkThread();
         this.topLeftRadius = topLeft;
         this.topRightRadius = topRight;
         this.bottomLeftRadius = bottomLeft;
         this.bottomRightRadius = bottomRight;
-        invalidateVisual();
+        invalidate(false);
     }
 }

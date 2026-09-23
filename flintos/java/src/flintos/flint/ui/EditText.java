@@ -102,11 +102,12 @@ public class EditText extends PanelView {
     }
 
     public void setText(String text) {
+        FlintUI.checkThread();
         this.text = text;
         if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            invalidateLayout();
+            FlintUI.setInvalidateAll();
         else
-            invalidateVisual();
+            invalidate(false);
     }
 
     public Font getFont() {
@@ -114,13 +115,14 @@ public class EditText extends PanelView {
     }
 
     public void setFont(Font font) {
+        FlintUI.checkThread();
         if(font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
         if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            invalidateLayout();
+            FlintUI.setInvalidateAll();
         else
-            invalidateVisual();
+            invalidate(false);
     }
 
     public Color getTextColor() {
@@ -128,8 +130,9 @@ public class EditText extends PanelView {
     }
 
     public void setTextColor(Color color) {
+        FlintUI.checkThread();
         textColor = color;
-        invalidateVisual();
+        invalidate(false);
     }
 
     public Padding getPading() {
@@ -145,12 +148,13 @@ public class EditText extends PanelView {
     }
 
     public void setPadding(int left, int top, int right, int bottom) {
+        FlintUI.checkThread();
         if(left < 0 || top < 0 || right < 0 || bottom < 0)
             throw new IllegalArgumentException("TextView does not support padding with negative numbers");
         paddingLeft = left;
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
-        invalidateLayout();
+        FlintUI.setInvalidateAll();
     }
 }
