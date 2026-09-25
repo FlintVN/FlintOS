@@ -4,11 +4,13 @@ import flint.drawing.ClipMode;
 import flint.drawing.Graphics;
 
 public class ScrollView extends PanelView {
+    private static final int FP_PRECISION = 4;
+
     private static final int ANIMATION_DURATION = 200;
-    private static final float SCROLL_THROW = 0.93f;
-    private static final float SCROLL_OVER_THROW = 0.85f;
-    private static final float SCROLL_STOP = 0.5f;
-    private static final float ELASTIC_FACTOR = 0.2f;
+    private static final int SCROLL_THROW = 7;
+    private static final int SCROLL_OVER_THROW = 15;
+    private static final int SCROLL_ELASTIC_STOP = 2 << FP_PRECISION;
+    private static final int ELASTIC_FACTOR = 20;
 
     protected View content;
     protected int mode = 2;
@@ -17,10 +19,10 @@ public class ScrollView extends PanelView {
 
     private boolean isPressed;
     private boolean scrolling;
-    private float offsetX, offsetY;
+    private int offsetX, offsetY;
 
     private int touchX, touchY;
-    private float vX, vY;
+    private int vX, vY;
 
     public ScrollView() {
 
@@ -71,48 +73,52 @@ public class ScrollView extends PanelView {
     }
 
     private void momentumEffectX() {
-        float over = isOverX();
+        int over = isOverX();
         if(over != 0) {
-            vX = vX * SCROLL_OVER_THROW;
-            float tmp = applyElasticDamping(over) * vX;
+            int tmp = vX * SCROLL_OVER_THROW / 100;
+            if(tmp == 0) tmp = (vX > 0) ? 1 : -1;
+            vX -= tmp;
+            tmp = applyElasticDamping(over, vX);
             offsetX += tmp;
-            if(Math.abs(tmp) < 1.5f)
+            if(Math.abs(tmp) <= SCROLL_ELASTIC_STOP)
                 vX = 0;
         }
         else {
-            vX = vX * SCROLL_THROW;
+            int tmp = vX * SCROLL_THROW / 100;
+            if(tmp == 0) tmp = (vX > 0) ? 1 : -1;
+            vX -= tmp;
             offsetX += vX;
-            if(Math.abs(vX) < SCROLL_STOP)
-                vX = 0;
         }
     }
 
     private void momentumEffectY() {
-        float over = isOverY();
+        int over = isOverY();
         if(over != 0) {
-            vY = vY * SCROLL_OVER_THROW;
-            float tmp = applyElasticDamping(over) * vY;
+            int tmp = vY * SCROLL_OVER_THROW / 100;
+            if(tmp == 0) tmp = (vY > 0) ? 1 : -1;
+            vY -= tmp;
+            tmp = applyElasticDamping(over, vY);
             offsetY += tmp;
-            if(Math.abs(tmp) < 1.5f)
+            if(Math.abs(tmp) <= SCROLL_ELASTIC_STOP)
                 vY = 0;
         }
         else {
-            vY = vY * SCROLL_THROW;
+            int tmp = vY * SCROLL_THROW / 100;
+            if(tmp == 0) tmp = (vY > 0) ? 1 : -1;
+            vY -= tmp;
             offsetY += vY;
-            if(Math.abs(vY) < SCROLL_STOP)
-                vY = 0;
         }
     }
 
     private boolean elasticEffectX() {
-        float over = isOverX();
+        int over = isOverX();
         if(over != 0) {
             if(over > 0) {
-                float diff = 5 + over * ELASTIC_FACTOR;
+                int diff = (5 << FP_PRECISION) + over * ELASTIC_FACTOR / 100;
                 offsetX = (offsetX > diff) ? (offsetX - diff) : 0;
             }
             else {
-                float diff = 5 - over * ELASTIC_FACTOR;
+                int diff = (5 << FP_PRECISION) - over * ELASTIC_FACTOR / 100;
                 int min = getMinOffsetX();
                 offsetX = (offsetX < (min - diff)) ? (offsetX + diff) : min;
             }
@@ -122,14 +128,14 @@ public class ScrollView extends PanelView {
     }
 
     private boolean elasticEffectY() {
-        float over = isOverY();
+        int over = isOverY();
         if(over != 0) {
             if(over > 0) {
-                float diff = 5 + over * ELASTIC_FACTOR;
+                int diff = 5 + over * ELASTIC_FACTOR / 100;
                 offsetY = (offsetY > diff) ? (offsetY - diff) : 0;
             }
             else {
-                float diff = 5 - over * ELASTIC_FACTOR;
+                int diff = 5 - over * ELASTIC_FACTOR / 100;
                 int min = getMinOffsetY();
                 offsetY = (offsetY < (min - diff)) ? (offsetY + diff) : min;
             }
@@ -138,23 +144,23 @@ public class ScrollView extends PanelView {
         return false;
     }
 
-    private float applyElasticDamping(float overValue) {
-        return 1.0f / (1.0f + 0.07f * Math.abs(overValue));
+    private int applyElasticDamping(int overValue, int v) {
+        return (100 * v) / (100 + ((7 * Math.abs(overValue)) >>> FP_PRECISION));
     }
 
     private int getMinOffsetX() {
         if(content != null && content.actualWidth > actualWidth)
-            return actualWidth - content.actualWidth;
+            return (actualWidth - content.actualWidth) << FP_PRECISION;
         return 0;
     }
 
     private int getMinOffsetY() {
         if(content != null && content.actualHeight > actualHeight)
-            return actualHeight - content.actualHeight;
+            return (actualHeight - content.actualHeight) << FP_PRECISION;
         return 0;
     }
 
-    private float isOverX() {
+    private int isOverX() {
         if(offsetX > 0)
             return offsetX;
         else {
@@ -165,7 +171,7 @@ public class ScrollView extends PanelView {
         return 0;
     }
 
-    private float isOverY() {
+    private int isOverY() {
         if(offsetY > 0)
             return offsetY;
         else {
@@ -228,21 +234,18 @@ public class ScrollView extends PanelView {
                 return;
             }
             case MotionEvent.ACTION_MOVE: {
-                int x = event.x;
-                int y = event.y;
-
                 if((mode & 1) != 0) {
-                    int diff = x - touchX;
-                    float over = isOverX();
-                    offsetX += over != 0 ? applyElasticDamping(over) * diff : diff;
-                    touchX = x;
+                    int diff = (event.x - touchX) << FP_PRECISION;
+                    int over = isOverX();
+                    offsetX += over != 0 ? applyElasticDamping(over, diff) : diff;
+                    touchX = event.x;
                     vX = scrolling ? ((vX + diff) / 2) : diff;
                 }
                 if((mode & 2) != 0) {
-                    int diff = y - touchY;
-                    float over = isOverY();
-                    offsetY += over != 0 ? applyElasticDamping(over) * diff : diff;
-                    touchY = y;
+                    int diff = (event.y - touchY) << FP_PRECISION;
+                    int over = isOverY();
+                    offsetY += over != 0 ? applyElasticDamping(over, diff) : diff;
+                    touchY = event.y;
                     vY = scrolling ? ((vY + diff) / 2) : diff;
                 }
 
@@ -262,7 +265,7 @@ public class ScrollView extends PanelView {
 
         View v = content;
         if(v != null)
-            v.updateLocation(x + v.marginLeft + Math.round(offsetX), y + v.marginTop + Math.round(offsetY));
+            v.updateLocation(x + v.marginLeft + (offsetX >> FP_PRECISION), y + v.marginTop + (offsetY >> FP_PRECISION));
     }
 
     @Override
