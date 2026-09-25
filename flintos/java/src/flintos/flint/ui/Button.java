@@ -144,12 +144,9 @@ public class Button extends PanelView {
     @Override
     protected void updateActualWidth(int availableW) {
         if(width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
-            int contentW = getBorderThickness() << 1;
-
-            if(paddingLeft > 0) contentW += paddingLeft;
-            if(paddingRight > 0) contentW += paddingRight;
-
+            int contentW = paddingLeft + paddingRight + getBorderThickness() << 1;
             contentW += Graphics.measureStringWidth(text, font);
+            if(contentW < 0) contentW = 0;
 
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
@@ -160,12 +157,9 @@ public class Button extends PanelView {
     @Override
     protected void updateActualHeight(int availableH) {
         if(height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
-            int contentH = getBorderThickness() << 1;
-
-            if(paddingTop > 0) contentH += paddingTop;
-            if(paddingBottom > 0) contentH += paddingBottom;
-
+            int contentH = paddingTop + paddingBottom + (getBorderThickness() << 1);
             contentH += Graphics.measureStringHeight(text, font);
+            if(contentH < 0) contentH = 0;
 
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
         }
