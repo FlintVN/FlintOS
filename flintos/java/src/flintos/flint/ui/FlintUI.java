@@ -58,12 +58,12 @@ public abstract class FlintUI extends View {
             ui.invH = h;
         }
         else {
-            int x2 = x + w;
-            int y2 = y + h;
+            int x2 = Math.max(ui.invX + ui.invW, x + w);
+            int y2 = Math.max(ui.invY + ui.invH, y + h);
             if(ui.invX > x) ui.invX = x;
             if(ui.invY > y) ui.invY = y;
-            if((ui.invX + ui.invW) < x2) ui.invW = x2 - ui.invX;
-            if((ui.invY + ui.invH) < y2) ui.invH = y2 - ui.invY;
+            ui.invW = x2 - ui.invX;
+            ui.invH = y2 - ui.invY;
         }
         if(layout)
             ui.invLayout = layout;
