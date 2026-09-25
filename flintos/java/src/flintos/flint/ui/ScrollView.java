@@ -216,7 +216,6 @@ public class ScrollView extends PanelView {
                 touchY = event.y;
                 vX = vY = 0;
                 isPressed = true;
-                scrolling = false;
                 return;
             }
             case MotionEvent.ACTION_UP: {
