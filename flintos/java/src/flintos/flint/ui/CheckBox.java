@@ -59,8 +59,7 @@ public class CheckBox extends View {
             g.fillRoundRect(bgColor, this.x, this.y, actualWidth, actualHeight, topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
         }
 
-        Color c = color;
-        if(c != null && c.getAlpha() > 0) {
+        if(color.getAlpha() > 0) {
             int r = 4;
 
             int x = this.x + paddingLeft;
@@ -87,10 +86,10 @@ public class CheckBox extends View {
                 boxSize += PRESS_OFFSET_X2;
             }
 
-            g.drawRoundRect(c, x, y, boxSize, boxSize, r, r, r, r);
+            g.drawRoundRect(color, x, y, boxSize, boxSize, r, r, r, r);
             if(checked) {
                 r -= 2;
-                g.fillRoundRect(c, x + 3, y + 3, boxSize - 5, boxSize - 5, r, r, r, r);
+                g.fillRoundRect(color, x + 3, y + 3, boxSize - 5, boxSize - 5, r, r, r, r);
             }
         }
 
@@ -208,6 +207,8 @@ public class CheckBox extends View {
 
     public void setTextColor(Color color) {
         FlintUI.checkThread();
+        if(color == null)
+            throw new NullPointerException("color can not be null");
         textColor = color;
         invalidate(false);
     }
@@ -232,6 +233,8 @@ public class CheckBox extends View {
 
     public void setColor(Color color) {
         FlintUI.checkThread();
+        if(color == null)
+            throw new NullPointerException("color can not be null");
         this.color = color;
         invalidate(false);
     }

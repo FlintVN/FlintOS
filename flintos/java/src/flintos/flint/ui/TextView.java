@@ -107,6 +107,8 @@ public class TextView extends View {
 
     public void setTextColor(Color color) {
         FlintUI.checkThread();
+        if(color == null)
+            throw new NullPointerException("color can not be null");
         textColor = color;
         invalidate(false);
     }
