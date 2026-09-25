@@ -27,7 +27,7 @@ public class ToggleButton extends View {
 
     public ToggleButton() {
         onColor = Theme.defaultTheme.primaryColor();
-        background = Theme.defaultTheme.disabledColor();
+        background = Theme.defaultTheme.surfaceColor();
         thumbColor = Theme.defaultTheme.thumbColor();
 
         width = DEFAULT_HEIGHT * 2 - 4;

@@ -18,7 +18,7 @@ public class DarkTheme extends Theme {
     private static final Color selectedColor = new Color(0xFF2D2D2D);       // #2D2D2D
     private static final Color hoverColor = new Color(0xFF282828);          // #282828
     private static final Color borderColor = new Color(0xFF4B4B4B);         // #4B4B4B
-    private static final Color surfaceColor = new Color(0xFF1E1E1E);        // #1E1E1E
+    private static final Color surfaceColor = new Color(0xFF272727);        // #272727
     private static final Color overlayColor = new Color(0x80000000);        // #000000
 
     public DarkTheme() {
@@ -48,7 +48,7 @@ public class DarkTheme extends Theme {
     public Color textColor() {
         return textColor;
     }
-    
+
     public Color secondaryTextColor() {
         return secondaryTextColor;
     }
@@ -60,7 +60,7 @@ public class DarkTheme extends Theme {
     public Color hintTextColor() {
         return hintTextColor;
     }
-    
+
     public Color disabledColor() {
         return disabledColor;
     }

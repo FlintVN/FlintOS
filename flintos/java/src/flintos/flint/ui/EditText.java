@@ -53,7 +53,9 @@ public class EditText extends PanelView {
         int x1 = thk + paddingLeft;
         int x2 = actualWidth - thk - paddingRight;
 
-        g.setClip(this.x + x1, this.y + thk, x2 - x1, actualHeight - (thk << 1), ClipMode.INTERSECT);
+        int clipX1 = paddingLeft > 0 ? x1 : thk;
+        int clipX2 = paddingRight > 0 ? x2 : (actualWidth - thk);
+        g.setClip(this.x + clipX1, this.y + thk, clipX2 - clipX1, actualHeight - (thk << 1), ClipMode.INTERSECT);
 
         int txtW = Graphics.measureStringWidth(text, font);
         int txtH = Graphics.measureStringHeight(null, font);
@@ -68,13 +70,9 @@ public class EditText extends PanelView {
     @Override
     protected void updateActualWidth(int availableW) {
         if(width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
-            int contentW = getBorderThickness() << 1;
-
-            if(paddingLeft > 0) contentW += paddingLeft;
-            if(paddingRight > 0) contentW += paddingRight;
-
+            int contentW = paddingLeft + paddingRight + (getBorderThickness() << 1);
             contentW += Graphics.measureStringWidth(text, font);
-
+            if(contentW < 0) contentW = 0;
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
         else
@@ -84,13 +82,9 @@ public class EditText extends PanelView {
     @Override
     protected void updateActualHeight(int availableH) {
         if(height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
-            int contentH = getBorderThickness() << 1;
-
-            if(paddingTop > 0) contentH += paddingTop;
-            if(paddingBottom > 0) contentH += paddingBottom;
-
+            int contentH = paddingTop + paddingBottom + (getBorderThickness() << 1);
             contentH += Graphics.measureStringHeight(null, font);
-
+            if(contentH < 0) contentH = 0;
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
         }
         else
@@ -151,8 +145,6 @@ public class EditText extends PanelView {
 
     public void setPadding(int left, int top, int right, int bottom) {
         FlintUI.checkThread();
-        if(left < 0 || top < 0 || right < 0 || bottom < 0)
-            throw new IllegalArgumentException("TextView does not support padding with negative numbers");
         paddingLeft = left;
         paddingTop = top;
         paddingRight = right;

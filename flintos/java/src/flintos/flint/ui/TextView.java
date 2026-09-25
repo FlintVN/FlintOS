@@ -57,6 +57,7 @@ public class TextView extends View {
     protected void updateActualWidth(int availableW) {
         if(width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
             int contentW = Graphics.measureStringWidth(text, font) + paddingLeft + paddingRight;
+            if(contentW < 0) contentW = 0;
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
         else
@@ -67,6 +68,7 @@ public class TextView extends View {
     protected void updateActualHeight(int availableH) {
         if(height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
             int contentH = Graphics.measureStringHeight(text, font) + paddingTop + paddingBottom;
+            if(contentH < 0) contentH = 0;
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
         }
         else
@@ -148,8 +150,6 @@ public class TextView extends View {
 
     public void setPadding(int left, int top, int right, int bottom) {
         FlintUI.checkThread();
-        if(left < 0 || top < 0 || right < 0 || bottom < 0)
-            throw new IllegalArgumentException("TextView does not support padding with negative numbers");
         paddingLeft = left;
         paddingTop = top;
         paddingRight = right;
