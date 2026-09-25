@@ -59,8 +59,7 @@ public class ToggleButton extends View {
             g.drawRoundRect(borderColor, this.x, this.y, w, h, r, r, r, r);
         }
 
-        Color c = thumbColor;
-        if(c != null && c.getAlpha() > 0) {
+        if(thumbColor.getAlpha() > 0) {
             int thk = (borderColor != null && borderColor.getAlpha() > 0) ? 1 : 0;
             int h = actualHeight - (thk << 1) - 6;
             int y = thk + 3;
@@ -80,7 +79,7 @@ public class ToggleButton extends View {
             else
                 x = checked ? x2 : y;
             r = cornerRadius - thk - 3;
-            g.fillRoundRect(c, this.x + x, this.y + y, h, h, r, r, r, r);
+            g.fillRoundRect(thumbColor, this.x + x, this.y + y, h, h, r, r, r, r);
         }
     }
 
@@ -149,6 +148,8 @@ public class ToggleButton extends View {
 
     public void setOnColor(Color color) {
         FlintUI.checkThread();
+        if(color == null)
+            throw new NullPointerException("color can not be null");
         onColor = color;
         if(checked)
             invalidate(false);
@@ -160,6 +161,8 @@ public class ToggleButton extends View {
 
     public void setThumbColor(Color color) {
         FlintUI.checkThread();
+        if(color == null)
+            throw new NullPointerException("color can not be null");
         thumbColor = color;
         invalidate(false);
     }
