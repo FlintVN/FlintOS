@@ -1,12 +1,9 @@
 
-#include "flintos_native_midp_image.h"
-#include "flint_array_object.h"
 #include <stdlib.h>
 #include <string.h>
-
-/* ESP32-S3 ROM miniz: raw deflate/zlib inflate into a caller-provided buffer (no internal
- * allocation, so no ROM-vs-app allocator mismatch). Linked from esp32s3.rom.ld. */
-extern "C" size_t tinfl_decompress_mem_to_mem(void *pOut_buf, size_t out_buf_len, const void *pSrc_buf, size_t src_buf_len, int flags);
+#include "miniz.h"
+#include "flint_array_object.h"
+#include "flintos_native_midp_image.h"
 
 #define TINFL_FLAG_PARSE_ZLIB_HEADER                1
 #define TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF    4

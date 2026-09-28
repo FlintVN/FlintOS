@@ -52,3 +52,11 @@ target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-strict-aliasing)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-implicit-fallthrough)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-cast-function-type)
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-ignored-qualifiers)
+target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-type-limits)
+
+target_compile_definitions(${COMPONENT_LIB} PUBLIC
+    tinfl_decompress=flint_tinfl_decompress
+    tinfl_decompress_mem_to_callback=flint_tinfl_decompress_mem_to_callback
+    tinfl_decompress_mem_to_heap=flint_tinfl_decompress_mem_to_heap
+    tinfl_decompress_mem_to_mem=flint_tinfl_decompress_mem_to_mem
+)
