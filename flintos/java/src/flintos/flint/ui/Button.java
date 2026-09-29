@@ -21,7 +21,7 @@ public class Button extends PanelView {
     protected int paddingRight;
     protected int paddingBottom;
 
-    protected Object pressedBackground;
+    protected Color pressedBackground;
 
     private boolean animStatus = false;
     private boolean isReleased = true;
@@ -88,15 +88,9 @@ public class Button extends PanelView {
             h += PRESS_OFFSET_X2;
         }
 
-        Object bg = isReleased ? background : pressedBackground;
-        if(bg != null) {
-            if(bg instanceof Color color) {
-                if(color.getAlpha() > 0)
-                    g.fillRoundRect(color, x, y, w, h, r1, r2, r3, r4);
-            }
-            else
-                g.drawImage((Image)bg, x, y, w, h);
-        }
+        Color bg = isReleased ? background : pressedBackground;
+        if(bg != null && bg.getAlpha() > 0)
+            g.fillRoundRect(bg, x, y, w, h, r1, r2, r3, r4);
 
         if(borderColor != null && borderColor.getAlpha() > 0)
             g.drawRoundRect(borderColor, x, y, w - 1, h - 1, r1, r2, r3, r4);
@@ -207,18 +201,13 @@ public class Button extends PanelView {
         invalidate(false);
     }
 
-    public Object getPressedBackground() {
+    public Color getPressedBackground() {
         return pressedBackground;
     }
 
-    public void setPressedBackground(Object bg) {
+    public void setPressedBackground(Color bg) {
         FlintUI.checkThread();
-        if(bg == null)
-            pressedBackground = null;
-        else if((bg instanceof Color) || (bg instanceof Image))
-            pressedBackground = bg;
-        else
-            throw new IllegalArgumentException("background must be an instance of Color or Image");
+        pressedBackground = bg;
         if(!isReleased)
             invalidate(false);
     }

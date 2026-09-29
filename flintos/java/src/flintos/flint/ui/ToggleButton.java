@@ -116,18 +116,6 @@ public class ToggleButton extends View {
             actualHeight = height >= 0 ? height : availableH;
     }
 
-    @Override
-    public void setBackground(Object bg) {
-        FlintUI.checkThread();
-        if(bg == null)
-            background = null;
-        else if(bg instanceof Color)
-            background = bg;
-        else
-            throw new IllegalArgumentException("background must be an instance of Color");
-        invalidate(false);
-    }
-
     public boolean isChecked() {
         return checked;
     }

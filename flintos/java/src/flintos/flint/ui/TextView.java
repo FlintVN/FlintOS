@@ -31,14 +31,9 @@ public class TextView extends View {
 
     @Override
     protected void onDraw(Graphics g) {
-        if(background != null) {
-            if(background instanceof Color color) {
-                if(color.getAlpha() > 0)
-                    g.fillRoundRect(color, x, y, actualWidth, actualHeight, topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
-            }
-            else
-                g.drawImage((Image)background, x, y, actualWidth, actualHeight);
-        }
+        Color bg = background;
+        if(bg != null && bg.getAlpha() > 0)
+            g.fillRoundRect(bg, x, y, actualWidth, actualHeight, topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
 
         if(text == null || textColor == null) return;
 
