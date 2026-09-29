@@ -190,16 +190,6 @@ public abstract class FlintUI extends View {
         content = v;
     }
 
-    @Override
-    public void setBackground(Object bg) {
-        if(bg == null)
-            background = null;
-        else if(bg instanceof Color)
-            background = bg;
-        else
-            throw new IllegalArgumentException("background must be an instance of Color");
-    }
-
     public void doubleBuffer(boolean enabled) {
         this.doubleBuffer = enabled;
     }
@@ -241,7 +231,7 @@ public abstract class FlintUI extends View {
             }
 
             disp = (doubleBuffer && disp == disp1) ? disp2 : disp1;
-            Color bg = background != null ? (Color)background : Theme.defaultTheme.backgroundColor();
+            Color bg = background != null ? background : Theme.defaultTheme.backgroundColor();
             Graphics g = disp.createGraphics();
             g.setClip(x, y, w, h);
             g.clear(bg);

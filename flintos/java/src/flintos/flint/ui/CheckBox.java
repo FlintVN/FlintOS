@@ -54,10 +54,9 @@ public class CheckBox extends View {
 
     @Override
     protected void onDraw(Graphics g) {
-        if(background != null) {
-            Color bgColor = (Color)background;
-            g.fillRoundRect(bgColor, this.x, this.y, actualWidth, actualHeight, topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
-        }
+        Color bg = background;
+        if(bg != null && bg.getAlpha() > 0)
+            g.fillRoundRect(bg, this.x, this.y, actualWidth, actualHeight, topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
 
         if(color.getAlpha() > 0) {
             int r = 4;
@@ -155,18 +154,6 @@ public class CheckBox extends View {
         }
         else
             actualHeight = height >= 0 ? height : availableH;
-    }
-
-    @Override
-    public void setBackground(Object bg) {
-        FlintUI.checkThread();
-        if(bg == null)
-            background = null;
-        else if(bg instanceof Color)
-            background = bg;
-        else
-            throw new IllegalArgumentException("background must be an instance of Color");
-        invalidate(false);
     }
 
     public String getText() {

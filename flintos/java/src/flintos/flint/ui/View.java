@@ -29,7 +29,7 @@ public abstract class View {
     protected int marginRight;
     protected int marginBottom;
 
-    protected Object background;
+    protected Color background;
 
     protected HorizontalAlignment hAlignment = HorizontalAlignment.LEFT;
     protected VerticalAlignment vAlignment = VerticalAlignment.TOP;
@@ -204,18 +204,13 @@ public abstract class View {
         FlintUI.setInvalidateAll();
     }
 
-    public Object getBackground() {
+    public Color getBackground() {
         return background;
     }
 
-    public void setBackground(Object bg) {
+    public void setBackground(Color bg) {
         FlintUI.checkThread();
-        if(bg == null)
-            background = null;
-        else if((bg instanceof Color) || (bg instanceof Image))
-            background = bg;
-        else
-            throw new IllegalArgumentException("background must be an instance of Color or Image");
+        background = bg;
         invalidate(false);
     }
 

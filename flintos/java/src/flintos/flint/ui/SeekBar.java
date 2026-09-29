@@ -51,7 +51,7 @@ public class SeekBar extends View {
         int trackY = y + (THUMB_SIZE - TRACK_SIZE) / 2;
         int trackW = value + THUMB_SIZE / 2;
         g.fillRoundRect(color, x, trackY, trackW, TRACK_SIZE, r, 0, 0, r);
-        g.fillRoundRect((Color)background, x + trackW, trackY, w - trackW, TRACK_SIZE, 0, r, r, 0);
+        g.fillRoundRect(background, x + trackW, trackY, w - trackW, TRACK_SIZE, 0, r, r, 0);
 
         int s = THUMB_SIZE;
         x += value;
@@ -185,18 +185,6 @@ public class SeekBar extends View {
         this.width = width;
         this.height = View.WRAP_CONTENT;
         FlintUI.setInvalidateAll();
-    }
-
-    @Override
-    public void setBackground(Object bg) {
-        FlintUI.checkThread();
-        if(bg == null)
-            throw new NullPointerException("background can not be null in SeekBar");
-        else if(bg instanceof Color)
-            background = bg;
-        else
-            throw new IllegalArgumentException("background must be an instance of Color");
-        invalidate(false);
     }
 
     public Color getColor() {
