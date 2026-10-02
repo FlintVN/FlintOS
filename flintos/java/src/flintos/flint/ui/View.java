@@ -116,8 +116,24 @@ public abstract class View {
         return width;
     }
 
+    public void setWidth(int width) {
+        FlintUI.checkThread();
+        if(this.width != width) {
+            this.width = width;
+            FlintUI.setInvalidateAll();
+        }
+    }
+
     public int getHeight() {
         return height;
+    }
+
+    public void setHeight(int height) {
+        FlintUI.checkThread();
+        if(this.height != height) {
+            this.height = height;
+            FlintUI.setInvalidateAll();
+        }
     }
 
     public Size getSize() {
@@ -126,9 +142,10 @@ public abstract class View {
 
     public void setSize(int width, int height) {
         FlintUI.checkThread();
+        if(this.width != width || this.height != height)
+            FlintUI.setInvalidateAll();
         this.width = width;
         this.height = height;
-        FlintUI.setInvalidateAll();
     }
 
     protected void updateLocation(int x, int y) {
@@ -179,8 +196,10 @@ public abstract class View {
 
     public void setVisible(boolean visible) {
         FlintUI.checkThread();
-        this.visible = visible;
-        invalidate(false);
+        if(this.visible != visible) {
+            this.visible = visible;
+            invalidate(false);
+        }
     }
 
     public Margin getMargin() {
