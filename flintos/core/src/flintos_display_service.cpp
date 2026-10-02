@@ -28,11 +28,9 @@ static void showLogo(void) {
     const HAL::Display *disp = HAL::Devices::display();
     if(disp == NULL) return;
 
-    if(flintosLogo.format == IMG_RGB565) {
-        uint16_t x = (DISPLAY_WIDTH - flintosLogo.width) / 2;
-        uint16_t y = (DISPLAY_HEIGHT - flintosLogo.height) / 2;
-        disp->write(x, y, flintosLogo.width, flintosLogo.height, (uint8_t *)flintosLogo.data, flintosLogo.width);
-    }
+    uint16_t x = (DISPLAY_WIDTH - flintosLogo.width) / 2;
+    uint16_t y = (DISPLAY_HEIGHT - flintosLogo.height) / 2;
+    disp->write(x, y, flintosLogo.width, flintosLogo.height, (uint8_t *)flintosLogo.data, flintosLogo.width);
 }
 
 static bool displayFlush(void) {

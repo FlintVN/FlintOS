@@ -6,7 +6,6 @@
 #include "flint_native.h"
 #include "flintos_native_wifi.h"
 #include "flintos_native_display.h"
-#include "flintos_native_midp_image.h"
 #include "flintos_native_audio_track.h"
 #include "flintos_native_midp_key_converter.h"
 #include "flintos_native_native_event_receiver.h"
@@ -18,11 +17,6 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
   
     NATIVE_CLASS("flint/system/NativeEventReceiver",      nativeEventReceiverMethods),
 
-    /*
-     * This function can be removed and replaced with Java code based on java.util.zip.Inflater
-     * once that class is implemented on FlintJVM/FlintJDK.
-     */
-    NATIVE_CLASS("javax/microedition/lcdui/Image",        midpImageMethods),
     NATIVE_CLASS("javax/microedition/lcdui/KeyConverter", midpKeyConverterMethods),
 };
 

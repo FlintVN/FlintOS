@@ -61,7 +61,9 @@ set(FLINTOS_SRCS
     "../../../flintjvm/native/draw/src/flint_gfx_common.cpp"
     "../../../flintjvm/native/draw/src/flint_rgb565_sw_gfx.cpp"
     "../../../flintjvm/native/draw/src/flint_rgb565_sw_gfx_helper.cpp"
+    "../../../flintjvm/native/draw/src/flint_png_decoder.cpp"
     "../../../flintjvm/native/draw/src/flint_native_graphics.cpp"
+    "../../../flintjvm/native/draw/src/flint_native_image_decoder.cpp"
     "../../../flintjvm/native/draw/src/flint_native_rgb565_graphics.cpp"
 
     "../../../flintjvm/comp/miniz/miniz.c"
@@ -79,7 +81,6 @@ set(FLINTOS_SRCS
     "../../../flintos/native/src/flintos_native.cpp"
     "../../../flintos/native/src/flintos_native_wifi.cpp"
     "../../../flintos/native/src/flintos_native_display.cpp"
-    "../../../flintos/native/src/flintos_native_midp_image.cpp"
     "../../../flintos/native/src/flintos_native_audio_track.cpp"
     "../../../flintos/native/src/flintos_native_midp_key_converter.cpp"
     "../../../flintos/native/src/flintos_native_native_event_receiver.cpp"

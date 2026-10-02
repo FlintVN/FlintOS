@@ -175,7 +175,7 @@ public class Graphics {
         int w = img.getWidth(), h = img.getHeight();
         x = anchorX(x, w, anchor);
         y = anchorY(y, h, anchor);
-        fg.drawImage(img, x, y);
+        fg.drawImage(img.img, x, y);
     }
 
     public void drawRegion(Image src, int sx, int sy, int sw, int sh, int transform, int dx, int dy, int anchor) {
@@ -188,7 +188,7 @@ public class Graphics {
         int cw = fg.getClipWidth();
         int ch = fg.getClipHeight();
         clipRect(dx, dy, sw, sh);
-        fg.drawImage(src, dx - sx, dy - sy);
+        fg.drawImage(src.img, dx - sx, dy - sy);
         setClip(cx, cy, cw, ch);
     }
 
