@@ -1,6 +1,12 @@
 package flint.ui;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+
 import flint.media.Display;
+import flint.drawing.Font;
+import flint.drawing.Image;
 import flint.drawing.Color;
 import flint.drawing.Graphics;
 import flint.system.EventTypes;
@@ -8,6 +14,8 @@ import flint.system.NativeEvent;
 import flint.system.NativeEventReceiver;
 
 public abstract class FlintUI extends View {
+    private static final String RES_PREFIX = "flint-app://";
+
     private static FlintUI currentUI;
 
     private Thread mThread;
@@ -246,6 +254,42 @@ public abstract class FlintUI extends View {
         else {
             taskQueue.post(task);
             NativeEventReceiver.notifyEvent();
+        }
+    }
+
+    public Image loadImage(String name) {
+        return loadImage(name, false);
+    }
+
+    public Image loadImage(String name, boolean mutable) {
+        try {
+            if(name.startsWith(RES_PREFIX)) {
+                String resName = name.substring(RES_PREFIX.length());
+                InputStream stream = this.getClass().getResourceAsStream(resName);
+                Image img = Image.create(stream, mutable);
+                stream.close();
+                return img;
+            }
+            return Image.create(name);
+        }
+        catch(IOException ex) {
+            return null;
+        }
+    }
+
+    public Font loadFont(String name) {
+        try {
+            if(name.startsWith(RES_PREFIX)) {
+                String resName = name.substring(RES_PREFIX.length());
+                InputStream stream = this.getClass().getResourceAsStream(resName);
+                Font font = new Font(stream);
+                stream.close();
+                return font;
+            }
+            return new Font(name);
+        }
+        catch(IOException ex) {
+            throw new UncheckedIOException(ex);
         }
     }
 
