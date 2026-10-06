@@ -140,27 +140,8 @@ public class ImageView extends View {
     }
 
     public void setImage(Image img) {
+        FlintUI.checkThread();
         image = img;
-        invalidate(false);
-    }
-
-    public void setImage(String path) {
-        try {
-            image = Image.create(path);
-        }
-        catch(IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
-        invalidate(false);
-    }
-
-    public void setImage(File file) {
-        try {
-            image = Image.create(file);
-        }
-        catch(IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
         invalidate(false);
     }
 
@@ -169,7 +150,12 @@ public class ImageView extends View {
     }
 
     public void setScaleType(ScaleType type) {
-        scaleType = type.value;
-        invalidate(false);
+        FlintUI.checkThread();
+        if(type == null)
+            throw new NullPointerException("type cannot be null");
+        if(scaleType != type.value) {
+            scaleType = type.value;
+            invalidate(false);
+        }
     }
 }
