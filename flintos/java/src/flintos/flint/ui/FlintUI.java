@@ -47,7 +47,7 @@ public abstract class FlintUI extends View {
         invY = 0;
         invW = w;
         invH = h;
-        background = Theme.defaultTheme.backgroundColor();
+        background = Theme.getProperty("backgroundColor");
     }
 
     public static void checkThread() {
@@ -214,7 +214,7 @@ public abstract class FlintUI extends View {
                 taskQueue.runAll();
             }
             catch(InterruptedException e) {
-                
+
             }
         }
     }
@@ -239,10 +239,12 @@ public abstract class FlintUI extends View {
             }
 
             disp = (doubleBuffer && disp == disp1) ? disp2 : disp1;
-            Color bg = background != null ? background : Theme.defaultTheme.backgroundColor();
             Graphics g = disp.createGraphics();
             g.setClip(x, y, w, h);
-            g.clear(bg);
+            if(background != null)
+                g.clear(background);
+            else
+                g.clear();
             onDraw(g);
             disp.present(x, y, w, h);
         }

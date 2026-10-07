@@ -28,16 +28,16 @@ public class Button extends PanelView {
     private int startTime;
 
     public Button() {
-        background = Theme.defaultTheme.primaryColor();
-        pressedBackground = Theme.defaultTheme.pressedColor();
+        background = Theme.getProperty("primaryColor");
+        pressedBackground = Theme.getProperty("pressedColor");
 
-        font = Theme.defaultTheme.defaultFont();
-        textColor = Theme.defaultTheme.textColor();
+        font = Theme.getProperty("defaultFont");
+        textColor = Theme.getProperty("textColor");
 
         width = 65;
         height = 30;
 
-        int defaultRadius = Theme.defaultTheme.cornerRadius();
+        int defaultRadius = Theme.getProperty("cornerRadius");
         topLeftRadius = defaultRadius;
         topRightRadius = defaultRadius;
         bottomLeftRadius = defaultRadius;
@@ -212,7 +212,7 @@ public class Button extends PanelView {
             invalidate(false);
     }
 
-    public Padding getPading() {
+    public Padding getPadding() {
         return new Padding(paddingLeft, paddingTop, paddingRight, paddingBottom);
     }
 

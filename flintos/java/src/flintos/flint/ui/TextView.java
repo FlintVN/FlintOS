@@ -25,8 +25,8 @@ public class TextView extends View {
     public TextView() {
         width = View.WRAP_CONTENT;
         height = View.WRAP_CONTENT;
-        font = Theme.defaultTheme.defaultFont();
-        textColor = Theme.defaultTheme.textColor();
+        font = Theme.getProperty("defaultFont");
+        textColor = Theme.getProperty("textColor");
     }
 
     @Override
@@ -44,10 +44,10 @@ public class TextView extends View {
         g.setClip(this.x, this.y, actualWidth, actualHeight, ClipMode.INTERSECT);
 
         g.drawString(text, font, textColor, x + paddingLeft, y + paddingTop);
-    
+
         g.setClip(gClipX, gClipY, gClipW, gClipH, ClipMode.REPLACE);
     }
-    
+
     @Override
     protected void updateActualWidth(int availableW) {
         if(width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
@@ -131,7 +131,7 @@ public class TextView extends View {
         invalidate(false);
     }
 
-    public Padding getPading() {
+    public Padding getPadding() {
         return new Padding(paddingLeft, paddingTop, paddingRight, paddingBottom);
     }
 

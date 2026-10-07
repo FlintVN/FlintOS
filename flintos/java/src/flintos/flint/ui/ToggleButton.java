@@ -26,9 +26,9 @@ public class ToggleButton extends View {
     private int startTimeChange = 0;
 
     public ToggleButton() {
-        onColor = Theme.defaultTheme.primaryColor();
-        background = Theme.defaultTheme.surfaceColor();
-        thumbColor = Theme.defaultTheme.thumbColor();
+        onColor = Theme.getProperty("primaryColor");
+        background = Theme.getProperty("surfaceColor");
+        thumbColor = Theme.getProperty("thumbColor");
 
         width = DEFAULT_HEIGHT * 2 - 4;
         height = DEFAULT_HEIGHT;

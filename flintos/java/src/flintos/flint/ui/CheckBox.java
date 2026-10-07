@@ -38,10 +38,10 @@ public class CheckBox extends View {
     private int startTime;
 
     public CheckBox() {
-        font = Theme.defaultTheme.defaultFont();
-        textColor = Theme.defaultTheme.textColor();
+        font = Theme.getProperty("defaultFont");
+        textColor = Theme.getProperty("textColor");
 
-        color = Theme.defaultTheme.primaryColor();
+        color = Theme.getProperty("primaryColor");
 
         width = View.WRAP_CONTENT;
         height = View.WRAP_CONTENT;
@@ -243,7 +243,7 @@ public class CheckBox extends View {
         invalidate(false);
     }
 
-    public Padding getPading() {
+    public Padding getPadding() {
         return new Padding(paddingLeft, paddingTop, paddingRight, paddingBottom);
     }
 

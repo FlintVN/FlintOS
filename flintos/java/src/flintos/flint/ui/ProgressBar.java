@@ -15,15 +15,15 @@ public class ProgressBar extends PanelView {
     private int startTime;
 
     public ProgressBar() {
-        color = Theme.defaultTheme.primaryColor();
-        background = Theme.defaultTheme.surfaceColor();
+        color = Theme.getProperty("primaryColor");
+        background = Theme.getProperty("surfaceColor");
 
         max = 100;
 
         width = View.MATCH_PARENT;
         height = 30;
 
-        int defaultRadius = Theme.defaultTheme.cornerRadius();
+        int defaultRadius = Theme.getProperty("cornerRadius");
         topLeftRadius = defaultRadius;
         topRightRadius = defaultRadius;
         bottomLeftRadius = defaultRadius;

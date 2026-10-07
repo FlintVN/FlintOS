@@ -17,16 +17,16 @@ public class EditText extends PanelView {
     protected int paddingBottom;
 
     public EditText() {
-        background = Theme.defaultTheme.surfaceColor();
-        borderColor = Theme.defaultTheme.borderColor();
+        background = Theme.getProperty("surfaceColor");
+        borderColor = Theme.getProperty("borderColor");
 
-        font = Theme.defaultTheme.defaultFont();
-        textColor = Theme.defaultTheme.textColor();
+        font = Theme.getProperty("defaultFont");
+        textColor = Theme.getProperty("textColor");
 
         width = 120;
         height = 26;
 
-        int defaultRadius = Theme.defaultTheme.cornerRadius();
+        int defaultRadius = Theme.getProperty("cornerRadius");
         topLeftRadius = defaultRadius;
         topRightRadius = defaultRadius;
         bottomLeftRadius = defaultRadius;
@@ -131,7 +131,7 @@ public class EditText extends PanelView {
         invalidate(false);
     }
 
-    public Padding getPading() {
+    public Padding getPadding() {
         return new Padding(paddingLeft, paddingTop, paddingRight, paddingBottom);
     }
 

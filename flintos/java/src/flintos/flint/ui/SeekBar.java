@@ -33,10 +33,10 @@ public class SeekBar extends View {
 
         width = View.MATCH_PARENT;
         height = View.WRAP_CONTENT;
-    
-        color = Theme.defaultTheme.primaryColor();
-        thumbColor = Theme.defaultTheme.thumbColor();
-        background = Theme.defaultTheme.surfaceColor();
+
+        color = Theme.getProperty("primaryColor");
+        thumbColor = Theme.getProperty("thumbColor");
+        background = Theme.getProperty("surfaceColor");
     }
 
     @Override

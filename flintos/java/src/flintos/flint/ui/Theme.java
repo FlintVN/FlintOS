@@ -8,8 +8,6 @@ import java.io.UncheckedIOException;
 public abstract class Theme {
     static Theme defaultTheme = new DarkTheme();
 
-    protected Font defaultFont;
-
     public static Theme getDefaultTheme() {
         return defaultTheme;
     }
@@ -20,52 +18,20 @@ public abstract class Theme {
         defaultTheme = theme;
     }
 
-    public Theme() {
+    protected Theme() {
 
     }
 
-    /* General */
-    public abstract Color backgroundColor();
-    public abstract Color primaryColor();
-    public abstract Color secondaryColor();
-    public abstract Color accentColor();
-    public abstract Color thumbColor();
+    public abstract Object get(String name);
 
-    /* Text */
-    public abstract Color textColor();
-    public abstract Color secondaryTextColor();
-    public abstract Color disabledTextColor();
-    public abstract Color hintTextColor();
+    public abstract void set(String name, Object value);
 
-    /* Component states */
-    public abstract Color disabledColor();
-    public abstract Color pressedColor();
-    public abstract Color focusedColor();
-    public abstract Color selectedColor();
-    public abstract Color hoverColor();
-
-    /* Borders */
-    public abstract Color borderColor();
-
-    /* Surfaces */
-    public abstract Color surfaceColor();
-    public abstract Color overlayColor();
-
-    /* Shape */
-    public int cornerRadius() {
-        return 4;
+    @SuppressWarnings("unchecked")
+    public static <T> T getProperty(String name) {
+        return (T)defaultTheme.get(name);
     }
 
-    /* Typography */
-    public Font defaultFont() {
-        if(defaultFont == null) {
-            try {
-                defaultFont = new Font("/sys/fonts/default.font");
-            }
-            catch(IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        }
-        return defaultFont;
+    public static void setProperty(String name, Object value) {
+        defaultTheme.set(name, value);
     }
 }
