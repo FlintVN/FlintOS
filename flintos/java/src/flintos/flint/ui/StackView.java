@@ -189,7 +189,7 @@ public class StackView extends GroupView {
             for(; matchParentCount > 0; matchParentIdx++) {
                 View v = children[matchParentIdx];
                 if(v.width == View.MATCH_PARENT) {
-                    v.updateActualWidth(actualWidth - v.marginLeft - v.marginBottom);
+                    v.updateActualWidth(actualWidth - v.marginLeft - v.marginRight);
                     matchParentCount--;
                 }
             }
