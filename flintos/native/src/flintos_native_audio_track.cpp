@@ -147,14 +147,14 @@ jint NativeAudioTrack_GetFrameSize(FNIEnv *env) {
     return AUDIO_FRAME_BUF_SIZE;
 }
 
-jint NativeAudioTrack_GetVolumn(FNIEnv *env) {
-    return AudioSrv::getVolumn();
+jint NativeAudioTrack_GetVolume(FNIEnv *env) {
+    return AudioSrv::getVolume();
 }
 
-jvoid NativeAudioTrack_SetVolumn(FNIEnv *env, jint value) {
+jvoid NativeAudioTrack_SetVolume(FNIEnv *env, jint value) {
     if(value < 0) value = 0;
     else if(value > 100) value = 100;
-    AudioSrv::setVolumn(value);
+    AudioSrv::setVolume(value);
 }
 
 jint NativeAudioTrack_Open0(FNIEnv *env, jobject obj) {

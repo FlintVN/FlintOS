@@ -8,7 +8,7 @@
 #define AUDIO_FRAME_BUF_LENGTH      (AUDIO_FRAME_BUF_SIZE / sizeof(int16_t))
 
 static atomic_flag audioLocked = ATOMIC_FLAG_INIT;
-static uint8_t volumn = 0;
+static uint8_t volume = 0;
 static int16_t audioBuff[AUDIO_FRAME_NUM * AUDIO_FRAME_BUF_LENGTH];
 static volatile uint32_t currentPos = 0;
 
@@ -60,13 +60,13 @@ uint32_t AudioSrv::write(int32_t *pos, int16_t *frame, uint32_t length) {
     return count;
 }
 
-uint8_t AudioSrv::getVolumn(void) {
-    return volumn;
+uint8_t AudioSrv::getVolume(void) {
+    return volume;
 }
 
-void AudioSrv::setVolumn(uint8_t value) {
+void AudioSrv::setVolume(uint8_t value) {
     const HAL::Audio *audio = HAL::Devices::audio();
-    volumn = value;
+    volume = value;
     if(audio != NULL)
-        audio->setVolumn(value);
+        audio->setVolume(value);
 }

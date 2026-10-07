@@ -127,6 +127,6 @@ uint32_t ES8311::write(uint8_t *data, uint32_t length) const {
     return length;
 }
 
-void ES8311::setVolumn(uint8_t value) const {
+void ES8311::setVolume(uint8_t value) const {
     esp_codec_dev_set_out_vol(codecHandle, value);
 }

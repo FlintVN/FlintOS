@@ -80,7 +80,7 @@ void FlintOS::main(void) {
     FlintAPI::Thread::create((void (*)(void *))InputSrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     if(HAL::Devices::audio() != NULL) {
         HAL::Devices::audio()->init();
-        AudioSrv::setVolumn(100);
+        AudioSrv::setVolume(100);
         FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     }
     if(HAL::Devices::wifi() != NULL)
