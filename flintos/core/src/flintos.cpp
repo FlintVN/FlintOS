@@ -72,7 +72,7 @@ static void debuggerTask() {
 void FlintOS::main(void) {
     if(HAL::Devices::display() != NULL) {
         HAL::Devices::display()->init();
-        HAL::Devices::display()->brightness(100);
+        DisplaySrv::setBrightness(100);
         FlintAPI::Thread::create((void (*)(void *))DisplaySrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     }
     if(HAL::Devices::touch())

@@ -168,7 +168,7 @@ jvoid NativeAudioTrack_Write1(FNIEnv *env, jobject obj, jbyteArray b) {
         return env->throwNew(env->findClass("java/io/IllegalStateException"), "AudioTrack has not been opened");
     if(b == NULL)
         return env->throwNew(env->findClass("java/lang/NullPointerException"));
-    
+
     putPcm(env, audioTrack, b->getData(), b->getLength());
 }
 

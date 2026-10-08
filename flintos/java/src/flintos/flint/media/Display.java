@@ -22,6 +22,8 @@ public class Display {
 
     public static native boolean isForeground();
 
+    public static native int getBrightness();
+
     public static native void setBrightness(int value);
 
     public int getWidth() {

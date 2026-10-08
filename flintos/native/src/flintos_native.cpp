@@ -14,7 +14,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/net/WiFi",                        wifiMethods),
     NATIVE_CLASS("flint/media/Display",                   displayMethods),
     NATIVE_CLASS("flint/media/AudioTrack",                audioTrackMethods),
-  
+
     NATIVE_CLASS("flint/system/NativeEventReceiver",      nativeEventReceiverMethods),
 
     NATIVE_CLASS("javax/microedition/lcdui/KeyConverter", midpKeyConverterMethods),

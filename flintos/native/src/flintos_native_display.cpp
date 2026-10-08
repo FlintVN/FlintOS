@@ -26,6 +26,10 @@ jbool NativeDisplay_IsForeground(FNIEnv *env) {
     return FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint());
 }
 
+jint NativeDisplay_getBrightness(FNIEnv *env) {
+    return DisplaySrv::getBrightness();
+}
+
 jvoid NativeDisplay_SetBrightness(FNIEnv *env, jint value) {
     if(FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint())) {
         if(value < 0) value = 0;

@@ -20,6 +20,7 @@ public:
     } Surface;
 
     static void mainTask(void);
+    static uint8_t getBrightness(void);
     static void setBrightness(uint8_t value);
     static void present(Surface *surf);
 };

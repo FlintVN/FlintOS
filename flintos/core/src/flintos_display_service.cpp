@@ -12,7 +12,7 @@
 #include "flintos_display_service.h"
 
 static atomic_flag displayLocked = ATOMIC_FLAG_INIT;
-
+static uint8_t brightness = 0;
 static DisplaySrv::Surface surface;
 
 static void displayLock(void) {
@@ -67,8 +67,13 @@ void DisplaySrv::mainTask(void) {
     }
 }
 
+uint8_t DisplaySrv::getBrightness(void) {
+    return brightness;
+}
+
 void DisplaySrv::setBrightness(uint8_t value) {
     const HAL::Display *disp = HAL::Devices::display();
+    brightness = value;
     if(disp != NULL)
         disp->brightness(value);
 }
