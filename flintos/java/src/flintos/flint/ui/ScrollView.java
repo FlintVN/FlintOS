@@ -149,14 +149,16 @@ public class ScrollView extends PanelView {
     }
 
     private int getMinOffsetX() {
-        if(content != null && content.actualWidth > actualWidth)
-            return (actualWidth - content.actualWidth) << FP_PRECISION;
+        int contentW = content.actualWidth + content.marginLeft + content.marginRight;
+        if(content != null && contentW > actualWidth)
+            return (actualWidth - contentW) << FP_PRECISION;
         return 0;
     }
 
     private int getMinOffsetY() {
-        if(content != null && content.actualHeight > actualHeight)
-            return (actualHeight - content.actualHeight) << FP_PRECISION;
+        int contentH = content.actualHeight + content.marginTop + content.marginBottom;
+        if(content != null && contentH > actualHeight)
+            return (actualHeight - contentH) << FP_PRECISION;
         return 0;
     }
 
