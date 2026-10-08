@@ -83,8 +83,8 @@ public abstract class FlintUI extends View {
             return;
         ui.invX = 0;
         ui.invY = 0;
-        ui.invW = ui.actualWidth;
-        ui.invH = ui.actualHeight;
+        ui.invW = ui.width;
+        ui.invH = ui.height;
         ui.invLayout = true;
     }
 
