@@ -1,0 +1,181 @@
+package flint.ui;
+
+import flint.drawing.Image;
+import flint.drawing.Color;
+import flint.drawing.ClipMode;
+import flint.drawing.Graphics;
+
+public class ToggleButton extends View {
+    private static final int DEFAULT_HEIGHT = 24;
+    private static final int DEFAULT_RADIUS = 12;
+
+    private static final int ANIMATION_DURATION = 100;
+
+    protected boolean checked;
+
+    protected Color onColor;
+    protected Color thumbColor;
+
+    protected Color borderColor;
+
+    protected int cornerRadius;
+
+    private OnCheckedChangeListener onCheckedChangeListener;
+
+    private boolean changing = false;
+    private int startTimeChange = 0;
+
+    public ToggleButton() {
+        onColor = Theme.getProperty("primaryColor");
+        background = Theme.getProperty("surfaceColor");
+        thumbColor = Theme.getProperty("thumbColor");
+
+        width = DEFAULT_HEIGHT * 2 - 4;
+        height = DEFAULT_HEIGHT;
+
+        cornerRadius = DEFAULT_RADIUS;
+    }
+
+    @Override
+    protected void onDraw(Graphics g) {
+        int time = 0;
+        int r = cornerRadius;
+        Object bgColor;
+        if(changing) {
+            time = (int)System.currentTimeMillis() - startTimeChange;
+            if(time >= ANIMATION_DURATION / 2)
+                bgColor = checked ? onColor : background;
+            else
+                bgColor = checked ? background : onColor;
+        }
+        else
+            bgColor = checked ? onColor : background;
+        if(bgColor != null)
+            g.fillRoundRect((Color)bgColor, this.x, this.y, actualWidth, actualHeight, r, r, r, r);
+
+        if(borderColor != null && borderColor.getAlpha() > 0) {
+            int w = actualWidth - 1;
+            int h = actualHeight - 1;
+            g.drawRoundRect(borderColor, this.x, this.y, w, h, r, r, r, r);
+        }
+
+        if(thumbColor.getAlpha() > 0) {
+            int thk = (borderColor != null && borderColor.getAlpha() > 0) ? 1 : 0;
+            int h = actualHeight - (thk << 1) - 6;
+            int y = thk + 3;
+            int x2 = actualWidth - y - h;
+            int x;
+            if(changing) {
+                if(time >= ANIMATION_DURATION) {
+                    changing = false;
+                    x = checked ? x2 : y;
+                }
+                else if(checked)
+                    x = y + time * (x2 - y) / ANIMATION_DURATION;
+                else
+                    x = x2 - time * (x2 - y) / ANIMATION_DURATION;
+                invalidate(false);
+            }
+            else
+                x = checked ? x2 : y;
+            r = cornerRadius - thk - 3;
+            g.fillRoundRect(thumbColor, this.x + x, this.y + y, h, h, r, r, r, r);
+        }
+    }
+
+    @Override
+    protected void onTouchEvent(MotionEvent event) {
+        switch(event.action) {
+            case MotionEvent.ACTION_UP: {
+                if(isPressing && containsPoint(event.x, event.y)) {
+                    checked = !checked;
+                    changing = true;
+                    startTimeChange = (int)System.currentTimeMillis();
+                    if(onCheckedChangeListener != null)
+                        onCheckedChangeListener.onCheckedChanged(this, checked);
+                    invalidate(false);
+                }
+                break;
+            }
+        }
+    }
+
+    @Override
+    protected void updateActualWidth(int availableW) {
+        if((width == View.WRAP_CONTENT) || (width == View.MATCH_PARENT && availableW < 0))
+            actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? (DEFAULT_HEIGHT * 2 - 4) : availableW);
+        else
+            actualWidth = width >= 0 ? width : availableW;
+    }
+
+    @Override
+    protected void updateActualHeight(int availableH) {
+        if((height == View.WRAP_CONTENT) || (height == View.MATCH_PARENT && availableH < 0))
+            actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? DEFAULT_HEIGHT : availableH);
+        else
+            actualHeight = height >= 0 ? height : availableH;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        FlintUI.checkThread();
+        if(this.checked != checked) {
+            this.checked = checked;
+            if(onCheckedChangeListener != null)
+                onCheckedChangeListener.onCheckedChanged(this, checked);
+            invalidate(false);
+        }
+    }
+
+    public Color getOnColor() {
+        return onColor;
+    }
+
+    public void setOnColor(Color color) {
+        FlintUI.checkThread();
+        if(color == null)
+            throw new NullPointerException("color can not be null");
+        onColor = color;
+        if(checked)
+            invalidate(false);
+    }
+
+    public Color getThumbColor() {
+        return thumbColor;
+    }
+
+    public void setThumbColor(Color color) {
+        FlintUI.checkThread();
+        if(color == null)
+            throw new NullPointerException("color can not be null");
+        thumbColor = color;
+        invalidate(false);
+    }
+
+    public Color getBorderColor() {
+        return borderColor;
+    }
+
+    public void setBorderColor(Color color) {
+        FlintUI.checkThread();
+        borderColor = color;
+        invalidate(false);
+    }
+
+    public int getCornerRadius() {
+        return cornerRadius;
+    }
+
+    public void setCornerRadius(int radius) {
+        FlintUI.checkThread();
+        cornerRadius = radius;
+        invalidate(false);
+    }
+
+    public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {
+        onCheckedChangeListener = listener;
+    }
+}
