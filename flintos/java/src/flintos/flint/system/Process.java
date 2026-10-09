@@ -36,5 +36,7 @@ public class Process {
 
     public native void close();
 
+    public native void foreground();
+
     public native static Process[] getProcesses();
 }

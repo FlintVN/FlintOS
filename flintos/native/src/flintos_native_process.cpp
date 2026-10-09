@@ -62,6 +62,19 @@ jvoid NativeProcess_Close(FNIEnv *env, jobject obj) {
     }
 }
 
+jvoid NativeProcess_Foreground(FNIEnv *env, jobject obj) {
+    JProcess *p = (JProcess *)obj;
+    jint handle = p->getHandle();
+    if (handle != -1) {
+        FlintOS::lock();
+        FProcess *fprocess = FlintOS::getProcesses()->find([&handle](FProcess *item) -> bool { return (jint)item == handle; });
+        if (fprocess != NULL)
+            FlintOS::setForeground(fprocess);
+        FlintOS::unlock();
+        p->setHandle(-1);
+    }
+}
+
 jobjectArray NativeProcess_GetProcesses(FNIEnv *env) {
     FlintOS::lock();
     FList<FProcess> *processes = FlintOS::getProcesses();

@@ -7,11 +7,13 @@
 
 jvoid NativeProcess_Start(FNIEnv *env, jobject obj);
 jvoid NativeProcess_Close(FNIEnv *env, jobject obj);
+jvoid NativeProcess_Foreground(FNIEnv *env, jobject obj);
 jobjectArray NativeProcess_GetProcesses(FNIEnv *env);
 
 inline constexpr NativeMethod processMethods[] = {
     NATIVE_METHOD("start",        "()V",                       NativeProcess_Start),
     NATIVE_METHOD("close",        "()V",                       NativeProcess_Close),
+    NATIVE_METHOD("foreground",   "()V",                       NativeProcess_Foreground),
     NATIVE_METHOD("getProcesses", "()[Lflint/system/Process;", NativeProcess_GetProcesses),
 };
 
