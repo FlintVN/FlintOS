@@ -128,5 +128,13 @@ uint32_t ES8311::write(uint8_t *data, uint32_t length) const {
 }
 
 void ES8311::setVolume(uint8_t value) const {
-    esp_codec_dev_set_out_vol(codecHandle, value);
+    const static uint8_t logVolTable[] = {
+        0, 5, 15, 23, 30, 34, 38, 42, 45, 47, 50, 52, 53, 55, 57, 58, 60, 61, 62, 63, 65,
+        66, 67, 68, 69, 69, 70, 71, 72, 73, 73, 74, 75, 75, 76, 77, 77, 78, 78, 79, 80,
+        80, 81, 81, 82, 82, 83, 83, 84, 84, 84, 85, 85, 86, 86, 87, 87, 87, 88, 88, 88,
+        89, 89, 89, 90, 90, 90, 91, 91, 91, 92, 92, 92, 93, 93, 93, 94, 94, 94, 94, 95,
+        95, 95, 95, 96, 96, 96, 96, 97, 97, 97, 97, 98, 98, 98, 98, 99, 99, 99, 99, 100,
+    };
+    if(value > 100) value = 100;
+    esp_codec_dev_set_out_vol(codecHandle, logVolTable[value]);
 }
