@@ -13,7 +13,7 @@ public abstract class Theme {
     }
 
     public static void setDefaultTheme(Theme theme) {
-        if(theme == null)
+        if (theme == null)
             throw new NullPointerException("theme cannot be null");
         defaultTheme = theme;
     }

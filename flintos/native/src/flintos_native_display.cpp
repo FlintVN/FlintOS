@@ -31,15 +31,15 @@ jint NativeDisplay_getBrightness(FNIEnv *env) {
 }
 
 jvoid NativeDisplay_SetBrightness(FNIEnv *env, jint value) {
-    if(FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint())) {
-        if(value < 0) value = 0;
-        else if(value > 100) value = 100;
+    if (FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint())) {
+        if (value < 0) value = 0;
+        else if (value > 100) value = 100;
         DisplaySrv::setBrightness(value);
     }
 }
 
 jvoid NativeDisplay_Present1(FNIEnv *env, jobject obj) {
-    if(FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint(), false)) {
+    if (FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint(), false)) {
         JDisplay *disp = (JDisplay *)obj;
         DisplaySrv::Surface surf;
         surf.invalid.x = 0;
@@ -56,7 +56,7 @@ jvoid NativeDisplay_Present1(FNIEnv *env, jobject obj) {
 }
 
 jvoid NativeDisplay_Present2(FNIEnv *env, jobject obj, jint x, jint y, jint w, jint h) {
-    if(FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint(), false)) {
+    if (FlintOS::isForeground((FProcess *)((FExec *)env)->getFlint(), false)) {
         JDisplay *disp = (JDisplay *)obj;
         DisplaySrv::Surface surf;
         surf.invalid.x = x;

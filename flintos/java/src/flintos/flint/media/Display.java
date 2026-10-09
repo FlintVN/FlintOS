@@ -9,7 +9,7 @@ public class Display {
     private Graphics g;
 
     public Display(int width, int height) {
-        if(width < 0 || height < 0)
+        if (width < 0 || height < 0)
             throw new IllegalArgumentException("width and height must be non-negative: width=" + width + ", height=" + height);
         this.width = width;
         this.height = height;
@@ -43,7 +43,7 @@ public class Display {
     public native void present(int x, int y, int w, int h);
 
     public Graphics createGraphics() {
-        if(g == null)
+        if (g == null)
             g = Graphics.create(width, height, buffer);
         return g;
     }

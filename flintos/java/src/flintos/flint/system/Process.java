@@ -22,7 +22,7 @@ public class Process {
     }
 
     public void setName(String name) {
-        if(name == null)
+        if (name == null)
             throw new NullPointerException("name cannot be null");
         this.name = name;
     }

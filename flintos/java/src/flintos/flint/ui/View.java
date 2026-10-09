@@ -86,26 +86,26 @@ public abstract class View {
     }
 
     protected final void dispatchTouchEvent(MotionEvent event) {
-        if(onTouchListener != null) {
-            if(onTouchListener.onTouch(this, event))
+        if (onTouchListener != null) {
+            if (onTouchListener.onTouch(this, event))
                 return;
         }
-        if(event.action == MotionEvent.ACTION_DOWN) {
+        if (event.action == MotionEvent.ACTION_DOWN) {
             isPressing = true;
             startX = event.x;
             startY = event.y;
         }
         onTouchEvent(event);
-        switch(event.action) {
+        switch (event.action) {
             case MotionEvent.ACTION_UP: {
-                if(isPressing && onClickListener != null && containsPoint(event.x, event.y))
+                if (isPressing && onClickListener != null && containsPoint(event.x, event.y))
                     onClickListener.onClick(this);
                 return;
             }
             case MotionEvent.ACTION_MOVE: {
                 int diffX = event.x > startX ? event.x - startX : startX - event.x;
                 int diffY = event.y > startY ? event.y - startY : startY - event.y;
-                if(diffX > SCROLL_LIMIT || diffY > SCROLL_LIMIT || !containsPoint(event.x, event.y))
+                if (diffX > SCROLL_LIMIT || diffY > SCROLL_LIMIT || !containsPoint(event.x, event.y))
                     isPressing = false;
                 return;
             }
@@ -118,7 +118,7 @@ public abstract class View {
 
     public void setWidth(int width) {
         FlintUI.checkThread();
-        if(this.width != width) {
+        if (this.width != width) {
             this.width = width;
             FlintUI.setInvalidateAll();
         }
@@ -130,7 +130,7 @@ public abstract class View {
 
     public void setHeight(int height) {
         FlintUI.checkThread();
-        if(this.height != height) {
+        if (this.height != height) {
             this.height = height;
             FlintUI.setInvalidateAll();
         }
@@ -142,7 +142,7 @@ public abstract class View {
 
     public void setSize(int width, int height) {
         FlintUI.checkThread();
-        if(this.width != width || this.height != height)
+        if (this.width != width || this.height != height)
             FlintUI.setInvalidateAll();
         this.width = width;
         this.height = height;
@@ -166,7 +166,7 @@ public abstract class View {
     }
 
     protected void updateActualWidth(int availableW) {
-        actualWidth = switch(width) {
+        actualWidth = switch (width) {
             case View.MATCH_PARENT -> availableW >= 0 ? availableW : 0;
             case View.WRAP_CONTENT -> 0;
             default -> width;
@@ -174,7 +174,7 @@ public abstract class View {
     }
 
     protected void updateActualHeight(int availableH) {
-        actualHeight = switch(height) {
+        actualHeight = switch (height) {
             case View.MATCH_PARENT -> availableH >= 0 ? availableH : 0;
             case View.WRAP_CONTENT -> 0;
             default -> height;
@@ -186,7 +186,7 @@ public abstract class View {
     }
 
     protected boolean isVisible(Graphics g) {
-        if(visible == false) return false;
+        if (visible == false) return false;
         return g.isVisible(x, y, actualWidth, actualHeight);
     }
 
@@ -196,7 +196,7 @@ public abstract class View {
 
     public void setVisible(boolean visible) {
         FlintUI.checkThread();
-        if(this.visible != visible) {
+        if (this.visible != visible) {
             this.visible = visible;
             invalidate(false);
         }
@@ -239,7 +239,7 @@ public abstract class View {
 
     public void setHorizontalAlignment(HorizontalAlignment alignment) {
         FlintUI.checkThread();
-        if(alignment == null)
+        if (alignment == null)
             throw new NullPointerException("alignment cannot be null");
         hAlignment = alignment;
         FlintUI.setInvalidateAll();
@@ -251,7 +251,7 @@ public abstract class View {
 
     public void setVerticalAlignment(VerticalAlignment alignment) {
         FlintUI.checkThread();
-        if(alignment == null)
+        if (alignment == null)
             throw new NullPointerException("alignment cannot be null");
         vAlignment = alignment;
         FlintUI.setInvalidateAll();

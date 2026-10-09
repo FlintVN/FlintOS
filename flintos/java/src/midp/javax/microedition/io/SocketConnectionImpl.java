@@ -47,7 +47,7 @@ class SocketConnectionImpl implements SocketConnection {
     }
 
     public void setSocketOption(byte option, int value) throws IOException {
-        switch(option) {
+        switch (option) {
             case DELAY: socket.setTcpNoDelay(value == 0); break;
             case LINGER: socket.setSoLinger(value > 0, value); break;
             // TODO
@@ -59,7 +59,7 @@ class SocketConnectionImpl implements SocketConnection {
     }
 
     public int getSocketOption(byte option) throws IOException {
-        switch(option) {
+        switch (option) {
             case DELAY: return socket.getTcpNoDelay() ? 0 : 1;
             case LINGER: return Math.max(socket.getSoLinger(), 0);
             // TODO

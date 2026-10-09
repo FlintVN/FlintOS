@@ -73,7 +73,7 @@ public class Graphics {
     }
 
     public void setFont(Font f) {
-        if(f != null)
+        if (f != null)
             font = f;
     }
 
@@ -170,7 +170,7 @@ public class Graphics {
     }
 
     public void drawImage(Image img, int x, int y, int anchor) {
-        if(img == null)
+        if (img == null)
             return;
         int w = img.getWidth(), h = img.getHeight();
         x = anchorX(x, w, anchor);
@@ -179,7 +179,7 @@ public class Graphics {
     }
 
     public void drawRegion(Image src, int sx, int sy, int sw, int sh, int transform, int dx, int dy, int anchor) {
-        if(src == null)
+        if (src == null)
             return;
         dx = anchorX(dx, sw, anchor);
         dy = anchorY(dy, sh, anchor);
@@ -193,17 +193,17 @@ public class Graphics {
     }
 
     private int anchorX(int x, int w, int anchor) {
-        if((anchor & RIGHT) != 0)
+        if ((anchor & RIGHT) != 0)
             return x - w;
-        if((anchor & HCENTER) != 0)
+        if ((anchor & HCENTER) != 0)
             return x - w / 2;
         return x;
     }
 
     private int anchorY(int y, int h, int anchor) {
-        if((anchor & BOTTOM) != 0)
+        if ((anchor & BOTTOM) != 0)
             return y - h;
-        if((anchor & VCENTER) != 0)
+        if ((anchor & VCENTER) != 0)
             return y - h / 2;
         return y;
     }

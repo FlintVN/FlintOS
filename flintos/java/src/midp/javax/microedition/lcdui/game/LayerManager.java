@@ -19,14 +19,14 @@ public class LayerManager {
     }
 
     public void insert(Layer l, int index) {
-        if((index < 0) || (index > nlayers) || (exist(l) && (index >= nlayers)))
+        if ((index < 0) || (index > nlayers) || (exist(l) && (index >= nlayers)))
             throw new IndexOutOfBoundsException();
         removeImpl(l);
         addImpl(l, index);
     }
 
     public Layer getLayerAt(int index) {
-        if((index < 0) || (index >= nlayers))
+        if ((index < 0) || (index >= nlayers))
             throw new IndexOutOfBoundsException();
         return component[index];
     }
@@ -48,9 +48,9 @@ public class LayerManager {
         g.translate(x - viewX, y - viewY);
         g.clipRect(viewX, viewY, viewWidth, viewHeight);
 
-        for(int i = nlayers; --i >= 0; ) {
+        for (int i = nlayers; --i >= 0; ) {
             Layer comp = component[i];
-            if(comp.visible)
+            if (comp.visible)
                 comp.paint(g);
         }
 
@@ -59,7 +59,7 @@ public class LayerManager {
     }
 
     public void setViewWindow(int x, int y, int width, int height) {
-        if(width < 0 || height < 0)
+        if (width < 0 || height < 0)
             throw new IllegalArgumentException();
         viewX = x;
         viewY = y;
@@ -68,7 +68,7 @@ public class LayerManager {
     }
 
     private void addImpl(Layer layer, int index) {
-        if(nlayers == component.length) {
+        if (nlayers == component.length) {
             Layer newcomponents[] = new Layer[nlayers + 4];
             System.arraycopy(component, 0, newcomponents, 0, nlayers);
             System.arraycopy(component, index, newcomponents, index + 1, nlayers - index);
@@ -82,21 +82,21 @@ public class LayerManager {
     }
 
     private void removeImpl(Layer l) {
-        if(l == null)
+        if (l == null)
             throw new NullPointerException();
 
-        for(int i = nlayers; --i >= 0; ) {
-            if(component[i] == l)
+        for (int i = nlayers; --i >= 0; ) {
+            if (component[i] == l)
                 remove(i);
         }
     }
 
     private boolean exist(Layer l) {
-        if(l == null)
+        if (l == null)
             return false;
 
-        for(int i = nlayers; --i >= 0; ) {
-            if(component[i] == l)
+        for (int i = nlayers; --i >= 0; ) {
+            if (component[i] == l)
                 return true;
         }
         return false;

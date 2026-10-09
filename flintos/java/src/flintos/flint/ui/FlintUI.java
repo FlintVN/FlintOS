@@ -51,15 +51,15 @@ public abstract class FlintUI extends View {
     }
 
     public static void checkThread() {
-        if(currentUI != null && currentUI.mThread != Thread.currentThread())
+        if (currentUI != null && currentUI.mThread != Thread.currentThread())
             throw new CalledFromWrongThreadException("Only the original thread that created a view hierarchy can touch its views");
     }
 
     static final void setInvalidate(int x, int y, int w, int h, boolean layout) {
         FlintUI ui = currentUI;
-        if(ui == null)
+        if (ui == null)
             return;
-        if(ui.invH == 0) {
+        if (ui.invH == 0) {
             ui.invX = x;
             ui.invY = y;
             ui.invW = w;
@@ -68,18 +68,18 @@ public abstract class FlintUI extends View {
         else {
             int x2 = Math.max(ui.invX + ui.invW, x + w);
             int y2 = Math.max(ui.invY + ui.invH, y + h);
-            if(ui.invX > x) ui.invX = x;
-            if(ui.invY > y) ui.invY = y;
+            if (ui.invX > x) ui.invX = x;
+            if (ui.invY > y) ui.invY = y;
             ui.invW = x2 - ui.invX;
             ui.invH = y2 - ui.invY;
         }
-        if(layout)
+        if (layout)
             ui.invLayout = layout;
     }
 
     static final void setInvalidateAll() {
         FlintUI ui = currentUI;
-        if(ui == null)
+        if (ui == null)
             return;
         ui.invX = 0;
         ui.invY = 0;
@@ -90,16 +90,16 @@ public abstract class FlintUI extends View {
 
     @Override
     protected void onDraw(Graphics g) {
-        if(content != null && content.isVisible(g))
+        if (content != null && content.isVisible(g))
             content.onDraw(g);
     }
 
     @Override
     protected View hitTest(int x, int y) {
-        if(containsPoint(x, y)) {
-            if(content != null) {
+        if (containsPoint(x, y)) {
+            if (content != null) {
                 View v = content.hitTest(x, y);
-                if(v != null)
+                if (v != null)
                     return v;
             }
             else
@@ -110,7 +110,7 @@ public abstract class FlintUI extends View {
 
     protected void processEvent(NativeEvent event) {
         int eventType = event.getType();
-        switch(eventType) {
+        switch (eventType) {
             case EventTypes.KEY_EVENT: {
                 keyEvent.action = event.getData(0);
                 keyEvent.keyCode = event.getData(1);
@@ -119,9 +119,9 @@ public abstract class FlintUI extends View {
             }
             case EventTypes.TOUCH_EVENT: {
                 int action = event.getData(0);
-                if(action == MotionEvent.ACTION_DOWN)
+                if (action == MotionEvent.ACTION_DOWN)
                     actView = hitTest(event.getData(1), event.getData(2));
-                if(actView != null) {
+                if (actView != null) {
                     motionEvent.action = action;
                     motionEvent.x = event.getData(1);
                     motionEvent.y = event.getData(2);
@@ -144,14 +144,14 @@ public abstract class FlintUI extends View {
     @Override
     protected void updateLocation(int x, int y) {
         View v = content;
-        if(v != null) {
-            int xoff = x + switch(v.hAlignment.value) {
+        if (v != null) {
+            int xoff = x + switch (v.hAlignment.value) {
                 case 0 -> v.marginLeft;
                 case 1 -> (actualWidth - v.actualWidth) / 2 + v.marginLeft - v.marginRight;
                 default -> actualWidth - v.marginRight - v.actualWidth;
             };
 
-            int yoff = y + switch(v.vAlignment.value) {
+            int yoff = y + switch (v.vAlignment.value) {
                 case 0 -> v.marginTop;
                 case 1 -> (actualHeight - v.actualHeight) / 2 + v.marginTop - v.marginBottom;
                 default -> actualHeight - v.marginBottom - v.actualHeight;
@@ -165,7 +165,7 @@ public abstract class FlintUI extends View {
     protected void updateActualWidth(int availableW) {
         actualWidth = availableW;
         View v = content;
-        if(v != null)
+        if (v != null)
             v.updateActualWidth(availableW - v.marginLeft - v.marginRight);
     }
 
@@ -173,7 +173,7 @@ public abstract class FlintUI extends View {
     protected void updateActualHeight(int availableH) {
         actualHeight = availableH;
         View v = content;
-        if(v != null)
+        if (v != null)
             v.updateActualHeight(availableH - v.marginTop - v.marginBottom);
     }
 
@@ -188,12 +188,12 @@ public abstract class FlintUI extends View {
     }
 
     public void setContent(View v) {
-        if(v != null) {
-            if(v.parent != null)
+        if (v != null) {
+            if (v.parent != null)
                 throw new IllegalStateException("The specified child already has a parent");
             v.parent = this;
         }
-        if(content != null)
+        if (content != null)
             content.parent = null;
         content = v;
     }
@@ -207,13 +207,13 @@ public abstract class FlintUI extends View {
         NativeEvent event = new NativeEvent();
         initGraphics();
         draw();
-        while(true) {
+        while (true) {
             try {
-                if(NativeEventReceiver.waitEvent(event))
+                if (NativeEventReceiver.waitEvent(event))
                     processEvent(event);
                 taskQueue.runAll();
             }
-            catch(InterruptedException e) {
+            catch (InterruptedException e) {
 
             }
         }
@@ -221,19 +221,19 @@ public abstract class FlintUI extends View {
 
     private void initGraphics() {
         disp1 = new Display(width, height);
-        if(doubleBuffer)
+        if (doubleBuffer)
             disp2 = new Display(width, height);
     }
 
     private void draw() {
         int w = invW;
         int h = invH;
-        if(invLayout || (w > 0 && h > 0)) {
+        if (invLayout || (w > 0 && h > 0)) {
             int x = invX;
             int y = invY;
             invW = 0;
             invH = 0;
-            if(invLayout) {
+            if (invLayout) {
                 invLayout = false;
                 updateLayout();
             }
@@ -241,7 +241,7 @@ public abstract class FlintUI extends View {
             disp = (doubleBuffer && disp == disp1) ? disp2 : disp1;
             Graphics g = disp.createGraphics();
             g.setClip(x, y, w, h);
-            if(background != null)
+            if (background != null)
                 g.clear(background);
             else
                 g.clear();
@@ -251,7 +251,7 @@ public abstract class FlintUI extends View {
     }
 
     public final void runOnUiThread(Runnable task) {
-        if(mThread == Thread.currentThread())
+        if (mThread == Thread.currentThread())
             task.run();
         else {
             taskQueue.post(task);
@@ -265,7 +265,7 @@ public abstract class FlintUI extends View {
 
     public Image loadImage(String name, boolean mutable) {
         try {
-            if(name.startsWith(RES_PREFIX)) {
+            if (name.startsWith(RES_PREFIX)) {
                 String resName = name.substring(RES_PREFIX.length());
                 InputStream stream = this.getClass().getResourceAsStream(resName);
                 Image img = Image.create(stream, mutable);
@@ -274,14 +274,14 @@ public abstract class FlintUI extends View {
             }
             return Image.create(name);
         }
-        catch(IOException ex) {
+        catch (IOException ex) {
             return null;
         }
     }
 
     public Font loadFont(String name) {
         try {
-            if(name.startsWith(RES_PREFIX)) {
+            if (name.startsWith(RES_PREFIX)) {
                 String resName = name.substring(RES_PREFIX.length());
                 InputStream stream = this.getClass().getResourceAsStream(resName);
                 Font font = new Font(stream);
@@ -290,7 +290,7 @@ public abstract class FlintUI extends View {
             }
             return new Font(name);
         }
-        catch(IOException ex) {
+        catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
     }
@@ -308,7 +308,7 @@ public abstract class FlintUI extends View {
         public void post(Runnable task) {
             Task t = new Task(task);
             synchronized(queueLock) {
-                if(last != null)
+                if (last != null)
                     last.next = t;
                 else
                     head = t;
@@ -318,7 +318,7 @@ public abstract class FlintUI extends View {
 
         public void runAll() {
             Task task;
-            if(head == null)
+            if (head == null)
                 return;
             synchronized(queueLock) {
                 task = head;
@@ -326,7 +326,7 @@ public abstract class FlintUI extends View {
                 last = null;
             }
 
-            while(task != null) {
+            while (task != null) {
                 task.run();
                 task = task.next;
             }
@@ -337,7 +337,7 @@ public abstract class FlintUI extends View {
             Task next;
 
             public Task(Runnable task) {
-                if(task == null)
+                if (task == null)
                     throw new NullPointerException();
                 this.task = task;
             }

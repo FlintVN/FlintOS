@@ -46,7 +46,7 @@ public abstract class Canvas extends Displayable {
     public int getKeyCode(int gameAction) {
         int n = KeyConverter.getKeyCode(gameAction);
 
-        if(n == 0)
+        if (n == 0)
             throw new IllegalArgumentException();
 
         return n;
@@ -55,7 +55,7 @@ public abstract class Canvas extends Displayable {
     public String getKeyName(int keyCode) {
         String s = KeyConverter.getKeyName(keyCode);
 
-        if(s == null)
+        if (s == null)
             throw new IllegalArgumentException();
 
         return s;
@@ -64,7 +64,7 @@ public abstract class Canvas extends Displayable {
     public int getGameAction(int keyCode) {
         int n = KeyConverter.getGameAction(keyCode);
 
-        if(n == -1)
+        if (n == -1)
             throw new IllegalArgumentException();
 
         return n;

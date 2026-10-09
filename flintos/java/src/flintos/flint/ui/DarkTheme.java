@@ -20,9 +20,9 @@ public class DarkTheme extends Theme {
     public Object get(String name) {
         synchronized(values) {
             Object ret = values.get(name);
-            if(ret == null) {
+            if (ret == null) {
                 ret = getDefault(name);
-                if(ret == null)
+                if (ret == null)
                     throw new NoSuchElementException("No value for: " + name);
                 values.put(name, ret);
             }
@@ -32,7 +32,7 @@ public class DarkTheme extends Theme {
 
     @Override
     public void set(String name, Object value) {
-        if(value == null)
+        if (value == null)
             throw new NullPointerException("The value cannot be null");
         synchronized(values) {
             values.put(name, value);
@@ -41,7 +41,7 @@ public class DarkTheme extends Theme {
 
     private static Object getDefault(String name) {
         try {
-            return switch(name) {
+            return switch (name) {
                 case "backgroundColor" -> new Color(0xFF121212);    // #121212
                 case "primaryColor" -> new Color(0xFF2196F3);       // #2196F3
                 case "secondaryColor" -> new Color(0xFF9C27B0);     // #9C27B0
@@ -64,7 +64,7 @@ public class DarkTheme extends Theme {
                 default -> null;
             };
         }
-        catch(IOException ex) {
+        catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
     }

@@ -33,16 +33,16 @@ public class EventQueue implements Runnable {
     }
 
     public void registerEventListener(int eventType, EventListener listener) {
-        if(eventType <= 0)
+        if (eventType <= 0)
             throw new IllegalArgumentException("Event type is not positive");
-        if(listener == null)
+        if (listener == null)
             throw new IllegalArgumentException("Listener is null");
 
         synchronized(eventQueueLock) {
-            if(eventType > listeners.length) {
+            if (eventType > listeners.length) {
                 EventListener[] newTable = new EventListener[eventType + 1];
 
-                for(int i = 0; i < listeners.length; i++)
+                for (int i = 0; i < listeners.length; i++)
                     newTable[i] = listeners[i];
 
                 listeners = newTable;
@@ -53,12 +53,12 @@ public class EventQueue implements Runnable {
 
     public void post(Event event) {
         synchronized(eventQueueLock) {
-            if(event.type < 1)
+            if (event.type < 1)
                 return;
-            if(event.type > listeners.length)
+            if (event.type > listeners.length)
                 return;
 
-            if(lastEvent != null)
+            if (lastEvent != null)
                 lastEvent.next = event;
             else
                 nextEvent = event;
@@ -75,23 +75,23 @@ public class EventQueue implements Runnable {
         EventListener listener;
 
         synchronized(eventQueueLock) {
-            for(Event current = nextEvent; current != null; prev = current, current = current.next) {
-                if(current.type == eventType) {
+            for (Event current = nextEvent; current != null; prev = current, current = current.next) {
+                if (current.type == eventType) {
                     result = current;
                     break;
                 }
             }
 
-            if(result == null)
+            if (result == null)
                 return null;
 
             listener = listeners[eventType - 1];
 
-            if(result == nextEvent)
+            if (result == nextEvent)
                 nextEvent = result.next;
-            if(result == lastEvent)
+            if (result == lastEvent)
                 lastEvent = prev;
-            if(prev != null)
+            if (prev != null)
                 prev.next = result.next;
 
             result.next = null;
@@ -104,19 +104,19 @@ public class EventQueue implements Runnable {
         Event event = null;
         EventListener listener;
 
-        for(;;) {
+        for (;;) {
             try {
                 synchronized(eventQueueLock) {
-                    while(nextEvent == null)
+                    while (nextEvent == null)
                         eventQueueLock.wait();
 
                     event = nextEvent;
                     nextEvent = event.next;
                     event.next = null;
-                    if(nextEvent == null)
+                    if (nextEvent == null)
                         lastEvent = null;
 
-                    if(event.type == EventTypes.EVENT_QUEUE_SHUTDOWN) {
+                    if (event.type == EventTypes.EVENT_QUEUE_SHUTDOWN) {
                         eventQueueLock.notifyAll();
                         return;
                     }
@@ -128,8 +128,8 @@ public class EventQueue implements Runnable {
 
                 event = null;
             }
-            catch(Throwable t) {
-                if(!(t instanceof OutOfMemoryError))
+            catch (Throwable t) {
+                if (!(t instanceof OutOfMemoryError))
                     t.printStackTrace();
             }
         }

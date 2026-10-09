@@ -9,7 +9,7 @@
 static FMutex wifiLock;
 
 static bool checkIsSupported(FNIEnv *env) {
-    if(HAL::Devices::wifi() == NULL) {
+    if (HAL::Devices::wifi() == NULL) {
         env->throwNew(env->findClass("java/lang/UnsupportedOperationException"), "Wi-Fi is not supported");
         return false;
     }
@@ -17,8 +17,8 @@ static bool checkIsSupported(FNIEnv *env) {
 }
 
 static bool checkParams(FNIEnv *env, jstring ssid, jstring password, uint32_t authMode) {
-    if((ssid == NULL) || ((password == NULL) && (authMode != 0))) {
-        if(ssid == NULL) {
+    if ((ssid == NULL) || ((password == NULL) && (authMode != 0))) {
+        if (ssid == NULL) {
             env->throwNew(env->findClass("java/lang/NullPointerException"), "ssid cannot be null object");
             return false;
         }
@@ -30,8 +30,8 @@ static bool checkParams(FNIEnv *env, jstring ssid, jstring password, uint32_t au
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
-    if((ssidLen > 32) || (passwordLen > 64)) {
-        if(ssidLen > 32) {
+    if ((ssidLen > 32) || (passwordLen > 64)) {
+        if (ssidLen > 32) {
             env->throwNew(env->findClass("java/lang/IllegalArgumentException"), "ssid value is invalid");
             return false;
         }
@@ -45,7 +45,7 @@ static bool checkParams(FNIEnv *env, jstring ssid, jstring password, uint32_t au
 }
 
 static bool checkReturn(FNIEnv *env, bool ret, const char *msg) {
-    if(ret != true) {
+    if (ret != true) {
         env->throwNew(env->findClass("java/io/UncheckedIOException"), msg);
         return false;
     }
@@ -58,8 +58,8 @@ jbool NativeWiFi_IsSupported(FNIEnv *env) {
 }
 
 jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authMode) {
-    if(!checkIsSupported(env)) return;
-    if(!checkParams(env, ssid, password, authMode)) return;
+    if (!checkIsSupported(env)) return;
+    if (!checkParams(env, ssid, password, authMode)) return;
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
@@ -74,7 +74,7 @@ jvoid NativeWiFi_Connect(FNIEnv *env, jstring ssid, jstring password, jint authM
 
 jbool NativeWiFi_IsConnected(FNIEnv *env) {
     (void)env;
-    if(!checkIsSupported(env)) return false;
+    if (!checkIsSupported(env)) return false;
     wifiLock.lock();
     bool ret = HAL::Devices::wifi()->isConnected();
     wifiLock.unlock();
@@ -83,16 +83,16 @@ jbool NativeWiFi_IsConnected(FNIEnv *env) {
 
 static jobject createAccessPointRecordObj(FNIEnv *env, HAL::WiFi::ApRecordType *apRecord) {
     jobject aprObj = env->newObject(env->findClass("flint/net/AccessPointRecord"));
-    if(aprObj == NULL) return NULL;
+    if (aprObj == NULL) return NULL;
 
     /* mac array */
     jbyteArray macArray = env->newByteArray(6);
-    if(macArray == NULL) return NULL;
+    if (macArray == NULL) return NULL;
     memcpy(macArray->getData(), apRecord->mac, 6);
 
     env->setObjField(env->getFieldId(aprObj, "mac"), macArray);
     jstring ssid = env->newString((char *)apRecord->ssid);
-    if(ssid == NULL) {
+    if (ssid == NULL) {
         env->freeObject(macArray);
         return NULL;
     }
@@ -104,10 +104,10 @@ static jobject createAccessPointRecordObj(FNIEnv *env, HAL::WiFi::ApRecordType *
 }
 
 jobject NativeWiFi_GetAPinfo(FNIEnv *env) {
-    if(!checkIsSupported(env)) return NULL;
+    if (!checkIsSupported(env)) return NULL;
     HAL::WiFi::ApRecordType apInfo;
     wifiLock.lock();
-    if(checkReturn(env, HAL::Devices::wifi()->getAPinfo(&apInfo), "getAPinfo error")) {
+    if (checkReturn(env, HAL::Devices::wifi()->getAPinfo(&apInfo), "getAPinfo error")) {
         wifiLock.unlock();
         jobject obj = createAccessPointRecordObj(env, &apInfo);
         return (obj != NULL) ? obj : NULL;
@@ -117,15 +117,15 @@ jobject NativeWiFi_GetAPinfo(FNIEnv *env) {
 }
 
 jvoid NativeWiFi_Disconnect(FNIEnv *env) {
-    if(!checkIsSupported(env)) return;
+    if (!checkIsSupported(env)) return;
     wifiLock.lock();
     HAL::Devices::wifi()->disconnect();
     wifiLock.unlock();
 }
 
 jvoid NativeWiFi_SoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMode, jint channel, jint maxConnection) {
-    if(!checkIsSupported(env)) return;
-    if(!checkParams(env, ssid, password, authMode)) return;
+    if (!checkIsSupported(env)) return;
+    if (!checkParams(env, ssid, password, authMode)) return;
 
     uint32_t ssidLen = ssid->getLength();
     uint32_t passwordLen = password ? password->getLength() : 0;
@@ -139,14 +139,14 @@ jvoid NativeWiFi_SoftAP(FNIEnv *env, jstring ssid, jstring password, jint authMo
 }
 
 jvoid NativeWiFi_SoftAPdisconnect(FNIEnv *env) {
-    if(!checkIsSupported(env)) return;
+    if (!checkIsSupported(env)) return;
     wifiLock.lock();
     HAL::Devices::wifi()->softAPDisconnect();
     wifiLock.unlock();
 }
 
 jvoid NativeWiFi_StartScan(FNIEnv *env, jbool blocked) {
-    if(!checkIsSupported(env)) return;
+    if (!checkIsSupported(env)) return;
     wifiLock.lock();
     bool ret = HAL::Devices::wifi()->startScan(blocked);
     wifiLock.unlock();
@@ -154,41 +154,41 @@ jvoid NativeWiFi_StartScan(FNIEnv *env, jbool blocked) {
 }
 
 jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
-    if(!checkIsSupported(env)) return NULL;
+    if (!checkIsSupported(env)) return NULL;
     wifiLock.lock();
     int32_t count = HAL::Devices::wifi()->getScanAPCount();
-    if(!checkReturn(env, count >= 0, "An error occurred while getting AP number")) {
+    if (!checkReturn(env, count >= 0, "An error occurred while getting AP number")) {
         wifiLock.unlock();
         return NULL;
     }
 
-    if(count == 0) {
+    if (count == 0) {
         HAL::Devices::wifi()->scanClear();
         wifiLock.unlock();
         return NULL;
     }
 
     jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/net/AccessPointRecord"), count);
-    if(arrayObj == NULL) {
+    if (arrayObj == NULL) {
         HAL::Devices::wifi()->scanClear();
         wifiLock.unlock();
         return NULL;
     }
     arrayObj->clearData();
     JObject **data = arrayObj->getData();
-    for(uint16_t i = 0; i < count; i++) {
+    for (uint16_t i = 0; i < count; i++) {
         HAL::WiFi::ApRecordType apRecords;
         bool ret = HAL::Devices::wifi()->getScanAPInfo(&apRecords);
-        if(!checkReturn(env, ret, "An error occurred while getting AP record")) {
+        if (!checkReturn(env, ret, "An error occurred while getting AP record")) {
             HAL::Devices::wifi()->scanClear();
             wifiLock.unlock();
             return NULL;
         }
         jobject aprObj = createAccessPointRecordObj(env, &apRecords);
-        if(aprObj == NULL) {
+        if (aprObj == NULL) {
             HAL::Devices::wifi()->scanClear();
             wifiLock.unlock();
-            while(i) env->freeObject(data[--i]);
+            while (i) env->freeObject(data[--i]);
             env->freeObject(arrayObj);
             return NULL;
         }
@@ -201,7 +201,7 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
 }
 
 jvoid NativeWiFi_StopScan(FNIEnv *env) {
-    if(!checkIsSupported(env)) return;
+    if (!checkIsSupported(env)) return;
     wifiLock.lock();
     HAL::Devices::wifi()->stopScan();
     wifiLock.unlock();

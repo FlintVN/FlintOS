@@ -191,7 +191,7 @@ static void LCD_Clear(void) {
     SPI_Write(0x2C, true);
     LCD_DC(1);
     uint32_t n = (240 * 320 * 2) / sizeof(data);
-    for(uint32_t i = 0; i < n;) {
+    for (uint32_t i = 0; i < n;) {
         i++;
         SPI_Write((uint8_t *)data, sizeof(data), i < n ? true : false);
     }
@@ -263,9 +263,9 @@ void ILI9341::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *dat
     SPI_Write(0x2C, true);
     LCD_DC(1);
 
-    if(w == stride) {
+    if (w == stride) {
         uint32_t len = w * h * 2;
-        while(len > 0) {
+        while (len > 0) {
             uint32_t sz = len > SPI_MAX_TRANSFER_SZ ? SPI_MAX_TRANSFER_SZ : len;
             trans[count].length = sz * 8;
             trans[count].rxlength = 0;
@@ -281,7 +281,7 @@ void ILI9341::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *dat
         trans[0].length = w << 4;
         trans[1].length = w << 4;
         stride <<= 1;
-        while(h > 0) {
+        while (h > 0) {
             trans[count].rxlength = 0;
             trans[count].tx_buffer = data;
             h--;

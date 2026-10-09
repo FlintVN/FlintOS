@@ -29,7 +29,7 @@ public final class Font {
     }
 
     public static synchronized Font getDefaultFont() {
-        if(DEFAULT_FONT == null)
+        if (DEFAULT_FONT == null)
             DEFAULT_FONT = new Font(FACE_SYSTEM, STYLE_PLAIN, SIZE_MEDIUM);
         return DEFAULT_FONT;
     }

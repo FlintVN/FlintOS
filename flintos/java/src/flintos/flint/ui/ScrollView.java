@@ -32,30 +32,30 @@ public class ScrollView extends PanelView {
     protected void onDraw(Graphics g) {
         super.onDraw(g);
 
-        if(!isPressed && scrolling) {
+        if (!isPressed && scrolling) {
             boolean requestUpdate = false;
-            if(vX != 0) {
+            if (vX != 0) {
                 momentumEffectX();
                 requestUpdate |= true;
             }
             else
                 requestUpdate |= elasticEffectX();
 
-            if(vY != 0) {
+            if (vY != 0) {
                 momentumEffectY();
                 requestUpdate |= true;
             }
             else
                 requestUpdate |= elasticEffectY();
 
-            if(requestUpdate)
+            if (requestUpdate)
                 invalidate(true);
             else
                 scrolling = false;
         }
 
         View v = content;
-        if(v != null) {
+        if (v != null) {
             int gClipX = g.getClipX();
             int gClipY = g.getClipY();
             int gClipW = g.getClipWidth();
@@ -74,18 +74,18 @@ public class ScrollView extends PanelView {
 
     private void momentumEffectX() {
         int over = isOverX();
-        if(over != 0) {
+        if (over != 0) {
             int tmp = vX * SCROLL_OVER_THROW / 100;
-            if(tmp == 0) tmp = (vX > 0) ? 1 : -1;
+            if (tmp == 0) tmp = (vX > 0) ? 1 : -1;
             vX -= tmp;
             tmp = applyElasticDamping(over, vX);
             offsetX += tmp;
-            if(Math.abs(tmp) <= SCROLL_ELASTIC_STOP)
+            if (Math.abs(tmp) <= SCROLL_ELASTIC_STOP)
                 vX = 0;
         }
         else {
             int tmp = vX * SCROLL_THROW / 100;
-            if(tmp == 0) tmp = (vX > 0) ? 1 : -1;
+            if (tmp == 0) tmp = (vX > 0) ? 1 : -1;
             vX -= tmp;
             offsetX += vX;
         }
@@ -93,18 +93,18 @@ public class ScrollView extends PanelView {
 
     private void momentumEffectY() {
         int over = isOverY();
-        if(over != 0) {
+        if (over != 0) {
             int tmp = vY * SCROLL_OVER_THROW / 100;
-            if(tmp == 0) tmp = (vY > 0) ? 1 : -1;
+            if (tmp == 0) tmp = (vY > 0) ? 1 : -1;
             vY -= tmp;
             tmp = applyElasticDamping(over, vY);
             offsetY += tmp;
-            if(Math.abs(tmp) <= SCROLL_ELASTIC_STOP)
+            if (Math.abs(tmp) <= SCROLL_ELASTIC_STOP)
                 vY = 0;
         }
         else {
             int tmp = vY * SCROLL_THROW / 100;
-            if(tmp == 0) tmp = (vY > 0) ? 1 : -1;
+            if (tmp == 0) tmp = (vY > 0) ? 1 : -1;
             vY -= tmp;
             offsetY += vY;
         }
@@ -112,8 +112,8 @@ public class ScrollView extends PanelView {
 
     private boolean elasticEffectX() {
         int over = isOverX();
-        if(over != 0) {
-            if(over > 0) {
+        if (over != 0) {
+            if (over > 0) {
                 int diff = (5 << FP_PRECISION) + over * ELASTIC_FACTOR / 100;
                 offsetX = (offsetX > diff) ? (offsetX - diff) : 0;
             }
@@ -129,8 +129,8 @@ public class ScrollView extends PanelView {
 
     private boolean elasticEffectY() {
         int over = isOverY();
-        if(over != 0) {
-            if(over > 0) {
+        if (over != 0) {
+            if (over > 0) {
                 int diff = 5 + over * ELASTIC_FACTOR / 100;
                 offsetY = (offsetY > diff) ? (offsetY - diff) : 0;
             }
@@ -150,35 +150,35 @@ public class ScrollView extends PanelView {
 
     private int getMinOffsetX() {
         int contentW = content.actualWidth + content.marginLeft + content.marginRight;
-        if(content != null && contentW > actualWidth)
+        if (content != null && contentW > actualWidth)
             return (actualWidth - contentW) << FP_PRECISION;
         return 0;
     }
 
     private int getMinOffsetY() {
         int contentH = content.actualHeight + content.marginTop + content.marginBottom;
-        if(content != null && contentH > actualHeight)
+        if (content != null && contentH > actualHeight)
             return (actualHeight - contentH) << FP_PRECISION;
         return 0;
     }
 
     private int isOverX() {
-        if(offsetX > 0)
+        if (offsetX > 0)
             return offsetX;
         else {
             int min = getMinOffsetX();
-            if(offsetX < min)
+            if (offsetX < min)
                 return offsetX - min;
         }
         return 0;
     }
 
     private int isOverY() {
-        if(offsetY > 0)
+        if (offsetY > 0)
             return offsetY;
         else {
             int min = getMinOffsetY();
-            if(offsetY < min)
+            if (offsetY < min)
                 return offsetY - min;
         }
         return 0;
@@ -186,15 +186,15 @@ public class ScrollView extends PanelView {
 
     @Override
     protected View hitTest(int x, int y) {
-        if(containsPoint(x, y)) {
-            if(scrolling)
+        if (containsPoint(x, y)) {
+            if (scrolling)
                 return this;
-            if(content != null) {
+            if (content != null) {
                 View v = content.hitTest(x, y);
-                if(v == null)
+                if (v == null)
                     return this;
-                while(v != this) {
-                    if(v.manipulationMode() == true)
+                while (v != this) {
+                    if (v.manipulationMode() == true)
                         return v;
                     v = v.parent;
                 }
@@ -211,13 +211,13 @@ public class ScrollView extends PanelView {
 
     @Override
     protected void onTouchEvent(MotionEvent event) {
-        switch(event.action) {
+        switch (event.action) {
             case MotionEvent.ACTION_DOWN: {
-                if(scrolling)
+                if (scrolling)
                     actView = null;
-                else if(content != null) {
+                else if (content != null) {
                     actView = content.hitTest(event.x, event.y);
-                    if(actView != null)
+                    if (actView != null)
                         actView.dispatchTouchEvent(event);
                 }
                 touchX = event.x;
@@ -227,7 +227,7 @@ public class ScrollView extends PanelView {
                 return;
             }
             case MotionEvent.ACTION_UP: {
-                if(actView != null) {
+                if (actView != null) {
                     actView.dispatchTouchEvent(event);
                     actView = null;
                 }
@@ -236,14 +236,14 @@ public class ScrollView extends PanelView {
                 return;
             }
             case MotionEvent.ACTION_MOVE: {
-                if((mode & 1) != 0) {
+                if ((mode & 1) != 0) {
                     int diff = (event.x - touchX) << FP_PRECISION;
                     int over = isOverX();
                     offsetX += over != 0 ? applyElasticDamping(over, diff) : diff;
                     touchX = event.x;
                     vX = scrolling ? ((vX + diff) / 2) : diff;
                 }
-                if((mode & 2) != 0) {
+                if ((mode & 2) != 0) {
                     int diff = (event.y - touchY) << FP_PRECISION;
                     int over = isOverY();
                     offsetY += over != 0 ? applyElasticDamping(over, diff) : diff;
@@ -253,7 +253,7 @@ public class ScrollView extends PanelView {
 
                 scrolling = true;
                 invalidate(true);
-                if(actView != null)
+                if (actView != null)
                     actView.dispatchTouchEvent(event);
                 return;
             }
@@ -266,17 +266,17 @@ public class ScrollView extends PanelView {
         this.y = y;
 
         View v = content;
-        if(v != null)
+        if (v != null)
             v.updateLocation(x + v.marginLeft + (offsetX >> FP_PRECISION), y + v.marginTop + (offsetY >> FP_PRECISION));
     }
 
     @Override
     protected void updateActualWidth(int availableW) {
         View v = content;
-        if(width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
+        if (width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
             int contentW = getBorderThickness() << 1;
 
-            if(v != null) {
+            if (v != null) {
                 v.updateActualWidth(availableW - v.marginLeft - v.marginRight);
                 contentW += v.actualWidth + v.marginLeft + v.marginRight;
             }
@@ -284,7 +284,7 @@ public class ScrollView extends PanelView {
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
         else {
-            if(v != null)
+            if (v != null)
                 v.updateActualWidth(availableW - v.marginLeft - v.marginRight);
             actualWidth = width >= 0 ? width : availableW;
         }
@@ -293,10 +293,10 @@ public class ScrollView extends PanelView {
     @Override
     protected void updateActualHeight(int availableH) {
         View v = content;
-        if(height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
+        if (height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
             int contentH = getBorderThickness() << 1;
 
-            if(v != null) {
+            if (v != null) {
                 v.updateActualHeight(availableH - v.marginTop - v.marginBottom);
                 contentH += v.actualHeight + v.marginTop + v.marginBottom;
             }
@@ -304,7 +304,7 @@ public class ScrollView extends PanelView {
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
         }
         else {
-            if(v != null)
+            if (v != null)
                 v.updateActualHeight(availableH - v.marginTop - v.marginBottom);
             actualHeight = height >= 0 ? height : availableH;
         }
@@ -316,12 +316,12 @@ public class ScrollView extends PanelView {
 
     public void setContent(View v) {
         FlintUI.checkThread();
-        if(v != null) {
-            if(v.parent != null)
+        if (v != null) {
+            if (v.parent != null)
                 throw new IllegalStateException("The specified child already has a parent");
             v.parent = this;
         }
-        if(content != null)
+        if (content != null)
             content.parent = null;
         content = v;
     }
@@ -332,7 +332,7 @@ public class ScrollView extends PanelView {
 
     public void setHorizontalScrollMode(boolean enabled) {
         FlintUI.checkThread();
-        if(enabled)
+        if (enabled)
             mode |= 1;
         else {
             mode &= ~1;
@@ -347,7 +347,7 @@ public class ScrollView extends PanelView {
 
     public void setVerticalScrollMode(boolean enabled) {
         FlintUI.checkThread();
-        if(enabled)
+        if (enabled)
             mode |= 2;
         else {
             mode &= ~2;

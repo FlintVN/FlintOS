@@ -31,7 +31,7 @@ public class RepaintEventProducer implements EventListener {
             RepaintEvent freeEvent = pooledEvent1;
             freeEvent.setRepaintFields(x, y, w, h, target);
 
-            if(queuedEvent == null) {
+            if (queuedEvent == null) {
                 pooledEvent1 = pooledEvent2;
                 pooledEvent2 = pooledEvent3;
                 pooledEvent3 = freeEvent;
@@ -40,13 +40,13 @@ public class RepaintEventProducer implements EventListener {
                 eventQueue.post(queuedEvent);
             }
             else {
-                if(queuedEvent.paintX1 > freeEvent.paintX1)
+                if (queuedEvent.paintX1 > freeEvent.paintX1)
                     queuedEvent.paintX1 = freeEvent.paintX1;
-                if(queuedEvent.paintY1 > freeEvent.paintY1)
+                if (queuedEvent.paintY1 > freeEvent.paintY1)
                     queuedEvent.paintY1 = freeEvent.paintY1;
-                if(queuedEvent.paintX2 < freeEvent.paintX2)
+                if (queuedEvent.paintX2 < freeEvent.paintX2)
                     queuedEvent.paintX2 = freeEvent.paintX2;
-                if(queuedEvent.paintY2 < freeEvent.paintY2)
+                if (queuedEvent.paintY2 < freeEvent.paintY2)
                     queuedEvent.paintY2 = freeEvent.paintY2;
             }
         }
@@ -79,12 +79,12 @@ public class RepaintEventProducer implements EventListener {
     }
 
     public void serviceRepaints() {
-        if(EventQueue.isDispatchThread()) {
-            if(eventInProcess != null)
+        if (EventQueue.isDispatchThread()) {
+            if (eventInProcess != null)
                 return;
 
             Event event = eventQueue.remove(EventTypes.REPAINT_EVENT);
-            if(event != null)
+            if (event != null)
                 process(event);
         }
         else
@@ -95,19 +95,19 @@ public class RepaintEventProducer implements EventListener {
         RepaintEvent eventToWaitFor = null;
 
         synchronized(this) {
-            if(queuedEvent != null)
+            if (queuedEvent != null)
                 eventToWaitFor = queuedEvent;
-            else if(eventInProcess != null)
+            else if (eventInProcess != null)
                 eventToWaitFor = eventInProcess;
             else
                 return;
 
             int currentEventUseID = eventToWaitFor.perUseID;
-            while(eventToWaitFor.perUseID == currentEventUseID) {
+            while (eventToWaitFor.perUseID == currentEventUseID) {
                 try {
                     wait();
                 }
-                catch(InterruptedException ie) {
+                catch (InterruptedException ie) {
                     break;
                 }
             }

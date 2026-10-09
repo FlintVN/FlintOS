@@ -32,10 +32,10 @@ public class TextView extends View {
     @Override
     protected void onDraw(Graphics g) {
         Color bg = background;
-        if(bg != null && bg.getAlpha() > 0)
+        if (bg != null && bg.getAlpha() > 0)
             g.fillRoundRect(bg, x, y, actualWidth, actualHeight, topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
 
-        if(text == null || textColor == null) return;
+        if (text == null || textColor == null) return;
 
         int gClipX = g.getClipX();
         int gClipY = g.getClipY();
@@ -50,9 +50,9 @@ public class TextView extends View {
 
     @Override
     protected void updateActualWidth(int availableW) {
-        if(width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
+        if (width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
             int contentW = Graphics.measureStringWidth(text, font) + paddingLeft + paddingRight;
-            if(contentW < 0) contentW = 0;
+            if (contentW < 0) contentW = 0;
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
         else
@@ -61,9 +61,9 @@ public class TextView extends View {
 
     @Override
     protected void updateActualHeight(int availableH) {
-        if(height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
+        if (height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
             int contentH = Graphics.measureStringHeight(text, font) + paddingTop + paddingBottom;
-            if(contentH < 0) contentH = 0;
+            if (contentH < 0) contentH = 0;
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
         }
         else
@@ -77,7 +77,7 @@ public class TextView extends View {
     public void setText(String text) {
         FlintUI.checkThread();
         this.text = text;
-        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+        if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             FlintUI.setInvalidateAll();
         else
             invalidate(false);
@@ -89,10 +89,10 @@ public class TextView extends View {
 
     public void setFont(Font font) {
         FlintUI.checkThread();
-        if(font == null)
+        if (font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
-        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+        if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             FlintUI.setInvalidateAll();
         else
             invalidate(false);
@@ -104,7 +104,7 @@ public class TextView extends View {
 
     public void setTextColor(Color color) {
         FlintUI.checkThread();
-        if(color == null)
+        if (color == null)
             throw new NullPointerException("color can not be null");
         textColor = color;
         invalidate(false);

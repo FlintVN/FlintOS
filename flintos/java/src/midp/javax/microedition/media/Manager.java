@@ -23,24 +23,24 @@ public final class Manager {
     }
 
     public static Player createPlayer(String locator) throws IOException, MediaException {
-        if(locator == null)
+        if (locator == null)
             throw new IllegalArgumentException();
 
         throw new MediaException("Cannot create Player");
     }
 
     public static Player createPlayer(InputStream stream, String type) throws IOException, MediaException {
-        if(stream == null)
+        if (stream == null)
             throw new IllegalArgumentException();
 
-        if(type == null)
+        if (type == null)
             throw new MediaException(PL_ERR + "NULL content-type");
 
         throw new MediaException("Cannot create Player");
     }
 
     public static void playTone(int note, int duration, int volume) throws MediaException {
-        if(note < 0 || note > 127 || duration <= 0)
+        if (note < 0 || note > 127 || duration <= 0)
             throw new IllegalArgumentException("bad param");
     }
 }

@@ -9,18 +9,18 @@ FEventQueue::FEventQueue(void) : eventLock() {
 }
 
 bool FEventQueue::postEvent(const FEvent *event) {
-    if(event == NULL) {
+    if (event == NULL) {
         eventLock.lock();
-        if(owner != NULL)
+        if (owner != NULL)
             FlintAPI::Thread::notify(owner->getOwnerThread()->getHandle(), FlintAPI::Thread::THREAD_NOTIFY_SYSTEM_EVENT);
         eventLock.unlock();
         return true;
     }
 
-    if(count == LENGTH(events)) return false;
+    if (count == LENGTH(events)) return false;
 
     eventLock.lock();
-    if(count < LENGTH(events)) {
+    if (count < LENGTH(events)) {
         events[head] = *event;
         head = (head + 1) % LENGTH(events);
         count++;
@@ -29,7 +29,7 @@ bool FEventQueue::postEvent(const FEvent *event) {
         eventLock.unlock();
         return false;
     }
-    if(owner != NULL)
+    if (owner != NULL)
         FlintAPI::Thread::notify(owner->getOwnerThread()->getHandle(), FlintAPI::Thread::THREAD_NOTIFY_SYSTEM_EVENT);
     eventLock.unlock();
     return true;
@@ -38,19 +38,19 @@ bool FEventQueue::postEvent(const FEvent *event) {
 const FEvent * FEventQueue::waitEvent(FExec *ctx, uint64_t millis) {
     int64_t startTime = FlintAPI::System::getTimeMillis();
     int64_t waitTime = 0;
-    if(ctx == NULL) return NULL;
+    if (ctx == NULL) return NULL;
     jthread ownerThread = ctx->getOwnerThread();
 
-    if(ownerThread->getHandle() != FlintAPI::Thread::getCurrentThread()) {
+    if (ownerThread->getHandle() != FlintAPI::Thread::getCurrentThread()) {
         ctx->throwNew(ctx->findClass("java/lang/IllegalMonitorStateException"), "current native thread is not owner");
         return NULL;
     }
 
     eventLock.lock();
-    if(owner == NULL)
+    if (owner == NULL)
         owner = ctx;
     else {
-        if(owner != ctx) {
+        if (owner != ctx) {
             eventLock.unlock();
             ctx->throwNew(ctx->findClass("java/lang/IllegalMonitorStateException"), "current java thread is not owner");
             return NULL;
@@ -58,13 +58,13 @@ const FEvent * FEventQueue::waitEvent(FExec *ctx, uint64_t millis) {
     }
     eventLock.unlock();
 
-    while(true) {
-        if(ctx->hasTerminateRequest() || ownerThread->getInterrupt()) {
+    while (true) {
+        if (ctx->hasTerminateRequest() || ownerThread->getInterrupt()) {
             owner = NULL;
             return NULL;
         }
 
-        if(count > 0) {
+        if (count > 0) {
             eventLock.lock();
             FEvent *event = &events[tail];
             tail = (tail + 1) % LENGTH(events);
@@ -74,11 +74,11 @@ const FEvent * FEventQueue::waitEvent(FExec *ctx, uint64_t millis) {
             return event;
         }
 
-        if(millis > 0) {
+        if (millis > 0) {
             waitTime = millis - (FlintAPI::System::getTimeMillis() - startTime);
-            if(waitTime > 1000)
+            if (waitTime > 1000)
                 waitTime = 1000;
-            else if(waitTime <= 0) {
+            else if (waitTime <= 0) {
                 owner = NULL;
                 return NULL;
             }

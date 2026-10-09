@@ -10,7 +10,7 @@ ThreadHandle FlintAPI::Thread::create(void (*task)(void *), void *param, uint32_
     static const uint8_t priorities[] = {tskIDLE_PRIORITY + 1, tskIDLE_PRIORITY + 2, tskIDLE_PRIORITY + 3};
     TaskHandle_t xHandle = NULL;
     uint32_t nativeStack = (stackSize > 16384) ? stackSize : 16384;
-    if(xTaskCreateWithCaps(task, "FlintJavaThread", nativeStack, param, priorities[priority], &xHandle, MALLOC_CAP_SPIRAM) != pdPASS)
+    if (xTaskCreateWithCaps(task, "FlintJavaThread", nativeStack, param, priorities[priority], &xHandle, MALLOC_CAP_SPIRAM) != pdPASS)
         return NULL;
     return (void *)xHandle;
 }
@@ -34,7 +34,7 @@ void FlintAPI::Thread::yield(void) {
 
 ThreadNotify FlintAPI::Thread::wait(uint32_t ms) {
     uint32_t value;
-    if(ms > 0)
+    if (ms > 0)
         return xTaskNotifyWait(0, ULONG_MAX, &value, pdMS_TO_TICKS(ms)) ? (ThreadNotify)value : THREAD_NOTIFY_TIMEOUT;
     else
         return xTaskNotifyWait(0, ULONG_MAX, &value, portMAX_DELAY) ? (ThreadNotify)value : THREAD_NOTIFY_TIMEOUT;

@@ -24,7 +24,7 @@ public class Connector {
         try {
             return openPrim(name, mode, timeouts);
         }
-        catch(ClassNotFoundException x) {
+        catch (ClassNotFoundException x) {
 
         }
 
@@ -32,28 +32,28 @@ public class Connector {
     }
 
     private static Connection openPrim(String name, int mode, boolean timeouts) throws IOException, ClassNotFoundException {
-        if(mode != READ && mode != WRITE && mode != READ_WRITE)
+        if (mode != READ && mode != WRITE && mode != READ_WRITE)
             throw new IllegalArgumentException();
 
-        if(name == null)
+        if (name == null)
             throw new IllegalArgumentException();
 
         int colon = name.indexOf(':');
 
-        if(colon < 1)
+        if (colon < 1)
             throw new IllegalArgumentException();
 
         String protocol = name.substring(0, colon);
         char[] chars = protocol.toCharArray();
-        for(int i = 0; i < chars.length; ++i) {
+        for (int i = 0; i < chars.length; ++i) {
             char c = chars[i];
-            if(('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ((i > 0) && (('0' <= c && c <= '9') || c == '+' || c == '-' || c == '.')))
+            if (('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ((i > 0) && (('0' <= c && c <= '9') || c == '+' || c == '-' || c == '.')))
                 continue;
             throw new IllegalArgumentException("Invalid protocol name");
         }
 
         String target = name.substring(colon + 1);
-        switch(protocol) {
+        switch (protocol) {
             case "socket":
                 return openSocket(target);
             case "serversocket":
@@ -66,21 +66,21 @@ public class Connector {
     }
 
     private static String[] parseHostPort(String target, boolean portRequired) {
-        if(!target.startsWith("//"))
+        if (!target.startsWith("//"))
             throw new IllegalArgumentException("Malformed connection string: " + target);
 
         String hostPort = target.substring(2);
 
         int semi = hostPort.indexOf(';');
-        if(semi >= 0)
+        if (semi >= 0)
             hostPort = hostPort.substring(0, semi);
 
         int colon = hostPort.lastIndexOf(':');
         String host;
         String port;
 
-        if(colon < 0) {
-            if(portRequired)
+        if (colon < 0) {
+            if (portRequired)
                 throw new IllegalArgumentException("Missing port in: " + target);
             host = hostPort;
             port = null;
@@ -90,7 +90,7 @@ public class Connector {
             port = hostPort.substring(colon + 1);
         }
 
-        if(host.isEmpty())
+        if (host.isEmpty())
             host = null;
 
         return new String[] { host, port };
@@ -99,18 +99,18 @@ public class Connector {
     private static int parsePort(String portStr) {
         try {
             int port = Integer.parseInt(portStr);
-            if(port < 0 || port > 65535)
+            if (port < 0 || port > 65535)
                 throw new IllegalArgumentException("Port out of range: " + port);
             return port;
         }
-        catch(NumberFormatException e) {
+        catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid port: " + portStr);
         }
     }
 
     private static Connection openSocket(String target) throws IOException {
         String[] hp = parseHostPort(target, true);
-        if(hp[0] == null)
+        if (hp[0] == null)
             throw new IllegalArgumentException("socket:// requires a host");
 
         Socket socket = new Socket(hp[0], parsePort(hp[1]));
@@ -128,7 +128,7 @@ public class Connector {
         String host = hp[0];
         int port = (hp[1] != null) ? parsePort(hp[1]) : 0;
 
-        if(host == null) {
+        if (host == null) {
             DatagramSocket socket = new DatagramSocket(port);
             return new DatagramConnectionImpl(socket, null, 0);
         }
@@ -143,7 +143,7 @@ public class Connector {
         try {
             con = (InputConnection)Connector.open(name, Connector.READ);
         }
-        catch(ClassCastException e) {
+        catch (ClassCastException e) {
             throw new IOException();
         }
 
@@ -160,7 +160,7 @@ public class Connector {
         try {
             con = (OutputConnection)Connector.open(name, Connector.WRITE);
         }
-        catch(ClassCastException e) {
+        catch (ClassCastException e) {
             throw new IOException();
         }
 

@@ -15,9 +15,9 @@ class DatagramImpl implements Datagram {
     private int port;
 
     DatagramImpl(byte[] buf, int size) {
-        if(buf == null)
+        if (buf == null)
             throw new IllegalArgumentException("buffer is null");
-        if(size < 0 || size > buf.length)
+        if (size < 0 || size > buf.length)
             throw new IllegalArgumentException("invalid size");
 
         this.buffer = buf;
@@ -30,13 +30,13 @@ class DatagramImpl implements Datagram {
     }
 
     public String getAddress() {
-        if(address == null)
+        if (address == null)
             return null;
         return "datagram://" + address.getHostAddress() + ":" + port;
     }
 
     public void setAddress(String addr) {
-        if(addr == null) {
+        if (addr == null) {
             address = null;
             port = 0;
             return;
@@ -44,11 +44,11 @@ class DatagramImpl implements Datagram {
 
         String target = addr;
         int colon2 = addr.indexOf("://");
-        if(colon2 >= 0)
+        if (colon2 >= 0)
             target = addr.substring(colon2 + 3);
 
         int colon = target.lastIndexOf(':');
-        if(colon < 0)
+        if (colon < 0)
             throw new IllegalArgumentException("Missing port in address: " + addr);
 
         String host = target.substring(0, colon);
@@ -58,16 +58,16 @@ class DatagramImpl implements Datagram {
             this.address = host.isEmpty() ? InetAddress.getLocalHost() : InetAddress.getByName(host);
             this.port = Integer.parseInt(portStr);
         }
-        catch(UnknownHostException e) {
+        catch (UnknownHostException e) {
             throw new IllegalArgumentException("Unknown host: " + host);
         }
-        catch(NumberFormatException e) {
+        catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid port: " + portStr);
         }
     }
 
     public void setAddress(Datagram reference) {
-        if(!(reference instanceof DatagramImpl))
+        if (!(reference instanceof DatagramImpl))
             throw new IllegalArgumentException("Unsupported Datagram implementation");
 
         DatagramImpl ref = (DatagramImpl)reference;
@@ -92,7 +92,7 @@ class DatagramImpl implements Datagram {
     }
 
     public void setLength(int len) {
-        if(len < 0 || len > capacity)
+        if (len < 0 || len > capacity)
             throw new IllegalArgumentException("length out of range: " + len);
         this.length = len;
         this.readPos = 0;
@@ -103,11 +103,11 @@ class DatagramImpl implements Datagram {
     }
 
     public void setData(byte[] buf, int offset, int len) {
-        if(buf == null)
+        if (buf == null)
             throw new IllegalArgumentException("buffer is null");
-        if(offset != 0)
+        if (offset != 0)
             throw new IllegalArgumentException("offset must be 0");
-        if(len < 0 || len > buf.length)
+        if (len < 0 || len > buf.length)
             throw new IllegalArgumentException("invalid length");
 
         this.buffer = buf;
@@ -134,9 +134,9 @@ class DatagramImpl implements Datagram {
     }
 
     public void write(byte[] b, int off, int len) throws IOException {
-        if(b == null)
+        if (b == null)
             throw new NullPointerException();
-        if(off < 0 || len < 0 || off + len > b.length)
+        if (off < 0 || len < 0 || off + len > b.length)
             throw new IndexOutOfBoundsException();
 
         ensureWriteSpace(len);
@@ -184,13 +184,13 @@ class DatagramImpl implements Datagram {
 
     public void writeBytes(String s) throws IOException {
         int len = s.length();
-        for(int i = 0; i < len; ++i)
+        for (int i = 0; i < len; ++i)
             write((byte)s.charAt(i));
     }
 
     public void writeChars(String s) throws IOException {
         int len = s.length();
-        for(int i = 0; i < len; ++i)
+        for (int i = 0; i < len; ++i)
             writeChar(s.charAt(i));
     }
 
@@ -198,24 +198,24 @@ class DatagramImpl implements Datagram {
         int strlen = s.length();
         int utflen = 0;
 
-        for(int i = 0; i < strlen; ++i) {
+        for (int i = 0; i < strlen; ++i) {
             int c = s.charAt(i);
-            if(c >= 0x0001 && c <= 0x007F) utflen += 1;
-            else if(c > 0x07FF) utflen += 3;
+            if (c >= 0x0001 && c <= 0x007F) utflen += 1;
+            else if (c > 0x07FF) utflen += 3;
             else utflen += 2;
         }
 
-        if(utflen > 65535)
+        if (utflen > 65535)
             throw new UTFDataFormatException("String too long for writeUTF: " + utflen);
 
         writeShort(utflen);
 
-        for(int i = 0; i < strlen; ++i) {
+        for (int i = 0; i < strlen; ++i) {
             int c = s.charAt(i);
-            if(c >= 0x0001 && c <= 0x007F) {
+            if (c >= 0x0001 && c <= 0x007F) {
                 write(c);
             }
-            else if(c > 0x07FF) {
+            else if (c > 0x07FF) {
                 write(0xE0 | ((c >> 12) & 0x0F));
                 write(0x80 | ((c >> 6) & 0x3F));
                 write(0x80 | (c & 0x3F));
@@ -228,12 +228,12 @@ class DatagramImpl implements Datagram {
     }
 
     private void ensureWriteSpace(int n) throws IOException {
-        if(writePos + n > capacity)
+        if (writePos + n > capacity)
             throw new IOException("Datagram buffer overflow");
     }
 
     private void advanceLength() {
-        if(writePos > length)
+        if (writePos > length)
             length = writePos;
     }
 
@@ -246,7 +246,7 @@ class DatagramImpl implements Datagram {
     }
 
     public int readUnsignedByte() throws IOException {
-        if(readPos >= length)
+        if (readPos >= length)
             throw new EOFException();
         return buffer[readPos++] & 0xFF;
     }
@@ -292,9 +292,9 @@ class DatagramImpl implements Datagram {
     }
 
     public void readFully(byte[] b, int off, int len) throws IOException {
-        if(off < 0 || len < 0 || off + len > b.length)
+        if (off < 0 || len < 0 || off + len > b.length)
             throw new IndexOutOfBoundsException();
-        if(readPos + len > length)
+        if (readPos + len > length)
             throw new EOFException();
 
         System.arraycopy(buffer, readPos, b, off, len);
@@ -313,14 +313,14 @@ class DatagramImpl implements Datagram {
         StringBuilder sb = new StringBuilder(utflen);
 
         int endPos = readPos + utflen;
-        if(endPos > length)
+        if (endPos > length)
             throw new EOFException();
 
-        while(readPos < endPos) {
+        while (readPos < endPos) {
             int c = readUnsignedByte();
             int c2, c3;
 
-            switch(c >> 4) {
+            switch (c >> 4) {
                 case 0: case 1: case 2: case 3:
                 case 4: case 5: case 6: case 7:
                     // 0xxxxxxx
@@ -329,7 +329,7 @@ class DatagramImpl implements Datagram {
                 case 12: case 13:
                     // 110xxxxx 10xxxxxx
                     c2 = readUnsignedByte();
-                    if((c2 & 0xC0) != 0x80)
+                    if ((c2 & 0xC0) != 0x80)
                         throw new UTFDataFormatException("Malformed UTF-8");
                     sb.append((char)(((c & 0x1F) << 6) | (c2 & 0x3F)));
                     break;
@@ -337,7 +337,7 @@ class DatagramImpl implements Datagram {
                     // 1110xxxx 10xxxxxx 10xxxxxx
                     c2 = readUnsignedByte();
                     c3 = readUnsignedByte();
-                    if((c2 & 0xC0) != 0x80 || (c3 & 0xC0) != 0x80)
+                    if ((c2 & 0xC0) != 0x80 || (c3 & 0xC0) != 0x80)
                         throw new UTFDataFormatException("Malformed UTF-8");
                     sb.append((char)(((c & 0x0F) << 12) | ((c2 & 0x3F) << 6) | (c3 & 0x3F)));
                     break;
@@ -353,12 +353,12 @@ class DatagramImpl implements Datagram {
         StringBuilder sb = new StringBuilder();
         boolean any = false;
 
-        while(readPos < length) {
+        while (readPos < length) {
             any = true;
             int c = readUnsignedByte();
-            if(c == '\n') break;
-            if(c == '\r') {
-                if(readPos < length && buffer[readPos] == '\n')
+            if (c == '\n') break;
+            if (c == '\r') {
+                if (readPos < length && buffer[readPos] == '\n')
                     readPos++;
                 break;
             }

@@ -52,14 +52,14 @@ public class Command {
     }
 
     private void setLabel(String shortLabel, String longLabel) {
-        if(shortLabel == null)
+        if (shortLabel == null)
             throw new NullPointerException();
         this.shortLabel = shortLabel;
         this.longLabel = longLabel;
     }
 
     private final void initialize(int commandType, int inp_priority) {
-        if((commandType < SCREEN) || (commandType > ITEM))
+        if ((commandType < SCREEN) || (commandType > ITEM))
             throw new IllegalArgumentException();
 
         this.commandType = commandType;

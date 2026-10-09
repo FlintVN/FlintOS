@@ -29,7 +29,7 @@ public abstract class Displayable {
     }
 
     public void addCommand(Command cmd) {
-        if(cmd == null)
+        if (cmd == null)
             throw new NullPointerException();
         synchronized(Display.LCDUILock) {
             addCommandImpl(cmd);
@@ -59,14 +59,14 @@ public abstract class Displayable {
     }
 
     int addCommandImpl(Command cmd) {
-        for(int i = 0; i < numCommands; ++i) {
-            if(commands[i] == cmd)
+        for (int i = 0; i < numCommands; ++i) {
+            if (commands[i] == cmd)
                 return -1;
         }
 
-        if((commands == null) || (numCommands == commands.length)) {
+        if ((commands == null) || (numCommands == commands.length)) {
             Command[] newCommands = new Command[numCommands + 4];
-            if(commands != null)
+            if (commands != null)
                 System.arraycopy(commands, 0, newCommands, 0, numCommands);
             commands = newCommands;
         }
@@ -78,8 +78,8 @@ public abstract class Displayable {
     }
 
     int removeCommandImpl(Command cmd) {
-        for(int i = 0; i < numCommands; ++i) {
-            if(commands[i] == cmd) {
+        for (int i = 0; i < numCommands; ++i) {
+            if (commands[i] == cmd) {
                 commands[i] = commands[--numCommands];
                 commands[numCommands] = null;
                 return i;

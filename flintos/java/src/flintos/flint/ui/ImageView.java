@@ -25,7 +25,7 @@ public class ImageView extends View {
         }
 
         static ScaleType fromValue(int value) {
-            return switch(value) {
+            return switch (value) {
                 case 0 -> CENTER_CROP;
                 case 1 -> FIT_CENTER;
                 default -> FIT_XY;
@@ -42,14 +42,14 @@ public class ImageView extends View {
     @Override
     protected void onDraw(Graphics g) {
         Color bg = background;
-        if(bg != null && bg.getAlpha() > 0)
+        if (bg != null && bg.getAlpha() > 0)
             g.fillRect(bg, x, y, actualWidth, actualHeight);
 
         Image img = image;
-        if(img == null)
+        if (img == null)
             return;
 
-        switch(scaleType) {
+        switch (scaleType) {
             case 0: {   /* CENTER */
                 int gClipX = g.getClipX();
                 int gClipY = g.getClipY();
@@ -72,7 +72,7 @@ public class ImageView extends View {
                 g.setClip(this.x, this.y, width, height, ClipMode.INTERSECT);
 
                 int x, y, w, h;
-                if(((long)actualWidth * img.getHeight()) > ((long)actualHeight * img.getWidth())) {
+                if (((long)actualWidth * img.getHeight()) > ((long)actualHeight * img.getWidth())) {
                     w = actualWidth;
                     h = img.getHeight() * actualWidth / img.getWidth();
                     x = this.x;
@@ -91,7 +91,7 @@ public class ImageView extends View {
             }
             case 2: {   /* FIT_CENTER */
                 int x, y, w, h;
-                if(((long)actualWidth * img.getHeight()) < ((long)actualHeight / img.getWidth())) {
+                if (((long)actualWidth * img.getHeight()) < ((long)actualHeight / img.getWidth())) {
                     w = actualWidth;
                     h = img.getHeight() * actualWidth / img.getWidth();
                     x = this.x;
@@ -117,7 +117,7 @@ public class ImageView extends View {
 
     @Override
     protected void updateActualWidth(int availableW) {
-        if(width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
+        if (width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
             int contentW = (image != null) ? image.getWidth() : 0;
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
@@ -127,7 +127,7 @@ public class ImageView extends View {
 
     @Override
     protected void updateActualHeight(int availableH) {
-        if(height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
+        if (height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
             int contentH = (image != null) ? image.getHeight() : 0;
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
         }
@@ -151,9 +151,9 @@ public class ImageView extends View {
 
     public void setScaleType(ScaleType type) {
         FlintUI.checkThread();
-        if(type == null)
+        if (type == null)
             throw new NullPointerException("type cannot be null");
-        if(scaleType != type.value) {
+        if (scaleType != type.value) {
             scaleType = type.value;
             invalidate(false);
         }

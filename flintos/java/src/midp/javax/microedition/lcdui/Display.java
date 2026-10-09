@@ -28,14 +28,14 @@ public class Display {
     }
 
     public static Display getDisplay(MIDlet m) {
-        if(instance == null)
+        if (instance == null)
             instance = new Display();
         return instance;
     }
 
     public void setCurrent(Displayable d) {
         current = d;
-        if(d instanceof Canvas canvas) {
+        if (d instanceof Canvas canvas) {
             canvas.showNotify();
             repaintEventProducer.scheduleRepaint(0, 0, WIDTH, HEIGHT, canvas);
         }
@@ -63,7 +63,7 @@ public class Display {
     }
 
     public void callSerially(Runnable r) {
-        if(r != null)
+        if (r != null)
             r.run();
     }
 
@@ -108,7 +108,7 @@ public class Display {
     }
 
     public static void handleRepaintEvent(int x1, int y1, int x2, int y2, Canvas target) {
-        if(target == null)
+        if (target == null)
             return;
         screenGfx.reset();
         target.paint(screenGfx);

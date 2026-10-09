@@ -32,10 +32,10 @@ static bool AudioSrv_Write(FNIEnv *env, JAudioTrack *audioTrack) {
     int16_t *buf = (int16_t *)audioTrack->getBuff()->getData();
     uint32_t len = audioTrack->getBuff()->getLength() >> 1;
     int32_t pos = audioTrack->getPos();
-    while(len > 0) {
-        if(env->hasTerminateRequest()) return false;
+    while (len > 0) {
+        if (env->hasTerminateRequest()) return false;
         uint32_t w = AudioSrv::write(&pos, buf, len);
-        if(w == 0)
+        if (w == 0)
             FlintAPI::Thread::yield();
         else {
             buf += w;
@@ -57,17 +57,17 @@ static void putPcm8(FNIEnv *env, JAudioTrack *audioTrack, int8_t *data, uint32_t
     int32_t srcPos = audioTrack->getSrcPos();
     int32_t srcAcc = audioTrack->getSrcAcc();
 
-    while(srcPos < len) {
+    while (srcPos < len) {
         uint16_t u16Data = data[srcPos] << 8;
         buf[bufPos++] = (uint8_t)u16Data;
         buf[bufPos++] = (uint8_t)(u16Data >> 8);
-        if(bufPos == bufSz) {
-            if(!AudioSrv_Write(env, audioTrack)) return;
+        if (bufPos == bufSz) {
+            if (!AudioSrv_Write(env, audioTrack)) return;
             bufPos = 0;
         }
 
         srcAcc += sampleRate;
-        if(srcAcc >= AUDIO_SAMPLE_RATE) {
+        if (srcAcc >= AUDIO_SAMPLE_RATE) {
             srcPos += (srcAcc / AUDIO_SAMPLE_RATE) * bytePerSample;
             srcAcc %= AUDIO_SAMPLE_RATE;
         }
@@ -89,18 +89,18 @@ static void putPcm16(FNIEnv *env, JAudioTrack *audioTrack, int8_t *data, uint32_
     int32_t srcPos = audioTrack->getSrcPos();
     int32_t srcAcc = audioTrack->getSrcAcc();
 
-    if(srcPos == -1) {
+    if (srcPos == -1) {
         int8_t lastVal = buf[--bufPos];
-        while(1) {
+        while (1) {
             buf[bufPos++] = lastVal;
             buf[bufPos++] = data[0];
-            if(bufPos == bufSz) {
-                if(!AudioSrv_Write(env, audioTrack)) return;
+            if (bufPos == bufSz) {
+                if (!AudioSrv_Write(env, audioTrack)) return;
                 bufPos = 0;
             }
 
             srcAcc += sampleRate;
-            if(srcAcc >= AUDIO_SAMPLE_RATE) {
+            if (srcAcc >= AUDIO_SAMPLE_RATE) {
                 srcPos += (srcAcc / AUDIO_SAMPLE_RATE) * bytePerSample;
                 srcAcc %= AUDIO_SAMPLE_RATE;
                 break;
@@ -108,20 +108,20 @@ static void putPcm16(FNIEnv *env, JAudioTrack *audioTrack, int8_t *data, uint32_
         }
     }
 
-    while(srcPos < len) {
+    while (srcPos < len) {
         buf[bufPos++] = data[srcPos + 0];
-        if((srcPos + 1) >= len) {
+        if ((srcPos + 1) >= len) {
             srcPos = -1;
             break;
         }
         buf[bufPos++] = data[srcPos + 1];
-        if(bufPos == bufSz) {
-            if(!AudioSrv_Write(env, audioTrack)) return;
+        if (bufPos == bufSz) {
+            if (!AudioSrv_Write(env, audioTrack)) return;
             bufPos = 0;
         }
 
         srcAcc += sampleRate;
-        if(srcAcc >= AUDIO_SAMPLE_RATE) {
+        if (srcAcc >= AUDIO_SAMPLE_RATE) {
             srcPos += (srcAcc / AUDIO_SAMPLE_RATE) * bytePerSample;
             srcAcc %= AUDIO_SAMPLE_RATE;
         }
@@ -133,7 +133,7 @@ static void putPcm16(FNIEnv *env, JAudioTrack *audioTrack, int8_t *data, uint32_
 }
 
 static void putPcm(FNIEnv *env, JAudioTrack *audioTrack, int8_t *data, uint32_t len) {
-    switch(audioTrack->getAudioFormat()) {
+    switch (audioTrack->getAudioFormat()) {
         case 0:
             return putPcm8(env, audioTrack, data, len);
         case 1:
@@ -152,8 +152,8 @@ jint NativeAudioTrack_GetVolume(FNIEnv *env) {
 }
 
 jvoid NativeAudioTrack_SetVolume(FNIEnv *env, jint value) {
-    if(value < 0) value = 0;
-    else if(value > 100) value = 100;
+    if (value < 0) value = 0;
+    else if (value > 100) value = 100;
     AudioSrv::setVolume(value);
 }
 
@@ -164,9 +164,9 @@ jint NativeAudioTrack_Open0(FNIEnv *env, jobject obj) {
 
 jvoid NativeAudioTrack_Write1(FNIEnv *env, jobject obj, jbyteArray b) {
     JAudioTrack *audioTrack = (JAudioTrack *)obj;
-    if(audioTrack->getPos() < 0)
+    if (audioTrack->getPos() < 0)
         return env->throwNew(env->findClass("java/io/IllegalStateException"), "AudioTrack has not been opened");
-    if(b == NULL)
+    if (b == NULL)
         return env->throwNew(env->findClass("java/lang/NullPointerException"));
 
     putPcm(env, audioTrack, b->getData(), b->getLength());
@@ -174,11 +174,11 @@ jvoid NativeAudioTrack_Write1(FNIEnv *env, jobject obj, jbyteArray b) {
 
 jvoid NativeAudioTrack_Write2(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint len) {
     JAudioTrack *audioTrack = (JAudioTrack *)obj;
-    if(audioTrack->getPos() < 0)
+    if (audioTrack->getPos() < 0)
         return env->throwNew(env->findClass("java/io/IllegalStateException"), "AudioTrack has not been opened");
-    if(b == NULL)
+    if (b == NULL)
         return env->throwNew(env->findClass("java/lang/NullPointerException"));
-    if(!CheckArrayIndexSize(env, b, off, len)) return;
+    if (!CheckArrayIndexSize(env, b, off, len)) return;
 
     putPcm(env, audioTrack, &b->getData()[off], len);
 }

@@ -35,7 +35,7 @@ public class AudioTrack implements AutoCloseable {
     }
 
     public void open() {
-        if(pos >= 0)
+        if (pos >= 0)
             throw new IllegalStateException("AudioTrack has been opened");
         pos = open0();
     }

@@ -31,7 +31,7 @@ public class Image {
 
     public static Image createImage(String name) throws IOException {
         try(java.io.InputStream is = Image.class.getResourceAsStream(name)) {
-            if(is == null)
+            if (is == null)
                 throw new IOException("resource not found: " + name);
             return createImage(is);
         }

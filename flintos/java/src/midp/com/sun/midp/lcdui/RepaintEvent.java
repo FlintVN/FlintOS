@@ -26,10 +26,10 @@ class RepaintEvent extends Event {
         w += x;
         h += y;
 
-        if(x < 0)
+        if (x < 0)
             x = 0;
 
-        if(y < 0)
+        if (y < 0)
             y = 0;
 
         paintX1 = x;

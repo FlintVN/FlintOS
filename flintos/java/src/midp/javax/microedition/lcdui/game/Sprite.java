@@ -66,14 +66,14 @@ public class Sprite extends Layer {
     }
 
     public void nextFrame() {
-        if(sequence != null)
+        if (sequence != null)
             seqIndex = (seqIndex + 1) % sequence.length;
         else
             frame = (frame + 1) % frameCount;
     }
 
     public void prevFrame() {
-        if(sequence != null)
+        if (sequence != null)
             seqIndex = (seqIndex + sequence.length - 1) % sequence.length;
         else
             frame = (frame + frameCount - 1) % frameCount;
@@ -93,7 +93,7 @@ public class Sprite extends Layer {
     }
 
     public void paint(Graphics g) {
-        if(!visible)
+        if (!visible)
             return;
         int idx = sequence != null ? sequence[seqIndex] : frame;
         int sx = (idx % cols) * fw, sy = (idx / cols) * fh;

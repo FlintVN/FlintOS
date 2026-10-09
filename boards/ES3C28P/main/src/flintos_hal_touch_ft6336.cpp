@@ -51,7 +51,7 @@ void FT6336::init(void) const {
     GPIO_Init();
     Touch_Reset();
 
-    if(i2c_master_get_bus_handle(I2C_PORT_NUM, &i2cBusHandle) != ESP_OK) {
+    if (i2c_master_get_bus_handle(I2C_PORT_NUM, &i2cBusHandle) != ESP_OK) {
         i2c_master_bus_config_t i2cMstCfg = {};
         i2cMstCfg.clk_source = I2C_CLK_SRC_DEFAULT;
         i2cMstCfg.i2c_port = I2C_PORT_NUM;
@@ -72,8 +72,8 @@ void FT6336::init(void) const {
 bool FT6336::read(uint16_t *x, uint16_t *y) const {
     uint8_t data[5];
 
-    if(!Touch_ReadRegs(FT6336_REG_TD_STATUS, data, sizeof(data))) return false;
-    if((data[0] & 0x0F) == 0) return false;
+    if (!Touch_ReadRegs(FT6336_REG_TD_STATUS, data, sizeof(data))) return false;
+    if ((data[0] & 0x0F) == 0) return false;
 
     uint16_t rawX = ((data[1] & 0x0F) << 8) | data[2];
     uint16_t rawY = ((data[3] & 0x0F) << 8) | data[4];

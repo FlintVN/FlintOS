@@ -25,9 +25,9 @@ public abstract class MIDlet {
     }
 
     public final String getAppProperty(String key) {
-        if(props == null) {
+        if (props == null) {
             synchronized(this) {
-                if(props == null)
+                if (props == null)
                     props = loadProps();
             }
         }
@@ -37,22 +37,22 @@ public abstract class MIDlet {
     private Hashtable<String, String> loadProps() {
         Hashtable<String, String> p = new Hashtable<>();
         try(java.io.InputStream is = this.getClass().getResourceAsStream("/MANIFEST.MF")) {
-            if(is != null) {
+            if (is != null) {
                 String s = new String(is.readAllBytes());
                 int start = 0;
-                while(start < s.length()) {
+                while (start < s.length()) {
                     int nl = s.indexOf('\n', start);
-                    if(nl < 0)
+                    if (nl < 0)
                         nl = s.length();
                     String line = s.substring(start, nl);
                     int colon = line.indexOf(':');
-                    if(colon > 0)
+                    if (colon > 0)
                         p.put(line.substring(0, colon).trim(), line.substring(colon + 1).trim());
                     start = nl + 1;
                 }
             }
         }
-        catch(Exception e) {
+        catch (Exception e) {
 
         }
         return p;

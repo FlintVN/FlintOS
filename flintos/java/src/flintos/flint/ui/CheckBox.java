@@ -55,38 +55,38 @@ public class CheckBox extends View {
     @Override
     protected void onDraw(Graphics g) {
         Color bg = background;
-        if(bg != null && bg.getAlpha() > 0)
+        if (bg != null && bg.getAlpha() > 0)
             g.fillRoundRect(bg, this.x, this.y, actualWidth, actualHeight, topLeftRadius, topRightRadius, bottomRightRadius, bottomLeftRadius);
 
-        if(color.getAlpha() > 0) {
+        if (color.getAlpha() > 0) {
             int r = 4;
 
             int x = this.x + paddingLeft;
             int y = this.y + paddingTop;
             int boxSize = BOX_SIZE;
 
-            if(animStatus) {
+            if (animStatus) {
                 int tmp, time = (int)System.currentTimeMillis() - startTime;
-                if(time < ANIMATION_DURATION)
+                if (time < ANIMATION_DURATION)
                     tmp = time * PRESS_OFFSET / ANIMATION_DURATION;
                 else {
                     tmp = PRESS_OFFSET;
                     animStatus = false;
                 }
-                if(isReleased) tmp = PRESS_OFFSET - tmp;
+                if (isReleased) tmp = PRESS_OFFSET - tmp;
                 x -= tmp;
                 y -= tmp;
                 boxSize += tmp << 1;
                 invalidate(false);
             }
-            else if(!isReleased) {
+            else if (!isReleased) {
                 x -= PRESS_OFFSET;
                 y -= PRESS_OFFSET;
                 boxSize += PRESS_OFFSET_X2;
             }
 
             g.drawRoundRect(color, x, y, boxSize, boxSize, r, r, r, r);
-            if(checked) {
+            if (checked) {
                 r -= 2;
                 g.fillRoundRect(color, x + 3, y + 3, boxSize - 5, boxSize - 5, r, r, r, r);
             }
@@ -98,7 +98,7 @@ public class CheckBox extends View {
         int gClipH = g.getClipHeight();
         g.setClip(this.x, this.y, actualWidth, actualHeight, ClipMode.INTERSECT);
 
-        if(text != null) {
+        if (text != null) {
             int x = paddingLeft + BOX_SIZE + 6 + this.x;
             int y = (BOX_SIZE - Graphics.measureStringHeight(null, font) + 1) / 2 + paddingTop + this.y;
             g.drawString(text, font, textColor, x, y);
@@ -109,7 +109,7 @@ public class CheckBox extends View {
 
     @Override
     protected void onTouchEvent(MotionEvent event) {
-        switch(event.action) {
+        switch (event.action) {
             case MotionEvent.ACTION_DOWN: {
                 animStatus = true;
                 isReleased = false;
@@ -121,9 +121,9 @@ public class CheckBox extends View {
                 animStatus = true;
                 isReleased = true;
                 startTime = (int)System.currentTimeMillis();
-                if(isPressing && containsPoint(event.x, event.y)) {
+                if (isPressing && containsPoint(event.x, event.y)) {
                     checked = !checked;
-                    if(onCheckedChangeListener != null)
+                    if (onCheckedChangeListener != null)
                         onCheckedChangeListener.onCheckedChanged(this, checked);
                 }
                 invalidate(false);
@@ -134,10 +134,10 @@ public class CheckBox extends View {
 
     @Override
     protected void updateActualWidth(int availableW) {
-        if(width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
+        if (width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
             int strW = Graphics.measureStringWidth(text, font);
             int contentW = strW + paddingLeft + paddingRight + BOX_SIZE + 6;
-            if(contentW < 0) contentW = 0;
+            if (contentW < 0) contentW = 0;
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
         else
@@ -146,10 +146,10 @@ public class CheckBox extends View {
 
     @Override
     protected void updateActualHeight(int availableH) {
-        if(height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
+        if (height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
             int strH = Graphics.measureStringHeight(text, font);
             int contentH = paddingTop + paddingBottom + (strH > (BOX_SIZE + 1) ? strH : (BOX_SIZE + 1));
-            if(contentH < 0) contentH = 0;
+            if (contentH < 0) contentH = 0;
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
         }
         else
@@ -163,7 +163,7 @@ public class CheckBox extends View {
     public void setText(String text) {
         FlintUI.checkThread();
         this.text = text;
-        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+        if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             FlintUI.setInvalidateAll();
         else
             invalidate(false);
@@ -175,10 +175,10 @@ public class CheckBox extends View {
 
     public void setFont(Font font) {
         FlintUI.checkThread();
-        if(font == null)
+        if (font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
-        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+        if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             FlintUI.setInvalidateAll();
         else
             invalidate(false);
@@ -190,7 +190,7 @@ public class CheckBox extends View {
 
     public void setTextColor(Color color) {
         FlintUI.checkThread();
-        if(color == null)
+        if (color == null)
             throw new NullPointerException("color can not be null");
         textColor = color;
         invalidate(false);
@@ -202,9 +202,9 @@ public class CheckBox extends View {
 
     public void setChecked(boolean checked) {
         FlintUI.checkThread();
-        if(this.checked != checked) {
+        if (this.checked != checked) {
             this.checked = checked;
-            if(onCheckedChangeListener != null)
+            if (onCheckedChangeListener != null)
                 onCheckedChangeListener.onCheckedChanged(this, checked);
             invalidate(false);
         }
@@ -216,7 +216,7 @@ public class CheckBox extends View {
 
     public void setColor(Color color) {
         FlintUI.checkThread();
-        if(color == null)
+        if (color == null)
             throw new NullPointerException("color can not be null");
         this.color = color;
         invalidate(false);

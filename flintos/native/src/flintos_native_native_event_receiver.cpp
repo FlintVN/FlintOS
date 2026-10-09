@@ -18,7 +18,7 @@ jbool NativeInputEvent_WaitEvent1(FNIEnv *env, jobject event) {
     FEventQueue *eventQueue = ((FProcess *)(ctx->getFlint()))->getEventQueue();
     const FEvent *fevent = eventQueue->waitEvent(ctx, 0);
 
-    if(fevent == NULL) return false;
+    if (fevent == NULL) return false;
 
     JNativeEvent *nativeEvent = (JNativeEvent *)event;
     nativeEvent->setType(fevent->type);
@@ -32,7 +32,7 @@ jbool NativeInputEvent_WaitEvent2(FNIEnv *env, jobject event, jlong millis) {
     FEventQueue *eventQueue = ((FProcess *)(ctx->getFlint()))->getEventQueue();
     const FEvent *fevent = eventQueue->waitEvent(ctx, millis);
 
-    if(fevent == NULL) return false;
+    if (fevent == NULL) return false;
 
     JNativeEvent *nativeEvent = (JNativeEvent *)event;
     nativeEvent->setType(fevent->type);

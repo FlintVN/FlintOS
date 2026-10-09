@@ -52,13 +52,13 @@ public abstract class Layer {
     public abstract void paint(Graphics g);
 
     void setWidthImpl(int width) {
-        if(width < 0)
+        if (width < 0)
             throw new IllegalArgumentException();
         this.width = width;
     }
 
     void setHeightImpl(int height) {
-        if(height < 0)
+        if (height < 0)
             throw new IllegalArgumentException();
         this.height = height;
     }

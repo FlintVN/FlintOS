@@ -18,11 +18,11 @@ static FMutex fosMutex;
 
 static void flintTerminated(Flint *flint) {
     FProcess *process = (FProcess *)flint;
-    if(process == homeApp)
+    if (process == homeApp)
         homeApp = NULL;
-    if(process == allowForeground)
+    if (process == allowForeground)
         allowForeground = homeApp;
-    if(process == currentForeground)
+    if (process == currentForeground)
         currentForeground = homeApp;
     fosMutex.lock();
     processList.remove(process);
@@ -33,11 +33,11 @@ static void flintTerminated(Flint *flint) {
 }
 
 char *trim(char *text) {
-    if(text == NULL) return NULL;
-    while(isspace(*text)) text++;
+    if (text == NULL) return NULL;
+    while (isspace(*text)) text++;
 
     char *end = text + strlen(text) - 1;
-    while(end > text && isspace(*end)) {
+    while (end > text && isspace(*end)) {
         *end = 0;
         end--;
     }
@@ -49,13 +49,13 @@ void FlintOS::startup() {
     char path[FILE_NAME_BUFF_SIZE];
 
     FileReader reader(NULL, "/sys/startup.ini");
-    if(!reader.open()) return;
+    if (!reader.open()) return;
 
-    while(reader.readLine(path, sizeof(path)) != -1) {
+    while (reader.readLine(path, sizeof(path)) != -1) {
         char *text = trim(path);
         FProcess *process = FlintOS::open(text);
-        if(isFirst) {
-            if(process != NULL)
+        if (isFirst) {
+            if (process != NULL)
                 setHomeApp(process);
             isFirst = false;
         }
@@ -68,20 +68,20 @@ static void debuggerTask() {
 }
 
 void FlintOS::main(void) {
-    if(HAL::Devices::display() != NULL) {
+    if (HAL::Devices::display() != NULL) {
         HAL::Devices::display()->init();
         DisplaySrv::setBrightness(100);
         FlintAPI::Thread::create((void (*)(void *))DisplaySrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     }
-    if(HAL::Devices::touch())
+    if (HAL::Devices::touch())
         HAL::Devices::touch()->init();
     FlintAPI::Thread::create((void (*)(void *))InputSrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
-    if(HAL::Devices::audio() != NULL) {
+    if (HAL::Devices::audio() != NULL) {
         HAL::Devices::audio()->init();
         AudioSrv::setVolume(100);
         FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     }
-    if(HAL::Devices::wifi() != NULL)
+    if (HAL::Devices::wifi() != NULL)
         HAL::Devices::wifi()->init();
     FlintOS::startup();
     FlintAPI::Thread::create((void (*)(void *))debuggerTask, NULL, 6144, FlintAPI::Thread::THREAD_PRIORITY_MEDIUM);
@@ -89,7 +89,7 @@ void FlintOS::main(void) {
 
 FProcess *FlintOS::newProcess(void) {
     FProcess *process = (FProcess *)FlintAPI::System::malloc(sizeof(FProcess));
-    if(process == NULL) return NULL;
+    if (process == NULL) return NULL;
     new (process)FProcess();
     process->terminatedCallback(flintTerminated);
     lock();
@@ -109,35 +109,35 @@ static bool readManifest(Flint *flint, const char *jarPath, Manifest *manifest) 
     bool ret = false;
     char buff[FILE_NAME_BUFF_SIZE];
     ZipFileReader zip(NULL, jarPath);
-    if(!zip.open()) return false;
-    if(!zip.gotoFile("META-INF/MANIFEST.MF")) goto exit;
+    if (!zip.open()) return false;
+    if (!zip.gotoFile("META-INF/MANIFEST.MF")) goto exit;
 
-    while(true) {
+    while (true) {
         int32_t br = zip.readLine(buff, FILE_NAME_BUFF_SIZE);
-        if(br == -1) goto exit;
-        if(br < 2) break;
+        if (br == -1) goto exit;
+        if (br < 2) break;
 
         char *line = trim(buff);
-        if(strncmp(line, "Main-Class:", 11) == 0) {
+        if (strncmp(line, "Main-Class:", 11) == 0) {
             char *mainCls = getNextValue(&line[11], ',', &len);
-            if(len == 0) goto exit;
-            for(uint32_t i = 0; i < len; i++)
-                if(mainCls[i] == '.') mainCls[i] = '/';
+            if (len == 0) goto exit;
+            for (uint32_t i = 0; i < len; i++)
+                if (mainCls[i] == '.') mainCls[i] = '/';
 
             manifest->type = 0;
             manifest->mainCls = flint->getUtf8(NULL, mainCls, len);
 
-            if(manifest->mainCls == NULL) goto exit;
+            if (manifest->mainCls == NULL) goto exit;
         }
-        else if(strncmp(line, "MIDlet-1:", 9) == 0) {
+        else if (strncmp(line, "MIDlet-1:", 9) == 0) {
             manifest->type = 1;
 
             char *name = getNextValue(&line[9], ',', &len);
             char *icon = getNextValue(&name[len], ',', &len);
             char *mainCls = getNextValue(&icon[len], ',', &len);
-            if(len > 0) {
+            if (len > 0) {
                 manifest->mainCls = flint->getUtf8(NULL, mainCls, len);
-                if(manifest->mainCls == NULL) goto exit;
+                if (manifest->mainCls == NULL) goto exit;
             }
             else
                 manifest->mainCls = NULL;
@@ -151,35 +151,35 @@ exit:
 
 static FProcess *runApplication(const char *file, void *args) {
     FProcess *process = FlintOS::newProcess();
-    if(process == NULL) return NULL;
+    if (process == NULL) return NULL;
 
     do {
         Manifest manifest;
-        if(!readManifest(process, file, &manifest)) break;
-        if(!process->setProgram(file)) break;
+        if (!readManifest(process, file, &manifest)) break;
+        if (!process->setProgram(file)) break;
 
-        if(manifest.type == 0) {    /* Normal application */
+        if (manifest.type == 0) {    /* Normal application */
             uint32_t argc = args != NULL ? 1 : 0;
-            if(!process->startToMain(argc, args)) break;
+            if (!process->startToMain(argc, args)) break;
         }
         else {                      /* J2ME application */
             static constexpr ConstNameAndType startAppName("startApp", "(Ljava/lang/Class;)V");
 
             JClass *mainCls = process->findClass(NULL, manifest.mainCls);
-            if(mainCls == NULL) break;
+            if (mainCls == NULL) break;
 
             JClass *ams = process->findClass(NULL, "flint/midp/AMS");
-            if(ams == NULL) break;
+            if (ams == NULL) break;
 
             MethodInfo *method = process->findMethod(NULL, ams, (ConstNameAndType *)&startAppName);
-            if(method == NULL) break;
+            if (method == NULL) break;
 
-            if(!process->start(method, 1, mainCls)) break;
+            if (!process->start(method, 1, mainCls)) break;
         }
 
         FlintOS::setForeground(process);
         return process;
-    } while(0);
+    } while (0);
 
     flintTerminated(process);
     return NULL;
@@ -187,15 +187,15 @@ static FProcess *runApplication(const char *file, void *args) {
 
 static const char *getExtensionName(const char *fileName) {
     int32_t endIdx = strlen(fileName) - 1;
-    while(endIdx >= 0 && fileName[endIdx] != '.') endIdx--;
+    while (endIdx >= 0 && fileName[endIdx] != '.') endIdx--;
     return (endIdx >= 0) ? &fileName[endIdx] : NULL;
 }
 
 FProcess *FlintOS::open(const char *file, void *args) {
-    if(file == NULL) return NULL;
-    if(FlintAPI::IO::finfo(file, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
+    if (file == NULL) return NULL;
+    if (FlintAPI::IO::finfo(file, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
         const char *extName = getExtensionName(file);
-        if(strcasecmp(extName, ".jar") == 0)
+        if (strcasecmp(extName, ".jar") == 0)
             return runApplication(file, args);
     }
     return NULL;
@@ -210,10 +210,10 @@ void FlintOS::setHomeApp(FProcess *process) {
 }
 
 bool FlintOS::isForeground(FProcess *process, bool checkOnly) {
-    if(process == currentForeground)
+    if (process == currentForeground)
         return true;
-    if(process == allowForeground) {
-        if(!checkOnly)
+    if (process == allowForeground) {
+        if (!checkOnly)
             currentForeground = allowForeground;
         return true;
     }
@@ -225,11 +225,11 @@ void FlintOS::setForeground(FProcess *process) {
 }
 
 bool FlintOS::postEvent(const FEvent *event) {
-    if(currentForeground == NULL) return false;
+    if (currentForeground == NULL) return false;
 
     bool ret = false;
     lock();
-    if(currentForeground != NULL)
+    if (currentForeground != NULL)
         ret = currentForeground->getEventQueue()->postEvent(event);
     unlock();
     return ret;

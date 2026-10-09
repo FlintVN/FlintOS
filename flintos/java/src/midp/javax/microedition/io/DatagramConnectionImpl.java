@@ -48,8 +48,8 @@ class DatagramConnectionImpl implements UDPDatagramConnection {
         InetAddress addr = impl.getInetAddress();
         int port = impl.getPortNum();
 
-        if(addr == null) {
-            if(fixedHost == null)
+        if (addr == null) {
+            if (fixedHost == null)
                 throw new IOException("No destination address set for datagram");
             addr = fixedHost;
             port = fixedPort;

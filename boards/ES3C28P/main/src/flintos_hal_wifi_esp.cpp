@@ -22,9 +22,9 @@ bool EspWiFi::connect(const char *ssid, uint8_t ssidLen, const char *password, u
     wifiConfig.sta.pmf_cfg.required = false;
 
     esp_err_t ret = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
-    if(ret == ESP_OK)
+    if (ret == ESP_OK)
         ret = esp_wifi_start();
-    if(ret == ESP_OK)
+    if (ret == ESP_OK)
         ret = esp_wifi_connect();
 
     return ret == ESP_OK;
@@ -36,7 +36,7 @@ void EspWiFi::disconnect(void) const {
 
 bool EspWiFi::isConnected(void) const {
     wifi_ap_record_t ap_info;
-    if(esp_wifi_sta_get_ap_info(&ap_info) != ESP_OK)
+    if (esp_wifi_sta_get_ap_info(&ap_info) != ESP_OK)
         return false;
 
     esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
@@ -48,7 +48,7 @@ bool EspWiFi::isConnected(void) const {
 bool EspWiFi::getAPinfo(EspWiFi::ApRecordType *apInfo) const {
     wifi_ap_record_t apRecord;
     esp_err_t ret = esp_wifi_sta_get_ap_info(&apRecord);
-    if(ret != ESP_OK) return false;
+    if (ret != ESP_OK) return false;
     memcpy(apInfo->mac, apRecord.bssid, 6);
     memcpy(apInfo->ssid, apRecord.ssid, 32);
     apInfo->rssi = apRecord.rssi;
@@ -67,9 +67,9 @@ bool EspWiFi::softAP(const char *ssid, uint8_t ssidLen, const char *password, ui
     memcpy(wifiConfig.ap.password, password, passLen);
 
     esp_err_t ret = esp_wifi_set_mode(WIFI_MODE_APSTA);
-    if(ret == ESP_OK)
+    if (ret == ESP_OK)
         ret = esp_wifi_set_config(WIFI_IF_AP, &wifiConfig);
-    if(ret == ESP_OK)
+    if (ret == ESP_OK)
         ret = esp_wifi_start();
 
     return ret == ESP_OK;
@@ -92,7 +92,7 @@ int32_t EspWiFi::getScanAPCount(void) const {
 bool EspWiFi::getScanAPInfo(EspWiFi::ApRecordType *apInfo) const {
     wifi_ap_record_t apRecord;
     esp_err_t ret = esp_wifi_scan_get_ap_record(&apRecord);
-    if(ret != ESP_OK) return false;
+    if (ret != ESP_OK) return false;
     memcpy(apInfo->mac, apRecord.bssid, 6);
     memcpy(apInfo->ssid, apRecord.ssid, 32);
     apInfo->rssi = apRecord.rssi;

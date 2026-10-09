@@ -55,7 +55,7 @@ void ES8311::init(void) const {
 
     /* Initialize I2C peripheral */
     i2c_master_bus_handle_t i2cBusHandle = NULL;
-    if(i2c_master_get_bus_handle(I2C_PORT_NUM, &i2cBusHandle) != ESP_OK) {
+    if (i2c_master_get_bus_handle(I2C_PORT_NUM, &i2cBusHandle) != ESP_OK) {
         i2c_master_bus_config_t i2cMstCfg = {};
         i2cMstCfg.i2c_port = I2C_PORT_NUM;
         i2cMstCfg.sda_io_num = (gpio_num_t)ES8311_SDA;
@@ -114,7 +114,7 @@ void ES8311::init(void) const {
     sampleCfg.channel_mask = 0;
     sampleCfg.sample_rate = AUDIO_SAMPLE_RATE;
     sampleCfg.mclk_multiple = 0;
-    if(esp_codec_dev_open(codecHandle, &sampleCfg) != ESP_CODEC_DEV_OK) {
+    if (esp_codec_dev_open(codecHandle, &sampleCfg) != ESP_CODEC_DEV_OK) {
         ESP_LOGE(TAG, "Open codec device failed");
         return;
     }
@@ -135,6 +135,6 @@ void ES8311::setVolume(uint8_t value) const {
         89, 89, 89, 90, 90, 90, 91, 91, 91, 92, 92, 92, 93, 93, 93, 94, 94, 94, 94, 95,
         95, 95, 95, 96, 96, 96, 96, 97, 97, 97, 97, 98, 98, 98, 98, 99, 99, 99, 99, 100,
     };
-    if(value > 100) value = 100;
+    if (value > 100) value = 100;
     esp_codec_dev_set_out_vol(codecHandle, logVolTable[value]);
 }

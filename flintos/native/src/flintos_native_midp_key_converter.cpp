@@ -26,7 +26,7 @@
 
 jint NativeKeyConverter_GetKeyCode(FNIEnv *env, jint gameAction) {
     (void)env;
-    switch(gameAction) {
+    switch (gameAction) {
         case UP: return KEY_NUM2;
         case DOWN: return KEY_NUM8;
         case LEFT: return KEY_NUM4;
@@ -42,7 +42,7 @@ jint NativeKeyConverter_GetKeyCode(FNIEnv *env, jint gameAction) {
 
 jint NativeKeyConverter_GetGameAction(FNIEnv *env, jint keyCode) {
     (void)env;
-    switch(keyCode) {
+    switch (keyCode) {
         case KEY_NUM2: return UP;
         case KEY_NUM8: return DOWN;
         case KEY_NUM4: return LEFT;

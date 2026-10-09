@@ -9,7 +9,7 @@ const char *FlintAPI::System::getClassPath(uint32_t index) {
         "/lib/flintos.jar",
         "/lib/midp.jar",
     };
-    if(index < LENGTH(jars))
+    if (index < LENGTH(jars))
         return jars[index];
     return NULL;
 }

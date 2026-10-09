@@ -66,22 +66,22 @@ public class Button extends PanelView {
         int w = this.actualWidth;
         int h = this.actualHeight;
 
-        if(animStatus) {
+        if (animStatus) {
             int tmp, time = (int)System.currentTimeMillis() - startTime;
-            if(time < ANIMATION_DURATION)
+            if (time < ANIMATION_DURATION)
                 tmp = time * PRESS_OFFSET / ANIMATION_DURATION;
             else {
                 tmp = PRESS_OFFSET;
                 animStatus = false;
             }
-            if(isReleased) tmp = PRESS_OFFSET - tmp;
+            if (isReleased) tmp = PRESS_OFFSET - tmp;
             x -= tmp;
             y -= tmp;
             w += tmp << 1;
             h += tmp << 1;
             invalidate(false);
         }
-        else if(!isReleased) {
+        else if (!isReleased) {
             x -= PRESS_OFFSET;
             y -= PRESS_OFFSET;
             w += PRESS_OFFSET_X2;
@@ -89,13 +89,13 @@ public class Button extends PanelView {
         }
 
         Color bg = isReleased ? background : pressedBackground;
-        if(bg != null && bg.getAlpha() > 0)
+        if (bg != null && bg.getAlpha() > 0)
             g.fillRoundRect(bg, x, y, w, h, r1, r2, r3, r4);
 
-        if(borderColor != null && borderColor.getAlpha() > 0)
+        if (borderColor != null && borderColor.getAlpha() > 0)
             g.drawRoundRect(borderColor, x, y, w - 1, h - 1, r1, r2, r3, r4);
 
-        if(text == null) return;
+        if (text == null) return;
 
         int gClipX = g.getClipX();
         int gClipY = g.getClipY();
@@ -117,7 +117,7 @@ public class Button extends PanelView {
 
     @Override
     protected void onTouchEvent(MotionEvent event) {
-        switch(event.action) {
+        switch (event.action) {
             case MotionEvent.ACTION_DOWN: {
                 animStatus = true;
                 isReleased = false;
@@ -137,10 +137,10 @@ public class Button extends PanelView {
 
     @Override
     protected void updateActualWidth(int availableW) {
-        if(width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
+        if (width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
             int contentW = paddingLeft + paddingRight + getBorderThickness() << 1;
             contentW += Graphics.measureStringWidth(text, font);
-            if(contentW < 0) contentW = 0;
+            if (contentW < 0) contentW = 0;
 
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
@@ -150,10 +150,10 @@ public class Button extends PanelView {
 
     @Override
     protected void updateActualHeight(int availableH) {
-        if(height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
+        if (height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
             int contentH = paddingTop + paddingBottom + (getBorderThickness() << 1);
             contentH += Graphics.measureStringHeight(text, font);
-            if(contentH < 0) contentH = 0;
+            if (contentH < 0) contentH = 0;
 
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
         }
@@ -168,7 +168,7 @@ public class Button extends PanelView {
     public void setText(String text) {
         FlintUI.checkThread();
         this.text = text;
-        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+        if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             FlintUI.setInvalidateAll();
         else
             invalidate(false);
@@ -180,10 +180,10 @@ public class Button extends PanelView {
 
     public void setFont(Font font) {
         FlintUI.checkThread();
-        if(font == null)
+        if (font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
-        if(width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
+        if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             FlintUI.setInvalidateAll();
         else
             invalidate(false);
@@ -195,7 +195,7 @@ public class Button extends PanelView {
 
     public void setTextColor(Color color) {
         FlintUI.checkThread();
-        if(color == null)
+        if (color == null)
             throw new NullPointerException("color can not be null");
         textColor = color;
         invalidate(false);
@@ -208,7 +208,7 @@ public class Button extends PanelView {
     public void setPressedBackground(Color bg) {
         FlintUI.checkThread();
         pressedBackground = bg;
-        if(!isReleased)
+        if (!isReleased)
             invalidate(false);
     }
 

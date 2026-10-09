@@ -41,36 +41,36 @@ public class ToggleButton extends View {
         int time = 0;
         int r = cornerRadius;
         Object bgColor;
-        if(changing) {
+        if (changing) {
             time = (int)System.currentTimeMillis() - startTimeChange;
-            if(time >= ANIMATION_DURATION / 2)
+            if (time >= ANIMATION_DURATION / 2)
                 bgColor = checked ? onColor : background;
             else
                 bgColor = checked ? background : onColor;
         }
         else
             bgColor = checked ? onColor : background;
-        if(bgColor != null)
+        if (bgColor != null)
             g.fillRoundRect((Color)bgColor, this.x, this.y, actualWidth, actualHeight, r, r, r, r);
 
-        if(borderColor != null && borderColor.getAlpha() > 0) {
+        if (borderColor != null && borderColor.getAlpha() > 0) {
             int w = actualWidth - 1;
             int h = actualHeight - 1;
             g.drawRoundRect(borderColor, this.x, this.y, w, h, r, r, r, r);
         }
 
-        if(thumbColor.getAlpha() > 0) {
+        if (thumbColor.getAlpha() > 0) {
             int thk = (borderColor != null && borderColor.getAlpha() > 0) ? 1 : 0;
             int h = actualHeight - (thk << 1) - 6;
             int y = thk + 3;
             int x2 = actualWidth - y - h;
             int x;
-            if(changing) {
-                if(time >= ANIMATION_DURATION) {
+            if (changing) {
+                if (time >= ANIMATION_DURATION) {
                     changing = false;
                     x = checked ? x2 : y;
                 }
-                else if(checked)
+                else if (checked)
                     x = y + time * (x2 - y) / ANIMATION_DURATION;
                 else
                     x = x2 - time * (x2 - y) / ANIMATION_DURATION;
@@ -85,13 +85,13 @@ public class ToggleButton extends View {
 
     @Override
     protected void onTouchEvent(MotionEvent event) {
-        switch(event.action) {
+        switch (event.action) {
             case MotionEvent.ACTION_UP: {
-                if(isPressing && containsPoint(event.x, event.y)) {
+                if (isPressing && containsPoint(event.x, event.y)) {
                     checked = !checked;
                     changing = true;
                     startTimeChange = (int)System.currentTimeMillis();
-                    if(onCheckedChangeListener != null)
+                    if (onCheckedChangeListener != null)
                         onCheckedChangeListener.onCheckedChanged(this, checked);
                     invalidate(false);
                 }
@@ -102,7 +102,7 @@ public class ToggleButton extends View {
 
     @Override
     protected void updateActualWidth(int availableW) {
-        if((width == View.WRAP_CONTENT) || (width == View.MATCH_PARENT && availableW < 0))
+        if ((width == View.WRAP_CONTENT) || (width == View.MATCH_PARENT && availableW < 0))
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? (DEFAULT_HEIGHT * 2 - 4) : availableW);
         else
             actualWidth = width >= 0 ? width : availableW;
@@ -110,7 +110,7 @@ public class ToggleButton extends View {
 
     @Override
     protected void updateActualHeight(int availableH) {
-        if((height == View.WRAP_CONTENT) || (height == View.MATCH_PARENT && availableH < 0))
+        if ((height == View.WRAP_CONTENT) || (height == View.MATCH_PARENT && availableH < 0))
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? DEFAULT_HEIGHT : availableH);
         else
             actualHeight = height >= 0 ? height : availableH;
@@ -122,9 +122,9 @@ public class ToggleButton extends View {
 
     public void setChecked(boolean checked) {
         FlintUI.checkThread();
-        if(this.checked != checked) {
+        if (this.checked != checked) {
             this.checked = checked;
-            if(onCheckedChangeListener != null)
+            if (onCheckedChangeListener != null)
                 onCheckedChangeListener.onCheckedChanged(this, checked);
             invalidate(false);
         }
@@ -136,10 +136,10 @@ public class ToggleButton extends View {
 
     public void setOnColor(Color color) {
         FlintUI.checkThread();
-        if(color == null)
+        if (color == null)
             throw new NullPointerException("color can not be null");
         onColor = color;
-        if(checked)
+        if (checked)
             invalidate(false);
     }
 
@@ -149,7 +149,7 @@ public class ToggleButton extends View {
 
     public void setThumbColor(Color color) {
         FlintUI.checkThread();
-        if(color == null)
+        if (color == null)
             throw new NullPointerException("color can not be null");
         thumbColor = color;
         invalidate(false);

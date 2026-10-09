@@ -51,9 +51,9 @@ public class ProgressBar extends PanelView {
 
         int target = w * this.value / max;
         int value = currValue;
-        if(value != target) {
+        if (value != target) {
             value = calcCurrValue();
-            if(value == target)
+            if (value == target)
                 currValue = value;
             invalidate(false);
         }
@@ -63,7 +63,7 @@ public class ProgressBar extends PanelView {
 
     private final int calcCurrValue() {
         int time = (int)System.currentTimeMillis() - startTime;
-        if(time < ANIMATION_DURATION)
+        if (time < ANIMATION_DURATION)
             return currValue + (diffValue * time / ANIMATION_DURATION);
         else {
             int w = actualWidth - (getBorderThickness() << 1);
@@ -78,7 +78,7 @@ public class ProgressBar extends PanelView {
         super.updateActualWidth(availableW);
 
         int w = actualWidth - (getBorderThickness() << 1);
-        if(currValue > w) currValue = w;
+        if (currValue > w) currValue = w;
         diffValue = (w * value / max) - currValue;
         startTime = (int)System.currentTimeMillis();
     }
@@ -89,7 +89,7 @@ public class ProgressBar extends PanelView {
 
     public void setColor(Color color) {
         FlintUI.checkThread();
-        if(color == null)
+        if (color == null)
             throw new NullPointerException("color can not be null");
         this.color = color;
         invalidate(false);
@@ -101,10 +101,10 @@ public class ProgressBar extends PanelView {
 
     public void setMax(int max) {
         FlintUI.checkThread();
-        if(max < 0)
+        if (max < 0)
             max = 1;
-        if(this.max != max) {
-            if(value > max)
+        if (this.max != max) {
+            if (value > max)
                 value = max;
             int w = actualWidth - (getBorderThickness() << 1);
             currValue = (currValue > w) ? w : calcCurrValue();
@@ -125,13 +125,13 @@ public class ProgressBar extends PanelView {
 
     public void setValue(int value, boolean animate) {
         FlintUI.checkThread();
-        if(value < 0)
+        if (value < 0)
             value = 0;
-        else if(value > max)
+        else if (value > max)
             value = max;
-        if(this.value != value) {
+        if (this.value != value) {
             int w = actualWidth - (getBorderThickness() << 1);
-            if(!animate)
+            if (!animate)
                 currValue = w * value / max;
             else {
                 currValue = calcCurrValue();

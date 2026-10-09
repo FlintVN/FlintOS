@@ -13,22 +13,22 @@ void InputSrv::mainTask(void) {
     FEvent touchEvent = {.type = 2, .data = {0}};
     bool lastStatus = false;
 
-    while(true) {
+    while (true) {
         uint32_t tick = (uint32_t)FlintAPI::System::getTimeMillis();
-        if(touch != NULL) {
+        if (touch != NULL) {
             uint16_t x, y;
             bool status = touch->read(&x, &y);
-            if(status || lastStatus != status) {
-                if(lastStatus != status) {
+            if (status || lastStatus != status) {
+                if (lastStatus != status) {
                     lastStatus = status;
                     touchEvent.data[0] = !status;
-                    if(status) {
+                    if (status) {
                         touchEvent.data[1] = x;
                         touchEvent.data[2] = y;
                     }
                     FlintOS::postEvent(&touchEvent);
                 }
-                else if(touchEvent.data[1] != x || touchEvent.data[2] != y) {
+                else if (touchEvent.data[1] != x || touchEvent.data[2] != y) {
                     touchEvent.data[0] = 2;
                     touchEvent.data[1] = x;
                     touchEvent.data[2] = y;
@@ -37,7 +37,7 @@ void InputSrv::mainTask(void) {
             }
         }
         int32_t remaining = delay - (uint32_t)((uint32_t)FlintAPI::System::getTimeMillis() - tick);
-        if(remaining > 0)
+        if (remaining > 0)
             FlintAPI::Thread::sleep(remaining);
     }
 }

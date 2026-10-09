@@ -13,11 +13,11 @@ public:
 };
 
 static bool ResolvePath(FNIEnv *env, jstring name, char *buff, uint32_t buffSize) {
-    if(name == NULL) {
+    if (name == NULL) {
         env->throwNew(env->findClass("java/lang/NullPointerException"), "name cannot be null");
         return false;
     }
-    if(((FExec *)env)->getFlint()->resolvePath(name->getAscii(), name->getLength(), buff, buffSize) == -1) {
+    if (((FExec *)env)->getFlint()->resolvePath(name->getAscii(), name->getLength(), buff, buffSize) == -1) {
         jclass excpCls = env->findClass("java/lang/IllegalArgumentException");
         env->throwNew(excpCls, "Unable to resolve the path, file name too long leads to insufficient buffer size");
         return false;
@@ -28,8 +28,8 @@ static bool ResolvePath(FNIEnv *env, jstring name, char *buff, uint32_t buffSize
 jvoid NativeProcess_Start(FNIEnv *env, jobject obj) {
     char buff[FILE_NAME_BUFF_SIZE];
     JProcess *p = (JProcess *)obj;
-    if(!ResolvePath(env, p->getName(), buff, sizeof(buff))) return;
-    if(FlintOS::open(buff, p->getArgs()) == NULL) {
+    if (!ResolvePath(env, p->getName(), buff, sizeof(buff))) return;
+    if (FlintOS::open(buff, p->getArgs()) == NULL) {
         jclass excpCls = env->findClass("java/lang/IllegalArgumentException");
         env->throwNew(excpCls, "Process start failed"); 
     }
@@ -38,11 +38,11 @@ jvoid NativeProcess_Start(FNIEnv *env, jobject obj) {
 jvoid NativeProcess_Close(FNIEnv *env, jobject obj) {
     char buff[FILE_NAME_BUFF_SIZE];
     JProcess *p = (JProcess *)obj;
-    if(!ResolvePath(env, p->getName(), buff, sizeof(buff))) return;
+    if (!ResolvePath(env, p->getName(), buff, sizeof(buff))) return;
     FlintOS::lock();
     FList<FProcess> *processes = FlintOS::getProcesses();
     FProcess *fprocess = processes->find([&buff](FProcess *item) -> bool { return strcmp(item->getProgram(), buff) == 0; });
-    if(fprocess != NULL)
+    if (fprocess != NULL)
         fprocess->terminateRequest();
     FlintOS::unlock();
 }
@@ -52,19 +52,19 @@ jobjectArray NativeProcess_GetProcesses(FNIEnv *env) {
     FList<FProcess> *processes = FlintOS::getProcesses();
     uint32_t len = (processes != NULL) ? processes->length() : 0;
     jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/system/Process"), len);
-    if(arrayObj == NULL) return NULL;
+    if (arrayObj == NULL) return NULL;
     JObject **data = arrayObj->getData();
-    if(len > 0) {
+    if (len > 0) {
         FProcess *root = processes->find([](FProcess *) -> bool { return true; });
         FProcess *node = root;
-        for(uint32_t i = 0; i < len; i++) {
+        for (uint32_t i = 0; i < len; i++) {
             data[i] = env->newObject(env->findClass("flint/system/Process"));
             jstring name = env->newString(node->getProgram());
-            if(name == NULL || data[i] == NULL) {
+            if (name == NULL || data[i] == NULL) {
                 FlintOS::unlock();
-                if(data[i] != NULL) i++;
-                while(i) env->freeObject(data[--i]);
-                if(name != NULL) env->freeObject(name);
+                if (data[i] != NULL) i++;
+                while (i) env->freeObject(data[--i]);
+                if (name != NULL) env->freeObject(name);
                 env->freeObject(arrayObj);
                 return NULL;
             }

@@ -24,10 +24,10 @@ class PanelView extends View {
         int r4 = bottomRightRadius;
 
         Color bg = background;
-        if(bg != null && bg.getAlpha() > 0)
+        if (bg != null && bg.getAlpha() > 0)
             g.fillRoundRect(bg, x, y, actualWidth, actualHeight, r1, r2, r3, r4);
 
-        if(borderColor != null && borderColor.getAlpha() > 0) {
+        if (borderColor != null && borderColor.getAlpha() > 0) {
             int w = actualWidth - 1;
             int h = actualHeight - 1;
             g.drawRoundRect(borderColor, x, y, w, h, r1, r2, r3, r4);

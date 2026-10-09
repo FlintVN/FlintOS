@@ -13,7 +13,7 @@ static int16_t audioBuff[AUDIO_FRAME_NUM * AUDIO_FRAME_BUF_LENGTH];
 static volatile uint32_t currentPos = 0;
 
 static void audioLock(void) {
-    while(atomic_flag_test_and_set_explicit(&audioLocked, memory_order_acquire))
+    while (atomic_flag_test_and_set_explicit(&audioLocked, memory_order_acquire))
         FlintAPI::Thread::yield();
 }
 
@@ -23,12 +23,12 @@ static void audioUnlock(void) {
 
 void AudioSrv::mainTask(void) {
     const HAL::Audio *audio = HAL::Devices::audio();
-    while(1) {
+    while (1) {
         uint8_t *frame = (uint8_t *)&audioBuff[currentPos];
         uint32_t bw = 0;
-        while(bw < AUDIO_FRAME_BUF_SIZE) {
+        while (bw < AUDIO_FRAME_BUF_SIZE) {
             uint32_t tmp = audio->write(&frame[bw], AUDIO_FRAME_BUF_SIZE - bw);
-            if(tmp == 0)
+            if (tmp == 0)
                 FlintAPI::Thread::yield();
             else
                 bw += tmp;
@@ -43,15 +43,15 @@ uint32_t AudioSrv::open(void) {
 }
 
 uint32_t AudioSrv::write(int32_t *pos, int16_t *frame, uint32_t length) {
-    if(HAL::Devices::audio() == NULL) return length;
+    if (HAL::Devices::audio() == NULL) return length;
     int32_t localPos = *pos;
-    if(localPos == currentPos) return 0;
+    if (localPos == currentPos) return 0;
     uint32_t count = 0;
     audioLock();
-    for(; (count < length) && (localPos != currentPos); count++) {
+    for (; (count < length) && (localPos != currentPos); count++) {
         int32_t tmp = audioBuff[localPos] + *frame++;
-        if(tmp > 32767) tmp = 32767;
-        else if(tmp < -32768) tmp = -32768;
+        if (tmp > 32767) tmp = 32767;
+        else if (tmp < -32768) tmp = -32768;
         audioBuff[localPos] = tmp;
         localPos = (localPos + 1) % LENGTH(audioBuff);
     }
@@ -67,6 +67,6 @@ uint8_t AudioSrv::getVolume(void) {
 void AudioSrv::setVolume(uint8_t value) {
     const HAL::Audio *audio = HAL::Devices::audio();
     volume = value;
-    if(audio != NULL)
+    if (audio != NULL)
         audio->setVolume(value);
 }
