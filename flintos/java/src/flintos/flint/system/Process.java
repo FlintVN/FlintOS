@@ -1,6 +1,7 @@
 package flint.system;
 
 public class Process {
+    private int handle = -1;
     private String name;
     private String[] args;
 

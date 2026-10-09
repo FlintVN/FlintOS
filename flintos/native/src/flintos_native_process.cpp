@@ -6,10 +6,12 @@
 
 class JProcess : public JObject {
 public:
-    jstring getName() { return (jstring)getFieldByIndex(0)->getObj(); }
-    jarray getArgs() { return (jarray)getFieldByIndex(1)->getObj(); }
+    jint getHandle() { return getFieldByIndex(0)->getInt32(); }
+    jstring getName() { return (jstring)getFieldByIndex(1)->getObj(); }
+    jarray getArgs() { return (jarray)getFieldByIndex(2)->getObj(); }
 
-    void setName(jstring name) { getFieldByIndex(0)->setObj(name); }
+    void setHandle(jint val) { getFieldByIndex(0)->setInt32(val); }
+    void setName(jstring val) { getFieldByIndex(1)->setObj(val); }
 };
 
 static bool ResolvePath(FNIEnv *env, jstring name, char *buff, uint32_t buffSize) {
@@ -28,23 +30,36 @@ static bool ResolvePath(FNIEnv *env, jstring name, char *buff, uint32_t buffSize
 jvoid NativeProcess_Start(FNIEnv *env, jobject obj) {
     char buff[FILE_NAME_BUFF_SIZE];
     JProcess *p = (JProcess *)obj;
-    if (!ResolvePath(env, p->getName(), buff, sizeof(buff))) return;
-    if (FlintOS::open(buff, p->getArgs()) == NULL) {
-        jclass excpCls = env->findClass("java/lang/IllegalArgumentException");
-        env->throwNew(excpCls, "Process start failed"); 
+    uint32_t handle = p->getHandle();
+    FProcess *fprocess;
+    if (handle != -1) {
+        fprocess = FlintOS::getProcesses()->find([&handle](FProcess *item) -> bool { return (jint)item == handle; });
+        if (fprocess != NULL) {
+            env->throwNew(env->findClass("java/lang/IllegalStateException"), "Cannot restart an existing process");
+            return;
+        }
     }
+    if (!ResolvePath(env, p->getName(), buff, sizeof(buff))) return;
+    fprocess = FlintOS::open(buff, p->getArgs());
+    if (fprocess == NULL) {
+        jclass excpCls = env->findClass("java/lang/IllegalArgumentException");
+        env->throwNew(excpCls, "Process start failed");
+        return;
+    }
+    p->setHandle((jint)fprocess);
 }
 
 jvoid NativeProcess_Close(FNIEnv *env, jobject obj) {
-    char buff[FILE_NAME_BUFF_SIZE];
     JProcess *p = (JProcess *)obj;
-    if (!ResolvePath(env, p->getName(), buff, sizeof(buff))) return;
-    FlintOS::lock();
-    FList<FProcess> *processes = FlintOS::getProcesses();
-    FProcess *fprocess = processes->find([&buff](FProcess *item) -> bool { return strcmp(item->getProgram(), buff) == 0; });
-    if (fprocess != NULL)
-        fprocess->terminateRequest();
-    FlintOS::unlock();
+    jint handle = p->getHandle();
+    if (handle != -1) {
+        FlintOS::lock();
+        FProcess *fprocess = FlintOS::getProcesses()->find([&handle](FProcess *item) -> bool { return (jint)item == handle; });
+        if (fprocess != NULL)
+            fprocess->terminateRequest();
+        FlintOS::unlock();
+        p->setHandle(-1);
+    }
 }
 
 jobjectArray NativeProcess_GetProcesses(FNIEnv *env) {
@@ -68,7 +83,9 @@ jobjectArray NativeProcess_GetProcesses(FNIEnv *env) {
                 env->freeObject(arrayObj);
                 return NULL;
             }
-            data[i]->getFieldByIndex(0)->setObj(name);
+            ((JProcess *)data[i])->setHandle((jint)node);
+            ((JProcess *)data[i])->setName(name);
+            node = (FProcess *)node->next;
         }
     }
     FlintOS::unlock();
