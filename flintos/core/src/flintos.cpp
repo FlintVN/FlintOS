@@ -27,7 +27,7 @@ static void flintTerminated(Flint *flint) {
     fosMutex.lock();
     processList.remove(process);
     process->freeAll();
-    FosDbg::getInstance()->setTarget(NULL);
+    FosDbg::getInstance()->removeTarget(flint);
     FlintAPI::System::free(process);
     fosMutex.unlock();
 }
