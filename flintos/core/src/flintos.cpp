@@ -1,5 +1,4 @@
 
-#include "flint.h"
 #include "flintos.h"
 #include "flint_system_api.h"
 #include "flintos_debugger.h"
@@ -54,12 +53,11 @@ void FlintOS::startup() {
 
     while(reader.readLine(path, sizeof(path)) != -1) {
         char *text = trim(path);
-        if(FlintAPI::IO::finfo(text, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
-            FProcess *process = FlintOS::open(text);
-            if(isFirst) {
+        FProcess *process = FlintOS::open(text);
+        if(isFirst) {
+            if(process != NULL)
                 setHomeApp(process);
-                isFirst = false;
-            }
+            isFirst = false;
         }
     }
     reader.close();
@@ -94,9 +92,9 @@ FProcess *FlintOS::newProcess(void) {
     if(process == NULL) return NULL;
     new (process)FProcess();
     process->terminatedCallback(flintTerminated);
-    fosMutex.lock();
+    lock();
     processList.add(process);
-    fosMutex.unlock();
+    unlock();
     return process;
 }
 
@@ -151,7 +149,7 @@ exit:
     return ret;
 }
 
-static FProcess *runApplication(const char *file) {
+static FProcess *runApplication(const char *file, void *args) {
     FProcess *process = FlintOS::newProcess();
     if(process == NULL) return NULL;
 
@@ -161,7 +159,8 @@ static FProcess *runApplication(const char *file) {
         if(!process->setProgram(file)) break;
 
         if(manifest.type == 0) {    /* Normal application */
-            if(!process->startToMain()) break;
+            uint32_t argc = args != NULL ? 1 : 0;
+            if(!process->startToMain(argc, args)) break;
         }
         else {                      /* J2ME application */
             static constexpr ConstNameAndType startAppName("startApp", "(Ljava/lang/Class;)V");
@@ -192,12 +191,18 @@ static const char *getExtensionName(const char *fileName) {
     return (endIdx >= 0) ? &fileName[endIdx] : NULL;
 }
 
-FProcess *FlintOS::open(const char *file) {
+FProcess *FlintOS::open(const char *file, void *args) {
     if(file == NULL) return NULL;
-    const char *extName = getExtensionName(file);
-    if(strcasecmp(extName, ".jar") == 0)
-        return runApplication(file);
+    if(FlintAPI::IO::finfo(file, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
+        const char *extName = getExtensionName(file);
+        if(strcasecmp(extName, ".jar") == 0)
+            return runApplication(file, args);
+    }
     return NULL;
+}
+
+FList<FProcess> *FlintOS::getProcesses(void) {
+    return &processList;
 }
 
 void FlintOS::setHomeApp(FProcess *process) {
@@ -223,9 +228,17 @@ bool FlintOS::postEvent(const FEvent *event) {
     if(currentForeground == NULL) return false;
 
     bool ret = false;
-    fosMutex.lock();
+    lock();
     if(currentForeground != NULL)
         ret = currentForeground->getEventQueue()->postEvent(event);
-    fosMutex.unlock();
+    unlock();
     return ret;
+}
+
+void FlintOS::lock() {
+    fosMutex.lock();
+}
+
+void FlintOS::unlock() {
+    fosMutex.unlock();
 }

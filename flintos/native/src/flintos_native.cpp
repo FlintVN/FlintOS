@@ -5,6 +5,7 @@
 #include "flint_class_loader.h"
 #include "flint_native.h"
 #include "flintos_native_wifi.h"
+#include "flintos_native_process.h"
 #include "flintos_native_display.h"
 #include "flintos_native_audio_track.h"
 #include "flintos_native_midp_key_converter.h"
@@ -15,6 +16,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/media/Display",                   displayMethods),
     NATIVE_CLASS("flint/media/AudioTrack",                audioTrackMethods),
 
+    NATIVE_CLASS("flint/system/Process",                  processMethods),
     NATIVE_CLASS("flint/system/NativeEventReceiver",      nativeEventReceiverMethods),
 
     NATIVE_CLASS("javax/microedition/lcdui/KeyConverter", midpKeyConverterMethods),
