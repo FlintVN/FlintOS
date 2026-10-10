@@ -242,9 +242,9 @@ public abstract class FlintUI extends View {
             Graphics g = disp.createGraphics();
             g.setClip(x, y, w, h);
             if (background != null)
-                g.clear(background);
+                g.clear(background, x, y, w, h);
             else
-                g.clear();
+                g.clear(x, y, w, h);
             onDraw(g);
             disp.present(x, y, w, h);
         }

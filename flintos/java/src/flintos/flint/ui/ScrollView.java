@@ -232,7 +232,8 @@ public class ScrollView extends PanelView {
                     actView = null;
                 }
                 isPressed = false;
-                invalidate(true);
+                if(scrolling)
+                    invalidate(true);
                 return;
             }
             case MotionEvent.ACTION_MOVE: {
