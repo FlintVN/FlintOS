@@ -8,7 +8,7 @@ class JProcess : public JObject {
 public:
     jint getHandle() { return getFieldByIndex(0)->getInt32(); }
     jstring getName() { return (jstring)getFieldByIndex(1)->getObj(); }
-    jarray getArgs() { return (jarray)getFieldByIndex(2)->getObj(); }
+    jstringArray getArgs() { return (jstringArray)getFieldByIndex(2)->getObj(); }
 
     void setHandle(jint val) { getFieldByIndex(0)->setInt32(val); }
     void setName(jstring val) { getFieldByIndex(1)->setObj(val); }

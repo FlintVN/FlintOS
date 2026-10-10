@@ -149,7 +149,7 @@ exit:
     return ret;
 }
 
-static FProcess *runApplication(const char *file, void *args) {
+static FProcess *runApplication(const char *file, JStringArray *args) {
     FProcess *process = FlintOS::newProcess();
     if (process == NULL) return NULL;
 
@@ -159,8 +159,7 @@ static FProcess *runApplication(const char *file, void *args) {
         if (!process->setProgram(file)) break;
 
         if (manifest.type == 0) {    /* Normal application */
-            uint32_t argc = args != NULL ? 1 : 0;
-            if (!process->startToMain(argc, args)) break;
+            if (!process->startToMain(args)) break;
         }
         else {                      /* J2ME application */
             static constexpr ConstNameAndType startAppName("startApp", "(Ljava/lang/Class;)V");
@@ -196,7 +195,7 @@ FProcess *FlintOS::open(const char *file, void *args) {
     if (FlintAPI::IO::finfo(file, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
         const char *extName = getExtensionName(file);
         if (strcasecmp(extName, ".jar") == 0)
-            return runApplication(file, args);
+            return runApplication(file, (JStringArray *)args);
     }
     return NULL;
 }
