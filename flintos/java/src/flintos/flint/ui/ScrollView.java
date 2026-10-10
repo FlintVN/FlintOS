@@ -232,7 +232,7 @@ public class ScrollView extends PanelView {
                     actView = null;
                 }
                 isPressed = false;
-                if(scrolling)
+                if (scrolling)
                     invalidate(true);
                 return;
             }
