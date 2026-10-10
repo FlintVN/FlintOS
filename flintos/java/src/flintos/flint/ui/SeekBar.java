@@ -26,7 +26,7 @@ public class SeekBar extends View {
     private boolean animStatus;
     private int animStartTime;
 
-    private OnValueChangedListener onValueChangedListener;
+    private OnSeekBarChangeListener onSeekBarChangeListener;
 
     public SeekBar() {
         max = 100;
@@ -140,6 +140,8 @@ public class SeekBar extends View {
                     animStatus = true;
                     isPressed = true;
                     animStartTime = (int)System.currentTimeMillis();
+                    if (onSeekBarChangeListener != null)
+                        onSeekBarChangeListener.onStartTrackingTouch(this);
                     invalidate(false);
                 }
                 return;
@@ -149,6 +151,8 @@ public class SeekBar extends View {
                     isPressed = false;
                     animStatus = true;
                     animStartTime = (int)System.currentTimeMillis();
+                    if (onSeekBarChangeListener != null)
+                        onSeekBarChangeListener.onStopTrackingTouch(this);
                     invalidate(false);
                 }
                 return;
@@ -163,8 +167,8 @@ public class SeekBar extends View {
                     if (value != v) {
                         value = v;
                         currValue = w * value / max;
-                        if (onValueChangedListener != null)
-                            onValueChangedListener.onValueChanged(this);
+                        if (onSeekBarChangeListener != null)
+                            onSeekBarChangeListener.onProgressChanged(this, true);
                         invalidate(false);
                     }
                 }
@@ -208,8 +212,11 @@ public class SeekBar extends View {
         if (max < 0)
             max = 1;
         if (this.max != max) {
-            if (value > max)
+            if (value > max) {
                 value = max;
+                if (onSeekBarChangeListener != null)
+                    onSeekBarChangeListener.onProgressChanged(this, false);
+            }
             int w = actualWidth - THUMB_SIZE;
             currValue = (currValue > w) ? w : calcCurrValue();
             diffValue = (w * value / max) - currValue;
@@ -243,8 +250,8 @@ public class SeekBar extends View {
                 startTime = (int)System.currentTimeMillis();
             }
             this.value = value;
-            if (onValueChangedListener != null)
-                onValueChangedListener.onValueChanged(this);
+            if (onSeekBarChangeListener != null)
+                onSeekBarChangeListener.onProgressChanged(this, false);
             invalidate(false);
         }
     }
@@ -261,7 +268,7 @@ public class SeekBar extends View {
         invalidate(false);
     }
 
-    public void setOnValueChangedListener(OnValueChangedListener listener) {
-        onValueChangedListener = listener;
+    public void setOnSeekBarChangeListener(OnSeekBarChangeListener listener) {
+        onSeekBarChangeListener = listener;
     }
 }
