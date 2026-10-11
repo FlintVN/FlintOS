@@ -60,21 +60,25 @@ public abstract class FlintUI extends View {
         if (ui == null)
             return;
         if (ui.invH == 0) {
-            ui.invX = x;
-            ui.invY = y;
-            ui.invW = w;
-            ui.invH = h;
+            int x2 = Math.min(ui.width, x + w);
+            int y2 = Math.min(ui.height, y + h);
+            ui.invX = x > 0 ? x : 0;
+            ui.invY = y > 0 ? y : 0;
+            ui.invW = x2 - ui.invX;
+            ui.invH = y2 - ui.invY;
         }
         else {
             int x2 = Math.max(ui.invX + ui.invW, x + w);
             int y2 = Math.max(ui.invY + ui.invH, y + h);
+            if (x < 0) x = 0;
+            if (y < 0) y = 0;
             if (ui.invX > x) ui.invX = x;
             if (ui.invY > y) ui.invY = y;
             ui.invW = x2 - ui.invX;
             ui.invH = y2 - ui.invY;
         }
         if (layout)
-            ui.invLayout = layout;
+            ui.invLayout = true;
     }
 
     static final void setInvalidateAll() {
@@ -228,7 +232,7 @@ public abstract class FlintUI extends View {
     private void draw() {
         int w = invW;
         int h = invH;
-        if (invLayout || (w > 0 && h > 0)) {
+        if (w > 0 && h > 0) {
             int x = invX;
             int y = invY;
             invW = 0;
