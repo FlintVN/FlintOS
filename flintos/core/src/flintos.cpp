@@ -8,6 +8,7 @@
 #include "flintos_audio_service.h"
 #include "flintos_input_service.h"
 #include "flintos_display_service.h"
+#include "flintos_zip_class_cache.h"
 
 static FProcess *homeApp = NULL;
 static FProcess *allowForeground = NULL;
@@ -83,6 +84,7 @@ void FlintOS::main(void) {
     }
     if (HAL::Devices::wifi() != NULL)
         HAL::Devices::wifi()->init();
+    ZipClassCache::init();
     FlintOS::startup();
     FlintAPI::Thread::create((void (*)(void *))debuggerTask, NULL, 6144, FlintAPI::Thread::THREAD_PRIORITY_MEDIUM);
 }
@@ -110,7 +112,7 @@ static bool readManifest(Flint *flint, const char *jarPath, Manifest *manifest) 
     char buff[FILE_NAME_BUFF_SIZE];
     ZipFileReader zip(NULL, jarPath);
     if (!zip.open()) return false;
-    if (!zip.gotoFile("META-INF/MANIFEST.MF")) goto exit;
+    if (!zip.openEntry("META-INF/MANIFEST.MF")) goto exit;
 
     while (true) {
         int32_t br = zip.readLine(buff, FILE_NAME_BUFF_SIZE);

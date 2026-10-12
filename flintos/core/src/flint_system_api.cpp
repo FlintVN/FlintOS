@@ -1,15 +1,19 @@
 
+#include "flint.h"
 #include "flint_system_api.h"
+#include "flint_file_reader.h"
+#include "flint_zip_file_reader.h"
+#include "flintos_zip_class_cache.h"
 
-const char *FlintAPI::System::getClassPath(uint32_t index) {
-    static const char *jars[] = {
-        "/lib/java.base.jar",
-        "/lib/flint.net.jar",
-        "/lib/flint.drawing.jar",
-        "/lib/flintos.jar",
-        "/lib/midp.jar",
-    };
-    if (index < LENGTH(jars))
-        return jars[index];
-    return NULL;
+bool FlintAPI::System::openClassFile(FExec *ctx, const char *clsName, uint16_t length, FileReader *reader) {
+    ZipEntry *entry = ZipClassCache::find(clsName, length);
+    if (entry == NULL) return false;
+    ZipFileReader zip(ctx, entry->getZipFilePath());
+    if (!zip.open()) return false;
+    if (zip.openEntry(entry)) {
+        memcpy(reader, &zip, sizeof(FileReader));
+        return true;
+    }
+    zip.close();
+    return false;
 }

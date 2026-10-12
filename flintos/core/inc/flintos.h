@@ -13,7 +13,7 @@ public:
     static void startup(void);
     static FProcess *newProcess(void);
     static FProcess *open(const char *file, void *args = NULL);
-    
+
     static FList<FProcess> *getProcesses(void);
 
     static void setHomeApp(FProcess *process);
