@@ -10,7 +10,7 @@ void InputSrv::mainTask(void) {
     static const uint32_t delay = 20;
 
     const HAL::Touch *touch = HAL::Devices::touch();
-    FEvent touchEvent = {.type = 2, .data = {0}};
+    FEvent touchEvent = {.type = TOUCH_EVENT, .data = {0}};
     bool lastStatus = false;
 
     while (true) {

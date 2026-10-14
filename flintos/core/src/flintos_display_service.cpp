@@ -54,7 +54,7 @@ static bool displayFlush(void) {
 }
 
 void DisplaySrv::mainTask(void) {
-    static const FEvent monitorEvent = {.type = 3, .data = {0}};
+    static const FEvent monitorEvent = {.type = MONITOR_EVENT, .data = {0}};
     static const uint32_t screenPeriodic = (1000 + DISPLAY_FREQ / 2) / DISPLAY_FREQ;
     showLogo();
     while (true) {

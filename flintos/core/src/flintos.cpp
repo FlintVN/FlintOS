@@ -17,14 +17,23 @@ static FProcess *currentForeground = NULL;
 static FList<FProcess> processList;
 static FMutex fosMutex;
 
+static const FEvent foregroundEvent = {.type = FOREGROUND_EVENT, .data = {0}};
+static const FEvent backgroundEvent = {.type = BACKGROUND_EVENT, .data = {0}};
+
 static void flintTerminated(Flint *flint) {
     FProcess *process = (FProcess *)flint;
     if (process == homeApp)
         homeApp = NULL;
-    if (process == allowForeground)
+    if (process == allowForeground) {
         allowForeground = homeApp;
-    if (process == currentForeground)
+        if (homeApp != NULL)
+            homeApp->getEventQueue()->postEvent(&foregroundEvent);
+    }
+    if (process == currentForeground) {
         currentForeground = homeApp;
+        if (homeApp != NULL)
+            homeApp->getEventQueue()->postEvent(&foregroundEvent);
+    }
     fosMutex.lock();
     processList.remove(process);
     process->freeAll();
@@ -233,8 +242,11 @@ bool FlintOS::isForeground(FProcess *process, bool checkOnly) {
     if (process == currentForeground)
         return true;
     if (process == allowForeground) {
-        if (!checkOnly)
+        if (!checkOnly) {
+            if (currentForeground != NULL)
+                currentForeground->getEventQueue()->postEvent(&backgroundEvent);
             currentForeground = allowForeground;
+        }
         return true;
     }
     return false;
@@ -242,6 +254,7 @@ bool FlintOS::isForeground(FProcess *process, bool checkOnly) {
 
 void FlintOS::setForeground(FProcess *process) {
     allowForeground = process;
+    process->getEventQueue()->postEvent(&foregroundEvent);
 }
 
 bool FlintOS::postEvent(const FEvent *event) {
