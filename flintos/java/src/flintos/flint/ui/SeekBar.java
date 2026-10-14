@@ -101,7 +101,7 @@ public class SeekBar extends View {
 
     @Override
     protected void invalidate(boolean layoutImpact) {
-        FlintUI.setInvalidate(
+        invalidate(
             x - PRESS_OFFSET,
             y - PRESS_OFFSET,
             actualWidth + PRESS_OFFSET_X2,
@@ -188,7 +188,7 @@ public class SeekBar extends View {
         FlintUI.checkThread();
         this.width = width;
         this.height = View.WRAP_CONTENT;
-        FlintUI.setInvalidateAll();
+        invalidateAll();
     }
 
     public Color getColor() {

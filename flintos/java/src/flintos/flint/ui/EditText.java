@@ -99,7 +99,7 @@ public class EditText extends PanelView {
         FlintUI.checkThread();
         this.text = text;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         else
             invalidate(false);
     }
@@ -114,7 +114,7 @@ public class EditText extends PanelView {
             throw new NullPointerException("font cannot be null");
         this.font = font;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         else
             invalidate(false);
     }
@@ -149,6 +149,6 @@ public class EditText extends PanelView {
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
-        FlintUI.setInvalidateAll();
+        invalidateAll();
     }
 }

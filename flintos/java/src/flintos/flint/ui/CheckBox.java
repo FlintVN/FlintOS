@@ -48,8 +48,8 @@ public class CheckBox extends View {
     }
 
     @Override
-    public void invalidate(boolean layoutImpact) {
-        FlintUI.setInvalidate(x - PRESS_OFFSET, y - PRESS_OFFSET, actualWidth + PRESS_OFFSET_X2, actualHeight + PRESS_OFFSET_X2, layoutImpact);
+    protected void invalidate(boolean layoutImpact) {
+        invalidate(x - PRESS_OFFSET, y - PRESS_OFFSET, actualWidth + PRESS_OFFSET_X2, actualHeight + PRESS_OFFSET_X2, layoutImpact);
     }
 
     @Override
@@ -164,7 +164,7 @@ public class CheckBox extends View {
         FlintUI.checkThread();
         this.text = text;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         else
             invalidate(false);
     }
@@ -179,7 +179,7 @@ public class CheckBox extends View {
             throw new NullPointerException("font cannot be null");
         this.font = font;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         else
             invalidate(false);
     }
@@ -261,7 +261,7 @@ public class CheckBox extends View {
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
-        FlintUI.setInvalidateAll();
+        invalidateAll();
     }
 
     public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {
