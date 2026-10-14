@@ -35,7 +35,7 @@ public class GroupView extends PanelView {
         childrenCount++;
 
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         else
             invalidate(false);
     }
@@ -61,7 +61,7 @@ public class GroupView extends PanelView {
             children[index] = null;
 
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         else
             invalidate(false);
     }

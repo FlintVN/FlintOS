@@ -25,7 +25,7 @@ public abstract class FlintUI extends View {
     private boolean doubleBuffer = true;
     private Display disp, disp1, disp2;
 
-    private boolean invLayout = true;
+    private boolean invLayout;
     private int invX, invY, invW, invH;
 
     private View actView;
@@ -47,6 +47,7 @@ public abstract class FlintUI extends View {
         invY = 0;
         invW = w;
         invH = h;
+        invLayout = true;
         background = Theme.getProperty("backgroundColor");
     }
 
@@ -55,47 +56,54 @@ public abstract class FlintUI extends View {
             throw new CalledFromWrongThreadException("Only the original thread that created a view hierarchy can touch its views");
     }
 
-    static final void setInvalidate(int x, int y, int w, int h, boolean layout) {
-        FlintUI ui = currentUI;
-        if (ui == null)
-            return;
-
+    @Override
+    protected final void invalidate(int x, int y, int w, int h, boolean layout) {
         int x2 = x + w;
         int y2 = y + h;
-        if (x2 > ui.width) x2 = ui.width;
-        if (y2 > ui.height) y2 = ui.height;
+        if (x2 > width) x2 = width;
+        if (y2 > height) y2 = height;
         if (x < 0) x = 0;
         if (y < 0) y = 0;
 
         if (x < x2 && y < y2) {
-            if (ui.invH == 0) {
-                ui.invX = x;
-                ui.invY = y;
-                ui.invW = x2 - x;
-                ui.invH = y2 - y;
+            if (invH == 0) {
+                invX = x;
+                invY = y;
+                invW = x2 - x;
+                invH = y2 - y;
             }
             else {
-                x = x < ui.invX ? x : ui.invX;
-                y = y < ui.invY ? y : ui.invY;
-                if (ui.invX + ui.invW < x2) ui.invW = x2 - x;
-                if (ui.invY + ui.invH < y2) ui.invW = y2 - x;
-                ui.invX = x;
-                ui.invY = y;
+                x = x < invX ? x : invX;
+                y = y < invY ? y : invY;
+                if (invX + invW < x2) invW = x2 - x;
+                if (invY + invH < y2) invW = y2 - x;
+                invX = x;
+                invY = y;
             }
         }
         if (layout)
-            ui.invLayout = true;
+            invLayout = true;
     }
 
-    static final void setInvalidateAll() {
-        FlintUI ui = currentUI;
-        if (ui == null)
-            return;
-        ui.invX = 0;
-        ui.invY = 0;
-        ui.invW = ui.width;
-        ui.invH = ui.height;
-        ui.invLayout = true;
+    @Override
+    protected final void invalidateAll() {
+        invX = 0;
+        invY = 0;
+        invW = width;
+        invH = height;
+        invLayout = true;
+    }
+
+    protected void onStart() {
+
+    }
+
+    protected void onResume() {
+
+    }
+
+    protected void onPause() {
+
     }
 
     @Override
@@ -141,6 +149,19 @@ public abstract class FlintUI extends View {
             }
             case EventTypes.MONITOR_EVENT: {
                 draw();
+                return;
+            }
+            case EventTypes.FOREGROUND_EVENT: {
+                invX = 0;
+                invY = 0;
+                invW = width;
+                invH = height;
+                onResume();
+                draw();
+                return;
+            }
+            case EventTypes.BACKGROUND_EVENT: {
+                onPause();
                 return;
             }
         }
@@ -216,7 +237,7 @@ public abstract class FlintUI extends View {
         currentUI = this;
         NativeEvent event = new NativeEvent();
         initGraphics();
-        draw();
+        onStart();
         while (true) {
             try {
                 if (NativeEventReceiver.waitEvent(event))

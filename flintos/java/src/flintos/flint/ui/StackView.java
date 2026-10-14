@@ -240,6 +240,6 @@ public class StackView extends GroupView {
     public void setOrientation(Orientation orientation) {
         FlintUI.checkThread();
         this.orientation = orientation;
-        FlintUI.setInvalidateAll();
+        invalidateAll();
     }
 }

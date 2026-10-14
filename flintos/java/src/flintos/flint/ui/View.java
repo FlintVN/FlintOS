@@ -51,20 +51,34 @@ public abstract class View {
 
     public final void invalidateLayout() {
         FlintUI.checkThread();
-        FlintUI.setInvalidateAll();
-    }
-
-    public final void invalidateInternalLayout() {
-        FlintUI.checkThread();
-        invalidate(true);
+        invalidateAll();
     }
 
     protected void invalidate(boolean layoutImpact) {
-        FlintUI.setInvalidate(x, y, actualWidth, actualHeight, layoutImpact);
+        View p = getTopParent();
+        if (p != null)
+            p.invalidate(x, y, actualWidth, actualHeight, layoutImpact);
     }
 
-    protected final void invalidate(int x, int y, int w, int h, boolean layoutImpact) {
-        FlintUI.setInvalidate(x, y, w, h, layoutImpact);
+    protected void invalidate(int x, int y, int w, int h, boolean layoutImpact) {
+        View p = getTopParent();
+        if (p != null)
+            p.invalidate(x, y, w, h, layoutImpact);
+    }
+
+    protected void invalidateAll() {
+        View p = getTopParent();
+        if (p != null)
+            p.invalidateAll();
+    }
+
+    private View getTopParent() {
+        if (parent == null)
+            return null;
+        View top = parent;
+        while (top.parent != null)
+            top = top.parent;
+        return top;
     }
 
     protected abstract void onDraw(Graphics g);
@@ -124,7 +138,7 @@ public abstract class View {
         FlintUI.checkThread();
         if (this.width != width) {
             this.width = width;
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         }
     }
 
@@ -136,7 +150,7 @@ public abstract class View {
         FlintUI.checkThread();
         if (this.height != height) {
             this.height = height;
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         }
     }
 
@@ -147,7 +161,7 @@ public abstract class View {
     public void setSize(int width, int height) {
         FlintUI.checkThread();
         if (this.width != width || this.height != height)
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         this.width = width;
         this.height = height;
     }
@@ -224,7 +238,7 @@ public abstract class View {
         marginTop = top;
         marginRight = right;
         marginBottom = bottom;
-        FlintUI.setInvalidateAll();
+        invalidateAll();
     }
 
     public Color getBackground() {
@@ -246,7 +260,7 @@ public abstract class View {
         if (alignment == null)
             throw new NullPointerException("alignment cannot be null");
         hAlignment = alignment;
-        FlintUI.setInvalidateAll();
+        invalidateAll();
     }
 
     public VerticalAlignment getVerticalAlignment() {
@@ -258,7 +272,7 @@ public abstract class View {
         if (alignment == null)
             throw new NullPointerException("alignment cannot be null");
         vAlignment = alignment;
-        FlintUI.setInvalidateAll();
+        invalidateAll();
     }
 
     public void setOnClickListener(OnClickListener listener) {

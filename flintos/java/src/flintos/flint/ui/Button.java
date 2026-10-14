@@ -51,7 +51,7 @@ public class Button extends PanelView {
 
     @Override
     protected void invalidate(boolean layoutImpact) {
-        FlintUI.setInvalidate(x - PRESS_OFFSET, y - PRESS_OFFSET, actualWidth + PRESS_OFFSET_X2, actualHeight + PRESS_OFFSET_X2, layoutImpact);
+        invalidate(x - PRESS_OFFSET, y - PRESS_OFFSET, actualWidth + PRESS_OFFSET_X2, actualHeight + PRESS_OFFSET_X2, layoutImpact);
     }
 
     @Override
@@ -169,7 +169,7 @@ public class Button extends PanelView {
         FlintUI.checkThread();
         this.text = text;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         else
             invalidate(false);
     }
@@ -184,7 +184,7 @@ public class Button extends PanelView {
             throw new NullPointerException("font cannot be null");
         this.font = font;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            FlintUI.setInvalidateAll();
+            invalidateAll();
         else
             invalidate(false);
     }
@@ -230,6 +230,6 @@ public class Button extends PanelView {
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
-        FlintUI.setInvalidateAll();
+        invalidateAll();
     }
 }
