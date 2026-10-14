@@ -59,23 +59,29 @@ public abstract class FlintUI extends View {
         FlintUI ui = currentUI;
         if (ui == null)
             return;
-        if (ui.invH == 0) {
-            int x2 = Math.min(ui.width, x + w);
-            int y2 = Math.min(ui.height, y + h);
-            ui.invX = x > 0 ? x : 0;
-            ui.invY = y > 0 ? y : 0;
-            ui.invW = x2 - ui.invX;
-            ui.invH = y2 - ui.invY;
-        }
-        else {
-            int x2 = Math.max(ui.invX + ui.invW, x + w);
-            int y2 = Math.max(ui.invY + ui.invH, y + h);
-            if (x < 0) x = 0;
-            if (y < 0) y = 0;
-            if (ui.invX > x) ui.invX = x;
-            if (ui.invY > y) ui.invY = y;
-            ui.invW = x2 - ui.invX;
-            ui.invH = y2 - ui.invY;
+
+        int x2 = x + w;
+        int y2 = y + h;
+        if (x2 > ui.width) x2 = ui.width;
+        if (y2 > ui.height) y2 = ui.height;
+        if (x < 0) x = 0;
+        if (y < 0) y = 0;
+
+        if (x < x2 && y < y2) {
+            if (ui.invH == 0) {
+                ui.invX = x;
+                ui.invY = y;
+                ui.invW = x2 - x;
+                ui.invH = y2 - y;
+            }
+            else {
+                x = x < ui.invX ? x : ui.invX;
+                y = y < ui.invY ? y : ui.invY;
+                if (ui.invX + ui.invW < x2) ui.invW = x2 - x;
+                if (ui.invY + ui.invH < y2) ui.invW = y2 - x;
+                ui.invX = x;
+                ui.invY = y;
+            }
         }
         if (layout)
             ui.invLayout = true;
