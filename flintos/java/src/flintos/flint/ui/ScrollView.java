@@ -240,14 +240,20 @@ public class ScrollView extends PanelView {
                 if ((mode & 1) != 0) {
                     int diff = (event.x - touchX) << FP_PRECISION;
                     int over = isOverX();
-                    offsetX += over != 0 ? applyElasticDamping(over, diff) : diff;
+                    if ((over > 0 && diff > 0) || (over < 0 && diff < 0))
+                        offsetX += applyElasticDamping(over, diff);
+                    else
+                        offsetX += diff;
                     touchX = event.x;
                     vX = scrolling ? ((vX + diff) / 2) : diff;
                 }
                 if ((mode & 2) != 0) {
                     int diff = (event.y - touchY) << FP_PRECISION;
                     int over = isOverY();
-                    offsetY += over != 0 ? applyElasticDamping(over, diff) : diff;
+                    if ((over > 0 && diff > 0) || (over < 0 && diff < 0))
+                        offsetY += applyElasticDamping(over, diff);
+                    else
+                        offsetY += diff;
                     touchY = event.y;
                     vY = scrolling ? ((vY + diff) / 2) : diff;
                 }
