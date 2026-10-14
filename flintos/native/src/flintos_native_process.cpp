@@ -71,7 +71,6 @@ jvoid NativeProcess_Foreground(FNIEnv *env, jobject obj) {
         if (fprocess != NULL)
             FlintOS::setForeground(fprocess);
         FlintOS::unlock();
-        p->setHandle(-1);
     }
 }
 
