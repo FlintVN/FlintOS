@@ -25,7 +25,7 @@ public abstract class FlintUI extends View {
     private boolean doubleBuffer = true;
     private Display disp, disp1, disp2;
 
-    private boolean invLayout = true;
+    private boolean invLayout;
     private int invX, invY, invW, invH;
 
     private View actView;
@@ -47,6 +47,7 @@ public abstract class FlintUI extends View {
         invY = 0;
         invW = w;
         invH = h;
+        invLayout = true;
         background = Theme.getProperty("backgroundColor");
     }
 
@@ -98,6 +99,18 @@ public abstract class FlintUI extends View {
         ui.invLayout = true;
     }
 
+    protected void onStart() {
+
+    }
+
+    protected void onResume() {
+
+    }
+
+    protected void onPause() {
+
+    }
+
     @Override
     protected void onDraw(Graphics g) {
         if (content != null && content.isVisible(g))
@@ -141,6 +154,19 @@ public abstract class FlintUI extends View {
             }
             case EventTypes.MONITOR_EVENT: {
                 draw();
+                return;
+            }
+            case EventTypes.FOREGROUND_EVENT: {
+                invX = 0;
+                invY = 0;
+                invW = width;
+                invH = height;
+                onResume();
+                draw();
+                return;
+            }
+            case EventTypes.BACKGROUND_EVENT: {
+                onPause();
                 return;
             }
         }
@@ -216,7 +242,7 @@ public abstract class FlintUI extends View {
         currentUI = this;
         NativeEvent event = new NativeEvent();
         initGraphics();
-        draw();
+        onStart();
         while (true) {
             try {
                 if (NativeEventReceiver.waitEvent(event))
