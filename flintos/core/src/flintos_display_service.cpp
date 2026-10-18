@@ -100,7 +100,7 @@ void DisplaySrv::present(Surface *surf) {
         int32_t x1 = std::max<int32_t>(0, std::min(surface.invalid.x, surf->invalid.x));
         int32_t y1 = std::max<int32_t>(0, std::min(surface.invalid.y, surf->invalid.y));
         int32_t x2 = std::max<int32_t>(surface.invalid.x + surface.invalid.width, surf->invalid.x + surf->invalid.width);
-        int32_t y2 = std::max<int32_t>(surface.invalid.x + surface.invalid.height, surf->invalid.y + surf->invalid.height);
+        int32_t y2 = std::max<int32_t>(surface.invalid.y + surface.invalid.height, surf->invalid.y + surf->invalid.height);
         x2 = std::min<int32_t>(x2, std::min<int32_t>(surf->width, DISPLAY_WIDTH));
         y2 = std::min<int32_t>(y2, std::min<int32_t>(surf->height, DISPLAY_HEIGHT));
 
