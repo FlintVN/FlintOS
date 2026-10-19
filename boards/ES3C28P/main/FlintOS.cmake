@@ -102,4 +102,6 @@ set(FLINTJVM_INCS
     INCLUDE_DIRS "../../../flintos/hal"
     INCLUDE_DIRS "../../../flintos/core/inc"
     INCLUDE_DIRS "../../../flintos/native/inc"
+
+    INCLUDE_DIRS "../../../comp/minimp3"
 )
