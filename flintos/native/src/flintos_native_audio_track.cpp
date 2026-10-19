@@ -165,7 +165,7 @@ jint NativeAudioTrack_Open0(FNIEnv *env, jobject obj) {
 jvoid NativeAudioTrack_Write1(FNIEnv *env, jobject obj, jbyteArray b) {
     JAudioTrack *audioTrack = (JAudioTrack *)obj;
     if (audioTrack->getPos() < 0)
-        return env->throwNew(env->findClass("java/io/IllegalStateException"), "AudioTrack has not been opened");
+        return env->throwNew(env->findClass("java/lang/IllegalStateException"), "AudioTrack has not been opened");
     if (b == NULL)
         return env->throwNew(env->findClass("java/lang/NullPointerException"));
 
@@ -175,7 +175,7 @@ jvoid NativeAudioTrack_Write1(FNIEnv *env, jobject obj, jbyteArray b) {
 jvoid NativeAudioTrack_Write2(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint len) {
     JAudioTrack *audioTrack = (JAudioTrack *)obj;
     if (audioTrack->getPos() < 0)
-        return env->throwNew(env->findClass("java/io/IllegalStateException"), "AudioTrack has not been opened");
+        return env->throwNew(env->findClass("java/lang/IllegalStateException"), "AudioTrack has not been opened");
     if (b == NULL)
         return env->throwNew(env->findClass("java/lang/NullPointerException"));
     if (!CheckArrayIndexSize(env, b, off, len)) return;
