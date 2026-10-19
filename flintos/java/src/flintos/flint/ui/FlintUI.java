@@ -73,12 +73,12 @@ public abstract class FlintUI extends View {
                 invH = y2 - y;
             }
             else {
-                x = x < invX ? x : invX;
-                y = y < invY ? y : invY;
-                if (invX + invW < x2) invW = x2 - x;
-                if (invY + invH < y2) invW = y2 - x;
-                invX = x;
-                invY = y;
+                int right = invX + invW;
+                int bottom = invY + invH;
+                if (x < invX) invX = x;
+                if (y < invY) invY = y;
+                invW = (x2 > right ? x2 : right) - invX;
+                invH = (y2 > bottom ? y2 : bottom) - invY;
             }
         }
         if (layout)

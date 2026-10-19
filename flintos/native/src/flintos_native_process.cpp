@@ -79,7 +79,10 @@ jobjectArray NativeProcess_GetProcesses(FNIEnv *env) {
     FList<FProcess> *processes = FlintOS::getProcesses();
     uint32_t len = (processes != NULL) ? processes->length() : 0;
     jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/system/Process"), len);
-    if (arrayObj == NULL) return NULL;
+    if (arrayObj == NULL) {
+        FlintOS::unlock();
+        return NULL;
+    }
     JObject **data = arrayObj->getData();
     if (len > 0) {
         FProcess *root = processes->find([](FProcess *) -> bool { return true; });
