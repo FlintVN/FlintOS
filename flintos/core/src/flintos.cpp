@@ -156,9 +156,8 @@ static bool readManifest(const char *jarPath, Manifest *manifest) {
             manifest->mainCls[len] = 0;
         }
         else if (strncmp(line, "Launch-Mode:", 12) == 0) {
-            char *mode = getNextValue(&line[9], ',', &len);
-            if (len > 0 && strncmp(mode, "standard", len))
-                manifest->launchMode = 1;
+            const char *mode = getNextValue(line + 12, ',', &len);
+            manifest->launchMode = (len == 8 && strncmp(mode, "standard", 8) == 0) ? 1 : 0;
         }
     }
     ret = true;
