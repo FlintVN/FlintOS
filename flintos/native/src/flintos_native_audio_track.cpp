@@ -168,8 +168,8 @@ jvoid NativeAudioTrack_Write1(FNIEnv *env, jobject obj, jbyteArray b) {
         return env->throwNew(env->findClass("java/lang/IllegalStateException"), "AudioTrack has not been opened");
     if (b == NULL)
         return env->throwNew(env->findClass("java/lang/NullPointerException"));
-
-    putPcm(env, audioTrack, b->getData(), b->getLength());
+    if (b->getLength() > 0)
+        putPcm(env, audioTrack, b->getData(), b->getLength());
 }
 
 jvoid NativeAudioTrack_Write2(FNIEnv *env, jobject obj, jbyteArray b, jint off, jint len) {
@@ -178,7 +178,8 @@ jvoid NativeAudioTrack_Write2(FNIEnv *env, jobject obj, jbyteArray b, jint off, 
         return env->throwNew(env->findClass("java/lang/IllegalStateException"), "AudioTrack has not been opened");
     if (b == NULL)
         return env->throwNew(env->findClass("java/lang/NullPointerException"));
-    if (!CheckArrayIndexSize(env, b, off, len)) return;
-
-    putPcm(env, audioTrack, &b->getData()[off], len);
+    if (!CheckArrayIndexSize(env, b, off, len))
+        return;
+    if (len > 0)
+        putPcm(env, audioTrack, &b->getData()[off], len);
 }
