@@ -9,6 +9,7 @@
 #include "flintos_native_display.h"
 #include "flintos_native_audio_track.h"
 #include "flintos_native_mp3_decoder.h"
+#include "flintos_native_audio_manager.h"
 #include "flintos_native_midp_key_converter.h"
 #include "flintos_native_native_event_receiver.h"
 
@@ -16,6 +17,7 @@ static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/net/WiFi",                        wifiMethods),
     NATIVE_CLASS("flint/media/Display",                   displayMethods),
     NATIVE_CLASS("flint/media/AudioTrack",                audioTrackMethods),
+    NATIVE_CLASS("flint/media/AudioManager",              audioManagerMethods),
 
     NATIVE_CLASS("flint/util/Mp3Decoder",                 mp3DecoderMethods),
 

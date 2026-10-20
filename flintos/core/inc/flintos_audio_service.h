@@ -2,6 +2,8 @@
 #ifndef __AUDIO_SERVICE_H
 #define __AUDIO_SERVICE_H
 
+#include <stdint.h>
+
 class AudioSrv {
 public:
     static void mainTask(void);

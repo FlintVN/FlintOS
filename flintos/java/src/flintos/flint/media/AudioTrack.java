@@ -15,10 +15,6 @@ public class AudioTrack implements AutoCloseable {
 
     private static native int getFrameSize();
 
-    public static native int getVolume();
-
-    public static native void setVolume(int value);
-
     public AudioTrack(int sampleRate, int audioFormat, int channels) {
         this.sampleRate = sampleRate;
         this.audioFormat = audioFormat;

@@ -85,6 +85,7 @@ set(FLINTOS_SRCS
     "../../../flintos/native/src/flintos_native_display.cpp"
     "../../../flintos/native/src/flintos_native_audio_track.cpp"
     "../../../flintos/native/src/flintos_native_mp3_decoder.cpp"
+    "../../../flintos/native/src/flintos_native_audio_manager.cpp"
     "../../../flintos/native/src/flintos_native_midp_key_converter.cpp"
     "../../../flintos/native/src/flintos_native_native_event_receiver.cpp"
 )
