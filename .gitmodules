@@ -4,3 +4,6 @@
 [submodule "flintjdk"]
 	path = flintjdk
 	url = https://github.com/FlintVN/FlintJDK.git
+[submodule "comp/minimp3"]
+	path = comp/minimp3
+	url = https://github.com/lieff/minimp3.git

@@ -81,15 +81,15 @@ void FlintOS::main(void) {
     if (HAL::Devices::display() != NULL) {
         HAL::Devices::display()->init();
         DisplaySrv::setBrightness(100);
-        FlintAPI::Thread::create((void (*)(void *))DisplaySrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
+        FlintAPI::Thread::create((void (*)(void *))DisplaySrv::mainTask, NULL, 2048, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     }
     if (HAL::Devices::touch())
         HAL::Devices::touch()->init();
-    FlintAPI::Thread::create((void (*)(void *))InputSrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
+    FlintAPI::Thread::create((void (*)(void *))InputSrv::mainTask, NULL, 2048, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     if (HAL::Devices::audio() != NULL) {
         HAL::Devices::audio()->init();
         AudioSrv::setVolume(100);
-        FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 512, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
+        FlintAPI::Thread::create((void (*)(void *))AudioSrv::mainTask, NULL, 2048, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     }
     if (HAL::Devices::wifi() != NULL)
         HAL::Devices::wifi()->init();

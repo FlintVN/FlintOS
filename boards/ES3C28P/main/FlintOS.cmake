@@ -84,6 +84,7 @@ set(FLINTOS_SRCS
     "../../../flintos/native/src/flintos_native_process.cpp"
     "../../../flintos/native/src/flintos_native_display.cpp"
     "../../../flintos/native/src/flintos_native_audio_track.cpp"
+    "../../../flintos/native/src/flintos_native_mp3_decoder.cpp"
     "../../../flintos/native/src/flintos_native_midp_key_converter.cpp"
     "../../../flintos/native/src/flintos_native_native_event_receiver.cpp"
 )
@@ -102,4 +103,6 @@ set(FLINTJVM_INCS
     INCLUDE_DIRS "../../../flintos/hal"
     INCLUDE_DIRS "../../../flintos/core/inc"
     INCLUDE_DIRS "../../../flintos/native/inc"
+
+    INCLUDE_DIRS "../../../comp/minimp3"
 )

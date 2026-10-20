@@ -9,7 +9,7 @@ using namespace FlintAPI::Thread;
 ThreadHandle FlintAPI::Thread::create(void (*task)(void *), void *param, uint32_t stackSize, ThreadPriority priority) {
     static const uint8_t priorities[] = {tskIDLE_PRIORITY + 1, tskIDLE_PRIORITY + 2, tskIDLE_PRIORITY + 3};
     TaskHandle_t xHandle = NULL;
-    uint32_t nativeStack = (stackSize > 16384) ? stackSize : 16384;
+    uint32_t nativeStack = stackSize ? stackSize : 20480;
     if (xTaskCreateWithCaps(task, "FlintJavaThread", nativeStack, param, priorities[priority], &xHandle, MALLOC_CAP_SPIRAM) != pdPASS)
         return NULL;
     return (void *)xHandle;
