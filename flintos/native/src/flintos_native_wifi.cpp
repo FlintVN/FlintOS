@@ -82,7 +82,7 @@ jbool NativeWiFi_IsConnected(FNIEnv *env) {
 }
 
 static jobject createAccessPointRecordObj(FNIEnv *env, HAL::WiFi::ApRecordType *apRecord) {
-    jobject aprObj = env->newObject(env->findClass("flint/net/AccessPointRecord"));
+    jobject aprObj = env->newObject(env->findClass("flint/net/wifi/AccessPointRecord"));
     if (aprObj == NULL) return NULL;
 
     /* mac array */
@@ -168,7 +168,7 @@ jobjectArray NativeWiFi_GetScanResult(FNIEnv *env) {
         return NULL;
     }
 
-    jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/net/AccessPointRecord"), count);
+    jobjectArray arrayObj = env->newObjectArray(env->findClass("flint/net/wifi/AccessPointRecord"), count);
     if (arrayObj == NULL) {
         HAL::Devices::wifi()->scanClear();
         wifiLock.unlock();
