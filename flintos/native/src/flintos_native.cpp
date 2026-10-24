@@ -7,6 +7,7 @@
 #include "flintos_native_wifi.h"
 #include "flintos_native_process.h"
 #include "flintos_native_display.h"
+#include "flintos_native_tls_socket.h"
 #include "flintos_native_audio_track.h"
 #include "flintos_native_mp3_decoder.h"
 #include "flintos_native_audio_manager.h"
@@ -15,6 +16,7 @@
 
 static constexpr NativeClass ESP_NATIVE_CLASS_LIST[] = {
     NATIVE_CLASS("flint/net/wifi/WiFi",                   wifiMethods),
+    NATIVE_CLASS("flint/net/TlsSocket",                   tlsSocketMethods),
 
     NATIVE_CLASS("flint/media/Display",                   displayMethods),
     NATIVE_CLASS("flint/media/AudioTrack",                audioTrackMethods),

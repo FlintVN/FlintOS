@@ -81,6 +81,8 @@ set(FLINTOS_SRCS
 
     "../../../flintos/native/src/flintos_native.cpp"
     "../../../flintos/native/src/flintos_native_wifi.cpp"
+    "../../../flintos/native/src/flintos_native_platform.cpp"
+    "../../../flintos/native/src/flintos_native_tls_socket.cpp"
     "../../../flintos/native/src/flintos_native_process.cpp"
     "../../../flintos/native/src/flintos_native_display.cpp"
     "../../../flintos/native/src/flintos_native_audio_track.cpp"
