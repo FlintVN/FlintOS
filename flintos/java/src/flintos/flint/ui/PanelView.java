@@ -4,7 +4,7 @@ import flint.drawing.Color;
 import flint.drawing.Image;
 import flint.drawing.Graphics;
 
-class PanelView extends View {
+public class PanelView extends View {
     protected Color borderColor;
 
     protected int topLeftRadius;
