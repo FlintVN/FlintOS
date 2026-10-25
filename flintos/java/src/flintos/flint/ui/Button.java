@@ -138,7 +138,7 @@ public class Button extends PanelView {
     @Override
     protected void updateActualWidth(int availableW) {
         if (width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
-            int contentW = paddingLeft + paddingRight + getBorderThickness() << 1;
+            int contentW = paddingLeft + paddingRight + (getBorderThickness() << 1);
             contentW += Graphics.measureStringWidth(text, font);
             if (contentW < 0) contentW = 0;
 
