@@ -52,14 +52,16 @@ public class Connector {
             throw new IllegalArgumentException("Invalid protocol name");
         }
 
-        String target = name.substring(colon + 1);
         switch (protocol) {
             case "socket":
-                return openSocket(target);
+                return openSocket(name.substring(colon + 1));
             case "serversocket":
-                return openServerSocket(target);
+                return openServerSocket(name.substring(colon + 1));
             case "datagram":
-                return openDatagram(target);
+                return openDatagram(name.substring(colon + 1));
+            case "http":
+            case "https":
+                return openHttp(name, mode, timeouts);
             default:
                 throw new ConnectionNotFoundException("Unsupported protocol: " + protocol);
         }
@@ -136,6 +138,33 @@ public class Connector {
             DatagramSocket socket = new DatagramSocket();
             return new DatagramConnectionImpl(socket, host, port);
         }
+    }
+
+    private static final int HTTP_TIMEOUT_MS = 30_000;
+
+    private static Connection openHttp(String name, int mode, boolean timeouts) throws IOException {
+        URL url;
+        try {
+            url = new URL(name);
+        }
+        catch (MalformedURLException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+
+        URLConnection uc = url.openConnection();
+        if (!(uc instanceof HttpURLConnection))
+            throw new ConnectionNotFoundException("Not an HTTP connection: " + name);
+
+        HttpURLConnection conn = (HttpURLConnection)uc;
+        conn.setDoInput(mode != WRITE);
+        conn.setInstanceFollowRedirects(true);
+
+        if (timeouts) {
+            conn.setConnectTimeout(HTTP_TIMEOUT_MS);
+            conn.setReadTimeout(HTTP_TIMEOUT_MS);
+        }
+
+        return new HttpConnectionImpl(conn);
     }
 
     public static DataInputStream openDataInputStream(String name) throws IOException {
