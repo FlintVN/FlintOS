@@ -39,7 +39,7 @@ public class StackView extends GroupView {
         this.y = y;
 
         int thk = getBorderThickness();
-        if (orientation.value == Orientation.VERTICAL.value) {
+        if (orientation == Orientation.VERTICAL) {
             int yoff = y + thk;
             for (int i = 0; i < childrenCount; i++) {
                 View v = children[i];
@@ -53,7 +53,7 @@ public class StackView extends GroupView {
                 yoff += v.actualHeight + v.marginBottom;
             }
         }
-        else if (orientation.value == Orientation.HORIZONTAL.value) {
+        else if (orientation == Orientation.HORIZONTAL) {
             int xoff = x + thk;
             for (int i = 0; i < childrenCount; i++) {
                 View v = children[i];
@@ -87,7 +87,7 @@ public class StackView extends GroupView {
 
     @Override
     protected void updateActualWidth(int availableW) {
-        if (orientation.value == Orientation.HORIZONTAL.value)
+        if (orientation == Orientation.HORIZONTAL)
             updateActualWidthHorizontal(availableW);
         else
             updateActualWidthVertical(availableW);
@@ -95,7 +95,7 @@ public class StackView extends GroupView {
 
     @Override
     protected void updateActualHeight(int availableH) {
-        if (orientation.value == Orientation.VERTICAL.value)
+        if (orientation == Orientation.VERTICAL)
             updateActualHeightVertical(availableH);
         else
             updateActualHeightHorizontal(availableH);
@@ -239,7 +239,9 @@ public class StackView extends GroupView {
 
     public void setOrientation(Orientation orientation) {
         FlintUI.checkThread();
-        this.orientation = orientation;
-        invalidateAll();
+        if (this.orientation != orientation) {
+            this.orientation = orientation;
+            invalidateAll();
+        }
     }
 }
