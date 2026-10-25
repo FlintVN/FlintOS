@@ -7,14 +7,16 @@ import flint.drawing.ClipMode;
 import flint.drawing.Graphics;
 
 public class EditText extends PanelView {
-    protected String text;
-    protected Font font;
-    protected Color textColor;
+    private String text;
+    private Font font;
+    private Color textColor;
+    private int textWidth;
+    private int textHeight;
 
-    protected int paddingLeft;
-    protected int paddingTop;
-    protected int paddingRight;
-    protected int paddingBottom;
+    private int paddingLeft;
+    private int paddingTop;
+    private int paddingRight;
+    private int paddingBottom;
 
     public EditText() {
         background = Theme.getProperty("surfaceColor");
@@ -57,11 +59,9 @@ public class EditText extends PanelView {
         int clipX2 = paddingRight > 0 ? x2 : (actualWidth - thk);
         g.setClip(this.x + clipX1, this.y + thk, clipX2 - clipX1, actualHeight - (thk << 1), ClipMode.INTERSECT);
 
-        int txtW = Graphics.measureStringWidth(text, font);
-        int txtH = Graphics.measureStringHeight(null, font);
         int spaceW = x2 - x1;
-        int x = ((txtW > spaceW) ? (spaceW - txtW) : 0) + x1 + this.x;
-        int y = (actualHeight - txtH) / 2 + paddingTop - paddingBottom + this.y;
+        int x = ((textWidth > spaceW) ? (spaceW - textWidth) : 0) + x1 + this.x;
+        int y = (actualHeight - textHeight) / 2 + paddingTop - paddingBottom + this.y;
         g.drawString(text, font, textColor, x, y);
 
         g.setClip(gClipX, gClipY, gClipW, gClipH, ClipMode.REPLACE);
@@ -71,7 +71,7 @@ public class EditText extends PanelView {
     protected void updateActualWidth(int availableW) {
         if (width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
             int contentW = paddingLeft + paddingRight + (getBorderThickness() << 1);
-            contentW += Graphics.measureStringWidth(text, font);
+            contentW += textWidth;
             if (contentW < 0) contentW = 0;
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
@@ -83,7 +83,7 @@ public class EditText extends PanelView {
     protected void updateActualHeight(int availableH) {
         if (height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
             int contentH = paddingTop + paddingBottom + (getBorderThickness() << 1);
-            contentH += Graphics.measureStringHeight(null, font);
+            contentH += textHeight;
             if (contentH < 0) contentH = 0;
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
         }
@@ -98,6 +98,12 @@ public class EditText extends PanelView {
     public void setText(String text) {
         FlintUI.checkThread();
         this.text = text;
+        if (text != null) {
+            textWidth = Graphics.measureStringWidth(text, font);
+            textHeight = Graphics.measureStringHeight(text, font);
+        }
+        else
+            textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             invalidateAll();
         else
@@ -113,6 +119,12 @@ public class EditText extends PanelView {
         if (font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
+        if (text != null) {
+            textWidth = Graphics.measureStringWidth(text, font);
+            textHeight = Graphics.measureStringHeight(text, font);
+        }
+        else
+            textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             invalidateAll();
         else

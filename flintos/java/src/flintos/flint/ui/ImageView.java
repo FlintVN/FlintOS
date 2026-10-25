@@ -9,8 +9,8 @@ import flint.drawing.ClipMode;
 import flint.drawing.Graphics;
 
 public class ImageView extends View {
-    protected Image image;
-    protected int scaleType;
+    private Image image;
+    private int scaleType;
 
     public enum ScaleType {
         CENTER(0),

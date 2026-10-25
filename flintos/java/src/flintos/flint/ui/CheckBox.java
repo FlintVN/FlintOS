@@ -13,23 +13,25 @@ public class CheckBox extends View {
     private static final int PRESS_OFFSET = 2;
     private static final int PRESS_OFFSET_X2 = PRESS_OFFSET << 1;
 
-    protected String text;
-    protected Font font;
-    protected Color textColor;
+    private String text;
+    private Font font;
+    private Color textColor;
+    private int textWidth;
+    private int textHeight;
 
-    protected boolean checked;
+    private boolean checked;
 
-    protected Color color;
+    private Color color;
 
-    protected int topLeftRadius;
-    protected int topRightRadius;
-    protected int bottomLeftRadius;
-    protected int bottomRightRadius;
+    private int topLeftRadius;
+    private int topRightRadius;
+    private int bottomLeftRadius;
+    private int bottomRightRadius;
 
-    protected int paddingLeft;
-    protected int paddingTop;
-    protected int paddingRight;
-    protected int paddingBottom;
+    private int paddingLeft;
+    private int paddingTop;
+    private int paddingRight;
+    private int paddingBottom;
 
     private OnCheckedChangeListener onCheckedChangeListener;
 
@@ -100,7 +102,7 @@ public class CheckBox extends View {
 
         if (text != null) {
             int x = paddingLeft + BOX_SIZE + 6 + this.x;
-            int y = (BOX_SIZE - Graphics.measureStringHeight(null, font) + 1) / 2 + paddingTop + this.y;
+            int y = (BOX_SIZE - textHeight + 1) / 2 + paddingTop + this.y;
             g.drawString(text, font, textColor, x, y);
         }
 
@@ -135,7 +137,7 @@ public class CheckBox extends View {
     @Override
     protected void updateActualWidth(int availableW) {
         if (width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
-            int strW = Graphics.measureStringWidth(text, font);
+            int strW = textWidth;
             int contentW = strW + paddingLeft + paddingRight + BOX_SIZE + 6;
             if (contentW < 0) contentW = 0;
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
@@ -147,7 +149,7 @@ public class CheckBox extends View {
     @Override
     protected void updateActualHeight(int availableH) {
         if (height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
-            int strH = Graphics.measureStringHeight(text, font);
+            int strH = textHeight;
             int contentH = paddingTop + paddingBottom + (strH > (BOX_SIZE + 1) ? strH : (BOX_SIZE + 1));
             if (contentH < 0) contentH = 0;
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
@@ -163,6 +165,12 @@ public class CheckBox extends View {
     public void setText(String text) {
         FlintUI.checkThread();
         this.text = text;
+        if (text != null) {
+            textWidth = Graphics.measureStringWidth(text, font);
+            textHeight = Graphics.measureStringHeight(text, font);
+        }
+        else
+            textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             invalidateAll();
         else
@@ -178,6 +186,12 @@ public class CheckBox extends View {
         if (font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
+        if (text != null) {
+            textWidth = Graphics.measureStringWidth(text, font);
+            textHeight = Graphics.measureStringHeight(text, font);
+        }
+        else
+            textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             invalidateAll();
         else
