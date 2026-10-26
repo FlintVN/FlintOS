@@ -8,19 +8,21 @@ import flint.drawing.ClipMode;
 import flint.drawing.Graphics;
 
 public class TextView extends View {
-    protected String text;
-    protected Font font;
-    protected Color textColor;
+    private String text;
+    private Font font;
+    private Color textColor;
+    private int textWidth;
+    private int textHeight;
 
-    protected int topLeftRadius;
-    protected int topRightRadius;
-    protected int bottomLeftRadius;
-    protected int bottomRightRadius;
+    private int topLeftRadius;
+    private int topRightRadius;
+    private int bottomLeftRadius;
+    private int bottomRightRadius;
 
-    protected int paddingLeft;
-    protected int paddingTop;
-    protected int paddingRight;
-    protected int paddingBottom;
+    private int paddingLeft;
+    private int paddingTop;
+    private int paddingRight;
+    private int paddingBottom;
 
     public TextView() {
         width = View.WRAP_CONTENT;
@@ -51,7 +53,7 @@ public class TextView extends View {
     @Override
     protected void updateActualWidth(int availableW) {
         if (width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
-            int contentW = Graphics.measureStringWidth(text, font) + paddingLeft + paddingRight;
+            int contentW = textWidth + paddingLeft + paddingRight;
             if (contentW < 0) contentW = 0;
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
         }
@@ -62,7 +64,7 @@ public class TextView extends View {
     @Override
     protected void updateActualHeight(int availableH) {
         if (height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
-            int contentH = Graphics.measureStringHeight(text, font) + paddingTop + paddingBottom;
+            int contentH = textHeight + paddingTop + paddingBottom;
             if (contentH < 0) contentH = 0;
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
         }
@@ -77,6 +79,12 @@ public class TextView extends View {
     public void setText(String text) {
         FlintUI.checkThread();
         this.text = text;
+        if (text != null) {
+            textWidth = Graphics.measureStringWidth(text, font);
+            textHeight = Graphics.measureStringHeight(text, font);
+        }
+        else
+            textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             invalidateAll();
         else
@@ -92,6 +100,12 @@ public class TextView extends View {
         if (font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
+        if (text != null) {
+            textWidth = Graphics.measureStringWidth(text, font);
+            textHeight = Graphics.measureStringHeight(text, font);
+        }
+        else
+            textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             invalidateAll();
         else

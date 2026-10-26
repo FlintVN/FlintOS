@@ -20,7 +20,7 @@ public abstract class FlintUI extends View {
 
     private Thread mThread;
 
-    protected View content;
+    private View content;
 
     private boolean doubleBuffer = true;
     private Display disp, disp1, disp2;
@@ -299,6 +299,8 @@ public abstract class FlintUI extends View {
             if (name.startsWith(RES_PREFIX)) {
                 String resName = name.substring(RES_PREFIX.length());
                 InputStream stream = this.getClass().getResourceAsStream(resName);
+                if (stream == null)
+                    return null;
                 Image img = Image.create(stream, mutable);
                 stream.close();
                 return img;

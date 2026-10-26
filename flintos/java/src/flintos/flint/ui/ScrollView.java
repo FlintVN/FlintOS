@@ -12,8 +12,8 @@ public class ScrollView extends PanelView {
     private static final int SCROLL_ELASTIC_STOP = 2 << FP_PRECISION;
     private static final int ELASTIC_FACTOR = 20;
 
-    protected View content;
-    protected int mode = 2;
+    private View content;
+    private int mode = 2;
 
     private View actView;
 

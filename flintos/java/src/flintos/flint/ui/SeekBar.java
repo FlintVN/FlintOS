@@ -13,10 +13,10 @@ public class SeekBar extends View {
     private static final int THUMB_SIZE = 20;
     private static final int TRACK_SIZE = 10;
 
-    protected Color color;
-    protected Color thumbColor;
-    protected int max;
-    protected int value;
+    private Color color;
+    private Color thumbColor;
+    private int max;
+    private int value;
 
     private int currValue;
     private int diffValue;

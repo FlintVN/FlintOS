@@ -4,7 +4,7 @@ import flint.drawing.ClipMode;
 import flint.drawing.Graphics;
 
 public class StackView extends GroupView {
-    protected Orientation orientation;
+    private Orientation orientation;
 
     public StackView() {
         width = View.MATCH_PARENT;

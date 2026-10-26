@@ -6,9 +6,9 @@ import flint.drawing.Graphics;
 public class ProgressBar extends PanelView {
     private static final int ANIMATION_DURATION = 500;
 
-    protected Color color;
-    protected int max;
-    protected int value;
+    private Color color;
+    private int max;
+    private int value;
 
     private int currValue;
     private int diffValue;

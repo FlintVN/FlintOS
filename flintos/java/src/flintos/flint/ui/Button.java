@@ -12,16 +12,18 @@ public class Button extends PanelView {
     private static final int PRESS_OFFSET = 2;
     private static final int PRESS_OFFSET_X2 = PRESS_OFFSET << 1;
 
-    protected String text;
-    protected Font font;
-    protected Color textColor;
+    private String text;
+    private Font font;
+    private Color textColor;
+    private int textWidth;
+    private int textHeight;
 
-    protected int paddingLeft;
-    protected int paddingTop;
-    protected int paddingRight;
-    protected int paddingBottom;
+    private int paddingLeft;
+    private int paddingTop;
+    private int paddingRight;
+    private int paddingBottom;
 
-    protected Color pressedBackground;
+    private Color pressedBackground;
 
     private boolean animStatus = false;
     private boolean isReleased = true;
@@ -106,10 +108,8 @@ public class Button extends PanelView {
         int thk2 = thk << 1;
         g.setClip(x + thk, y + thk, w - thk2, h - thk2, ClipMode.INTERSECT);
 
-        int txtW = Graphics.measureStringWidth(text, font);
-        int txtH = Graphics.measureStringHeight(null, font);
-        x += (w - txtW) / 2 + paddingLeft - paddingRight;
-        y += (h - txtH) / 2 + paddingTop - paddingBottom;
+        x += (w - textWidth) / 2 + paddingLeft - paddingRight;
+        y += (h - textHeight) / 2 + paddingTop - paddingBottom;
         g.drawString(text, font, textColor, x, y);
 
         g.setClip(gClipX, gClipY, gClipW, gClipH, ClipMode.REPLACE);
@@ -138,8 +138,8 @@ public class Button extends PanelView {
     @Override
     protected void updateActualWidth(int availableW) {
         if (width == View.WRAP_CONTENT || (width == View.MATCH_PARENT && availableW < 0)) {
-            int contentW = paddingLeft + paddingRight + getBorderThickness() << 1;
-            contentW += Graphics.measureStringWidth(text, font);
+            int contentW = paddingLeft + paddingRight + (getBorderThickness() << 1);
+            contentW += textWidth;
             if (contentW < 0) contentW = 0;
 
             actualWidth = width >= 0 ? width : ((width == View.WRAP_CONTENT || availableW < 0) ? contentW : availableW);
@@ -152,7 +152,7 @@ public class Button extends PanelView {
     protected void updateActualHeight(int availableH) {
         if (height == View.WRAP_CONTENT || (height == View.MATCH_PARENT && availableH < 0)) {
             int contentH = paddingTop + paddingBottom + (getBorderThickness() << 1);
-            contentH += Graphics.measureStringHeight(text, font);
+            contentH += textHeight;
             if (contentH < 0) contentH = 0;
 
             actualHeight = height >= 0 ? height : ((height == View.WRAP_CONTENT || availableH < 0) ? contentH : availableH);
@@ -168,6 +168,12 @@ public class Button extends PanelView {
     public void setText(String text) {
         FlintUI.checkThread();
         this.text = text;
+        if (text != null) {
+            textWidth = Graphics.measureStringWidth(text, font);
+            textHeight = Graphics.measureStringHeight(text, font);
+        }
+        else
+            textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             invalidateAll();
         else
@@ -183,6 +189,12 @@ public class Button extends PanelView {
         if (font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
+        if (text != null) {
+            textWidth = Graphics.measureStringWidth(text, font);
+            textHeight = Graphics.measureStringHeight(text, font);
+        }
+        else
+            textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             invalidateAll();
         else
