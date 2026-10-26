@@ -30,6 +30,7 @@ idf_component_register(
     SRCS "src/flintos_hal_wifi_esp.cpp"
     SRCS "src/flintos_hal_audio_es8311.cpp"
     SRCS "src/flintos_hal_touch_ft6336.cpp"
+    SRCS "src/flintos_hal_key_board_esp.cpp"
     SRCS "src/flintos_hal_display_ili9341.cpp"
     SRCS "src/freertos_psram_system_thread_api.cpp"
 

@@ -6,6 +6,7 @@
 #include "flintos_hal_audio.h"
 #include "flintos_hal_touch.h"
 #include "flintos_hal_display.h"
+#include "flintos_hal_key_board.h"
 
 namespace HAL {
     class Devices {
@@ -13,6 +14,7 @@ namespace HAL {
         static const WiFi *wifi(void);
         static const Audio *audio(void);
         static const Touch *touch(void);
+        static const KeyBoard *keyBoard(void);
         static const Display *display(void);
     };
 }

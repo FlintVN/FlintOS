@@ -83,6 +83,8 @@ void FlintOS::main(void) {
         DisplaySrv::setBrightness(100);
         FlintAPI::Thread::create((void (*)(void *))DisplaySrv::mainTask, NULL, 2048, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
     }
+    if (HAL::Devices::keyBoard())
+        HAL::Devices::keyBoard()->init();
     if (HAL::Devices::touch())
         HAL::Devices::touch()->init();
     FlintAPI::Thread::create((void (*)(void *))InputSrv::mainTask, NULL, 2048, FlintAPI::Thread::THREAD_PRIORITY_HIGH);
@@ -220,8 +222,10 @@ FProcess *FlintOS::open(const char *file, void *args) {
                     const char *program = item->getProgram();
                     return (hash == ((uint32_t *)program)[-1]) && (strcmp(file, program) == 0);
                 });
-                if (process != NULL)
+                if (process != NULL) {
+                    setForeground(process);
                     return process;
+                }
                 return runNewApp(&manifest, (JStringArray *)args);
             }
         }
@@ -257,8 +261,13 @@ void FlintOS::setForeground(FProcess *process) {
 }
 
 bool FlintOS::postEvent(const FEvent *event) {
-    if (currentForeground == NULL) return false;
-
+    if (event->type == KEY_EVENT && event->data[0] == HAL::KEY_RELEASED && event->data[1] == HAL::KEYCODE_HOME) {
+        if (homeApp != NULL && homeApp != currentForeground && homeApp != allowForeground)
+            setForeground(homeApp);
+        return true;
+    }
+    if (currentForeground == NULL)
+        return false;
     bool ret = false;
     fosMutex.lock();
     if (currentForeground != NULL)

@@ -3,6 +3,7 @@
 #include "flintos_hal_wifi_esp.h"
 #include "flintos_hal_audio_es8311.h"
 #include "flintos_hal_touch_ft6336.h"
+#include "flintos_hal_Key_board_esp.h"
 #include "flintos_hal_display_ili9341.h"
 
 using namespace HAL;
@@ -20,6 +21,11 @@ const Audio *Devices::audio(void) {
 const Touch *Devices::touch(void) {
     static constexpr FT6336 touch;
     return &touch;
+}
+
+const KeyBoard *Devices::keyBoard(void) {
+    static constexpr EspKeyBoard keyBoard;
+    return &keyBoard;
 }
 
 const Display *Devices::display(void) {
