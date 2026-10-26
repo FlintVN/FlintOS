@@ -7,18 +7,18 @@
 
 #define AUDIO_FRAME_BUF_LENGTH      (AUDIO_FRAME_BUF_SIZE / sizeof(int16_t))
 
-static atomic_flag audioLocked = ATOMIC_FLAG_INIT;
+static atomic<bool> audioLocked = ATOMIC_FLAG_INIT;
 static uint8_t volume = 0;
 static int16_t audioBuff[AUDIO_FRAME_NUM * AUDIO_FRAME_BUF_LENGTH];
 static volatile uint32_t currentPos = 0;
 
 static void audioLock(void) {
-    while (atomic_flag_test_and_set_explicit(&audioLocked, memory_order_acquire))
+    while (audioLocked.exchange(true, memory_order_acquire))
         FlintAPI::Thread::yield();
 }
 
 static void audioUnlock(void) {
-    atomic_flag_clear_explicit(&audioLocked, memory_order_release);
+    audioLocked.exchange(false, memory_order_release);
 }
 
 void AudioSrv::mainTask(void) {

@@ -103,9 +103,9 @@ FProcess *FlintOS::newProcess(void) {
     if (process == NULL) return NULL;
     new (process)FProcess();
     process->terminatedCallback(flintTerminated);
-    lock();
+    fosMutex.lock();
     processList.add(process);
-    unlock();
+    fosMutex.unlock();
     return process;
 }
 
@@ -260,10 +260,10 @@ bool FlintOS::postEvent(const FEvent *event) {
     if (currentForeground == NULL) return false;
 
     bool ret = false;
-    lock();
+    fosMutex.lock();
     if (currentForeground != NULL)
         ret = currentForeground->getEventQueue()->postEvent(event);
-    unlock();
+    fosMutex.unlock();
     return ret;
 }
 

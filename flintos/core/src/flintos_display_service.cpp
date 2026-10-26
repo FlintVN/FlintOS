@@ -11,17 +11,17 @@
 #include "flintos_default_conf.h"
 #include "flintos_display_service.h"
 
-static atomic_flag displayLocked = ATOMIC_FLAG_INIT;
+static atomic<bool> displayLocked = ATOMIC_FLAG_INIT;
 static uint8_t brightness = 0;
 static DisplaySrv::Surface surface;
 
 static void displayLock(void) {
-    while (atomic_flag_test_and_set_explicit(&displayLocked, memory_order_acquire))
+    while (displayLocked.exchange(true, memory_order_acquire))
         FlintAPI::Thread::yield();
 }
 
 static void displayUnlock(void) {
-    atomic_flag_clear_explicit(&displayLocked, memory_order_release);
+    displayLocked.exchange(false, memory_order_acquire);
 }
 
 static void showLogo(void) {

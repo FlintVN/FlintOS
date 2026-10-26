@@ -29,6 +29,7 @@ private:
     static void lock();
     static void unlock();
 
+    friend jvoid NativeProcess_Start(FNIEnv *, jobject);
     friend jvoid NativeProcess_Close(class FNIEnv *, jobject);
     friend jvoid NativeProcess_Foreground(class FNIEnv *, jobject);
     friend jobjectArray NativeProcess_GetProcesses(class FNIEnv *);

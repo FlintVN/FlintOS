@@ -33,11 +33,14 @@ jvoid NativeProcess_Start(FNIEnv *env, jobject obj) {
     uint32_t handle = p->getHandle();
     FProcess *fprocess;
     if (handle != -1) {
+        FlintOS::lock();
         fprocess = FlintOS::getProcesses()->find([&handle](FProcess *item) -> bool { return (jint)item == handle; });
         if (fprocess != NULL) {
+            FlintOS::unlock();
             env->throwNew(env->findClass("java/lang/IllegalStateException"), "Cannot restart an existing process");
             return;
         }
+        FlintOS::unlock();
     }
     if (!ResolvePath(env, p->getName(), buff, sizeof(buff))) return;
     fprocess = FlintOS::open(buff, p->getArgs());
