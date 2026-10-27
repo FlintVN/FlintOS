@@ -38,7 +38,7 @@ static uint32_t startWith(const char *str, const char *prefix) {
         if (str[i] != prefix[i])
             return 0;
     }
-    return (prefix[i]) == 0 ? i : 0;
+    return (prefix[i] == 0 && (str[i] == 0 || str[i] == '/')) ? i : 0;
 }
 
 static uint32_t diskMapping(const char **path, char *buf, uint32_t bufLen) {
@@ -54,7 +54,10 @@ static uint32_t diskMapping(const char **path, char *buf, uint32_t bufLen) {
     for (uint32_t i = 0; i < LENGTH(diskMappingInfo); i++) {
         uint32_t prefixLen = startWith(*path, diskMappingInfo[i].basePath);
         if (prefixLen > 0) {
-            snprintf(buf, bufLen, "%d:/%s", (int)diskMappingInfo[i].diskNum, &(*path)[prefixLen + 1]);
+            if ((*path)[prefixLen] != 0)
+                snprintf(buf, bufLen, "%d:%s", (int)diskMappingInfo[i].diskNum, &(*path)[prefixLen]);
+            else
+                snprintf(buf, bufLen, "%d:/", (int)diskMappingInfo[i].diskNum);
             *path = buf;
             return diskMappingInfo[i].diskNum;
         }
