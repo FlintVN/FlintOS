@@ -69,6 +69,11 @@ void FT6336::init(void) const {
     ESP_ERROR_CHECK(i2c_master_bus_add_device(i2cBusHandle, &devCfg, &i2cTouchDev));
 }
 
+static inline int32_t mapAxis(int32_t v, int32_t inMin, int32_t inMax, int32_t outSize) {
+    v = std::clamp(v, inMin, inMax);
+    return (v - inMin) * (outSize - 1) / (inMax - inMin);
+}
+
 bool FT6336::read(uint16_t *x, uint16_t *y) const {
     uint8_t data[5];
 
@@ -77,6 +82,9 @@ bool FT6336::read(uint16_t *x, uint16_t *y) const {
 
     uint16_t rawX = ((data[1] & 0x0F) << 8) | data[2];
     uint16_t rawY = ((data[3] & 0x0F) << 8) | data[4];
+
+    rawX = mapAxis(rawX, 20, 220, 240);
+    rawY = mapAxis(rawY, 20, 300, 320);
 
     *x = std::min(rawX, (uint16_t)(DISPLAY_WIDTH - 1));
     *y = std::min(rawY, (uint16_t)(DISPLAY_HEIGHT - 1));
