@@ -295,6 +295,8 @@ public class ScrollView extends PanelView {
                 v.updateActualWidth(availableW - v.marginLeft - v.marginRight);
             actualWidth = width >= 0 ? width : availableW;
         }
+        if (isOverX() != 0)
+            scrolling = true;
     }
 
     @Override
@@ -315,6 +317,8 @@ public class ScrollView extends PanelView {
                 v.updateActualHeight(availableH - v.marginTop - v.marginBottom);
             actualHeight = height >= 0 ? height : availableH;
         }
+        if (isOverY() != 0)
+            scrolling = true;
     }
 
     public View getContent() {
@@ -361,5 +365,55 @@ public class ScrollView extends PanelView {
             offsetY = 0;
             invalidate(false);
         }
+    }
+
+    public int getScrollX() {
+        return offsetX >> FP_PRECISION;
+    }
+
+    public int getScrollY() {
+        return offsetY >> FP_PRECISION;
+    }
+
+    public void scrollTo(int x, int y) {
+        boolean requestUpdate = false;
+
+        if ((mode & 1) != 0) {
+            if (x > 0)
+                x = 0;
+            else {
+                int xmin = getMinOffsetX();
+                x <<= FP_PRECISION;
+                if (x < xmin)
+                    x = xmin;
+            }
+            if (offsetX != x) {
+                offsetX = x;
+                requestUpdate = true;
+            }
+        }
+
+        if ((mode & 2) != 0) {
+            if (y > 0)
+                y = 0;
+            else {
+                int ymin = getMinOffsetY();
+                y <<= FP_PRECISION;
+                if (y < ymin)
+                    y = ymin;
+            }
+            if (offsetY != y) {
+                offsetY = y;
+                requestUpdate = true;
+            }
+        }
+        if (requestUpdate)
+            invalidate(true);
+    }
+
+    public void scrollBy(int x, int y) {
+        x <<= FP_PRECISION;
+        y <<= FP_PRECISION;
+        scrollTo(offsetX + x, offsetY + y);
     }
 }
