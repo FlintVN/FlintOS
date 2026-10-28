@@ -43,7 +43,7 @@ jvoid NativeProcess_Start(FNIEnv *env, jobject obj) {
         FlintOS::unlock();
     }
     if (!ResolvePath(env, p->getName(), buff, sizeof(buff))) return;
-    fprocess = FlintOS::open(buff, p->getArgs());
+    fprocess = FlintOS::open((FExec *)env, buff, p->getArgs());
     if (fprocess == NULL) {
         jclass excpCls = env->findClass("java/lang/IllegalArgumentException");
         env->throwNew(excpCls, "Process start failed");

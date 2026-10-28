@@ -12,7 +12,7 @@ public:
     static void main(void);
 
     static FProcess *newProcess(void);
-    static FProcess *open(const char *file, JStringArray *args = NULL);
+    static FProcess *open(FExec *ctx, const char *file, JStringArray *args = NULL);
 
     static FList<FProcess> *getProcesses(void);
 
