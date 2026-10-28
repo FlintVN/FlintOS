@@ -6,30 +6,42 @@
 #include "flint_system_api.h"
 #include "flintos_zip_class_cache.h"
 
+class ZipEntryDictNode : public DictNode {
+private:
+    ZipEntry entry;
+    uint32_t hash;
+    char entryName[];
+
+    ZipEntryDictNode(ZipEntry *entry, const char *name, uint32_t nameLen) {
+        this->entry = *entry;
+        this->hash = Hash(name, nameLen);
+        this->entryName[nameLen] = 0;
+        memcpy(this->entryName, name, nameLen);
+    }
+public:
+    uint32_t getHashKey(void) const override {
+        return hash;
+    }
+
+    int32_t compareKey(const char *key, uint16_t length) const override {
+        return strncmp(entryName, key, length);
+    }
+
+    int32_t compareKey(DictNode *other) const override {
+        return strcmp(entryName, ((ZipEntryDictNode *)other)->entryName);
+    }
+
+    ZipEntry *getEntry(void) {
+        return &entry;
+    }
+private:
+    ZipEntryDictNode(const ZipEntryDictNode &) = delete;
+    void operator=(const ZipEntryDictNode &) = delete;
+
+    friend class ZipClassCache;
+};
+
 static FDict<ZipEntryDictNode> entryCache;
-
-ZipEntryDictNode::ZipEntryDictNode(ZipEntry *entry, const char *name, uint32_t nameLen) {
-    this->entry = *entry;
-    this->hash = Hash(name, nameLen);
-    this->entryName[nameLen] = 0;
-    memcpy(this->entryName, name, nameLen);
-}
-
-uint32_t ZipEntryDictNode::getHashKey(void) const {
-    return hash;
-}
-
-int32_t ZipEntryDictNode::compareKey(const char *key, uint16_t length) const {
-    return strncmp(entryName, key, length);
-}
-
-int32_t ZipEntryDictNode::compareKey(DictNode *other) const {
-    return strcmp(entryName, ((ZipEntryDictNode *)other)->entryName);
-}
-
-ZipEntry *ZipEntryDictNode::getEntry(void) {
-    return &entry;
-}
 
 bool ZipClassCache::init(void) {
     static const char *jars[] = {

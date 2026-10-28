@@ -10,13 +10,11 @@
 class FlintOS {
 public:
     static void main(void);
-    static void startup(void);
+
     static FProcess *newProcess(void);
-    static FProcess *open(const char *file, void *args = NULL);
+    static FProcess *open(const char *file, JStringArray *args = NULL);
 
     static FList<FProcess> *getProcesses(void);
-
-    static void setHomeApp(FProcess *process);
 
     static bool isForeground(FProcess *process, bool checkOnly = true);
     static void setForeground(FProcess *process);

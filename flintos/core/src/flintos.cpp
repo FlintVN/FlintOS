@@ -20,6 +20,8 @@ static FMutex fosMutex;
 static const FEvent foregroundEvent = {.type = FOREGROUND_EVENT, .data = {0}};
 static const FEvent backgroundEvent = {.type = BACKGROUND_EVENT, .data = {0}};
 
+extern char *getNextValue(char *value, char seperator, uint32_t *len);
+
 static void flintTerminated(Flint *flint) {
     FProcess *process = (FProcess *)flint;
     if (process == homeApp)
@@ -54,7 +56,11 @@ char *trim(char *text) {
     return text;
 }
 
-void FlintOS::startup() {
+static void setHomeApp(FProcess *process) {
+    homeApp = process;
+}
+
+static void startup() {
     bool isFirst = true;
     char path[FILE_NAME_BUFF_SIZE];
 
@@ -96,7 +102,7 @@ void FlintOS::main(void) {
     if (HAL::Devices::wifi() != NULL)
         HAL::Devices::wifi()->init();
     ZipClassCache::init();
-    FlintOS::startup();
+    startup();
     FlintAPI::Thread::create((void (*)(void *))debuggerTask, NULL, 6144, FlintAPI::Thread::THREAD_PRIORITY_MEDIUM);
 }
 
@@ -119,7 +125,6 @@ typedef struct {
 } Manifest;
 
 static bool readManifest(const char *jarPath, Manifest *manifest) {
-    extern char *getNextValue(char *value, char seperator, uint32_t *len);
     uint32_t len;
     bool ret = false;
     char buff[FILE_NAME_BUFF_SIZE];
@@ -168,6 +173,30 @@ exit:
     return ret;
 }
 
+static JStringArray *cloneArgs(FProcess *process, JStringArray *args) {
+    JClass *strCls = process->findClass(NULL, "java/lang/String");
+    JClass *byteArrCls = process->findClass(NULL, "[B");
+    if (strCls == NULL || byteArrCls == NULL) return NULL;
+    uint32_t argc = args->getLength();
+    JStringArray *args2 = (JStringArray *)process->newArray(NULL, strCls, argc);
+    if (args2 == NULL) return NULL;
+    for (uint32_t i = 0; i < argc; i++) {
+        JString *str1 = args->getData()[i];
+        JString *str2 = NULL;
+        if (str1 != NULL) {
+            str2 = (JString *)process->newObject(NULL, strCls);
+            JByteArray *bytes = (JByteArray *)process->newArray(NULL, byteArrCls, str1->getValue()->getLength());
+            if (str2 == NULL || bytes == NULL) return NULL;
+            memcpy(bytes->getData(), str1->getValue()->getData(), bytes->getLength());
+            str2->setHash(str1->getHash());
+            str2->setHashIsZero(str1->getHashIsZero());
+            str2->setValue(bytes);
+        }
+        args2->getData()[i] = str2;
+    }
+    return args2;
+}
+
 static FProcess *runNewApp(Manifest *manifest, JStringArray *args) {
     FProcess *process = FlintOS::newProcess();
     if (process == NULL) return NULL;
@@ -180,7 +209,10 @@ static FProcess *runNewApp(Manifest *manifest, JStringArray *args) {
         if (manifest->type == 0) {    /* Normal application */
             MethodInfo *method = mainCls->getClassLoader()->getMainMethodInfo(NULL);
             if (method == NULL) break;
-
+            if (args != NULL) {
+                args = cloneArgs(process, args);
+                if (args == NULL) break;
+            }
             if (!process->start(method, 1, args)) break;
         }
         else {                      /* J2ME application */
@@ -207,27 +239,31 @@ static const char *getExtensionName(const char *fileName) {
     return (endIdx >= 0) ? &fileName[endIdx] : NULL;
 }
 
-FProcess *FlintOS::open(const char *file, void *args) {
+static FProcess *findProcess(const char *file) {
+    uint32_t hash = Hash(file);
+    FProcess *process = processList.find([&file, &hash](FProcess *item) -> bool {
+        const char *program = item->getProgram();
+        return (hash == ((uint32_t *)program)[-1]) && (strcmp(file, program) == 0);
+    });
+    if (process != NULL) {
+        FlintOS::setForeground(process);
+        return process;
+    }
+    return NULL;
+}
+
+FProcess *FlintOS::open(const char *file, JStringArray *args) {
     if (file == NULL) return NULL;
     if (FlintAPI::IO::finfo(file, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
         const char *extName = getExtensionName(file);
         if (strcasecmp(extName, ".jar") == 0) {
             Manifest manifest;
             if (!readManifest(file, &manifest)) return NULL;
-            if (manifest.launchMode == 1)   /* standard mode - always create new */
-                return runNewApp(&manifest, (JStringArray *)args);
-            else {                          /* single mode - create only if it does not already exist */
-                uint32_t hash = Hash(file);
-                FProcess *process = processList.find([&file, &hash](FProcess *item) -> bool {
-                    const char *program = item->getProgram();
-                    return (hash == ((uint32_t *)program)[-1]) && (strcmp(file, program) == 0);
-                });
-                if (process != NULL) {
-                    setForeground(process);
-                    return process;
-                }
-                return runNewApp(&manifest, (JStringArray *)args);
+            if (manifest.launchMode == 0) { /* single mode - create only if it does not already exist */
+                FProcess *process = findProcess(file);
+                if (process != NULL) return process;
             }
+            return runNewApp(&manifest, args);
         }
     }
     return NULL;
@@ -235,10 +271,6 @@ FProcess *FlintOS::open(const char *file, void *args) {
 
 FList<FProcess> *FlintOS::getProcesses(void) {
     return &processList;
-}
-
-void FlintOS::setHomeApp(FProcess *process) {
-    homeApp = process;
 }
 
 bool FlintOS::isForeground(FProcess *process, bool checkOnly) {
