@@ -1,12 +1,10 @@
 package flint.ui;
 
-import flint.drawing.Image;
 import flint.drawing.Color;
 import flint.drawing.Graphics;
 
 public class SeekBar extends View {
     private static final int ANIMATION_DURATION_1 = 150;
-    private static final int ANIMATION_DURATION_2 = 500;
     private static final int PRESS_OFFSET = 2;
     private static final int PRESS_OFFSET_X2 = PRESS_OFFSET << 1;
 
@@ -17,10 +15,6 @@ public class SeekBar extends View {
     private Color thumbColor;
     private int max;
     private int value;
-
-    private int currValue;
-    private int diffValue;
-    private int startTime;
 
     private boolean isPressed;
     private boolean animStatus;
@@ -41,7 +35,7 @@ public class SeekBar extends View {
 
     @Override
     protected void onDraw(Graphics g) {
-        int value = isPressed ? currValue : valueWithAnimation();
+        int v = (actualWidth - THUMB_SIZE) * value / max;
 
         int x = this.x;
         int y = this.y;
@@ -49,12 +43,12 @@ public class SeekBar extends View {
         int r = TRACK_SIZE / 2;
 
         int trackY = y + (THUMB_SIZE - TRACK_SIZE) / 2;
-        int trackW = value + THUMB_SIZE / 2;
+        int trackW = v + THUMB_SIZE / 2;
         g.fillRoundRect(color, x, trackY, trackW, TRACK_SIZE, r, 0, 0, r);
         g.fillRoundRect(background, x + trackW, trackY, w - trackW, TRACK_SIZE, 0, r, r, 0);
 
         int s = THUMB_SIZE;
-        x += value;
+        x += v;
         if (animStatus) {
             int tmp, time = (int)System.currentTimeMillis() - animStartTime;
             if (time < ANIMATION_DURATION_1)
@@ -78,27 +72,6 @@ public class SeekBar extends View {
         g.fillEllipse(thumbColor, x, y, s, s);
     }
 
-    protected final int valueWithAnimation() {
-        int target = (actualWidth - THUMB_SIZE) * this.value / max;
-        int value = currValue;
-        if (value != target) {
-            value = calcCurrValue();
-            if (value == target)
-                currValue = value;
-            invalidate(false);
-        }
-
-        return value;
-    }
-
-    private final int calcCurrValue() {
-        int time = (int)System.currentTimeMillis() - startTime;
-        if (time < ANIMATION_DURATION_2)
-            return currValue + (diffValue * time / ANIMATION_DURATION_2);
-        else
-            return (actualWidth - THUMB_SIZE) * value / max;
-    }
-
     @Override
     protected void invalidate(boolean layoutImpact) {
         invalidate(
@@ -113,18 +86,6 @@ public class SeekBar extends View {
     @Override
     protected boolean manipulationMode() {
         return true;
-    }
-
-    @Override
-    protected void updateActualWidth(int availableW) {
-        currValue = calcCurrValue();
-
-        super.updateActualWidth(availableW);
-
-        int w = actualWidth - THUMB_SIZE;
-        if (currValue > w) currValue = w;
-        diffValue = (w * value / max) - currValue;
-        startTime = (int)System.currentTimeMillis();
     }
 
     @Override
@@ -166,7 +127,6 @@ public class SeekBar extends View {
                     v = v * max / w;
                     if (value != v) {
                         value = v;
-                        currValue = w * value / max;
                         if (onSeekBarChangeListener != null)
                             onSeekBarChangeListener.onProgressChanged(this, true);
                         invalidate(false);
@@ -179,7 +139,8 @@ public class SeekBar extends View {
 
     private boolean hitThumb(int x) {
         int s = THUMB_SIZE * 3;
-        int thumbX = this.x + currValue - THUMB_SIZE;
+        int v = (actualWidth - THUMB_SIZE) * value / max;
+        int thumbX = this.x + v - THUMB_SIZE;
         return thumbX <= x && x <= (thumbX + s);
     }
 
@@ -217,10 +178,6 @@ public class SeekBar extends View {
                 if (onSeekBarChangeListener != null)
                     onSeekBarChangeListener.onProgressChanged(this, false);
             }
-            int w = actualWidth - THUMB_SIZE;
-            currValue = (currValue > w) ? w : calcCurrValue();
-            diffValue = (w * value / max) - currValue;
-            startTime = (int)System.currentTimeMillis();
             this.max = max;
         }
         invalidate(false);
@@ -231,24 +188,12 @@ public class SeekBar extends View {
     }
 
     public void setValue(int value) {
-        setValue(value, false);
-    }
-
-    public void setValue(int value, boolean animate) {
         FlintUI.checkThread();
         if (value < 0)
             value = 0;
         else if (value > max)
             value = max;
         if (this.value != value) {
-            int w = actualWidth - THUMB_SIZE;
-            if (!animate)
-                currValue = w * value / max;
-            else {
-                currValue = calcCurrValue();
-                diffValue = (w * value / max) - currValue;
-                startTime = (int)System.currentTimeMillis();
-            }
             this.value = value;
             if (onSeekBarChangeListener != null)
                 onSeekBarChangeListener.onProgressChanged(this, false);
