@@ -84,7 +84,6 @@ bool FT6336::read(uint16_t *x, uint16_t *y) const {
     uint16_t rawY = ((data[3] & 0x0F) << 8) | data[4];
 
     rawX = mapAxis(rawX, 20, 220, 240);
-    rawY = mapAxis(rawY, 20, 300, 320);
 
     *x = std::min(rawX, (uint16_t)(DISPLAY_WIDTH - 1));
     *y = std::min(rawY, (uint16_t)(DISPLAY_HEIGHT - 1));
