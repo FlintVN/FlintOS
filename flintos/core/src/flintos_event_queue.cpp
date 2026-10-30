@@ -1,6 +1,11 @@
 
 #include "flintos_event_queue.h"
 
+static void notifyEvent(FExec *exec) {
+    if (exec != NULL)
+        FlintAPI::Thread::notify(exec->getOwnerThread()->getHandle(), FlintAPI::Thread::THREAD_NOTIFY_SYSTEM_EVENT);
+}
+
 FEventQueue::FEventQueue(void) : eventLock() {
     owner = NULL;
     head = 0;
@@ -11,8 +16,7 @@ FEventQueue::FEventQueue(void) : eventLock() {
 bool FEventQueue::postEvent(const FEvent *event) {
     if (event == NULL) {
         eventLock.lock();
-        if (owner != NULL)
-            FlintAPI::Thread::notify(owner->getOwnerThread()->getHandle(), FlintAPI::Thread::THREAD_NOTIFY_SYSTEM_EVENT);
+        notifyEvent(owner);
         eventLock.unlock();
         return true;
     }
@@ -20,6 +24,15 @@ bool FEventQueue::postEvent(const FEvent *event) {
     if (count == LENGTH(events)) return false;
 
     eventLock.lock();
+    if (event->type == MONITOR_EVENT || event->type == FOREGROUND_EVENT || event->type == BACKGROUND_EVENT) {
+        for (uint32_t i = 0; i < count; i++) {
+            if (events[(tail + i) % LENGTH(events)].type == event->type) {
+                notifyEvent(owner);
+                eventLock.unlock();
+                return true;
+            }
+        }
+    }
     if (count < LENGTH(events)) {
         events[head] = *event;
         head = (head + 1) % LENGTH(events);
@@ -29,8 +42,7 @@ bool FEventQueue::postEvent(const FEvent *event) {
         eventLock.unlock();
         return false;
     }
-    if (owner != NULL)
-        FlintAPI::Thread::notify(owner->getOwnerThread()->getHandle(), FlintAPI::Thread::THREAD_NOTIFY_SYSTEM_EVENT);
+    notifyEvent(owner);
     eventLock.unlock();
     return true;
 }

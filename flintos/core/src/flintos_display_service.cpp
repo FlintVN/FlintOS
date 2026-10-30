@@ -21,7 +21,7 @@ static void displayLock(void) {
 }
 
 static void displayUnlock(void) {
-    displayLocked.exchange(false, memory_order_acquire);
+    displayLocked.exchange(false, memory_order_release);
 }
 
 static void showLogo(void) {
@@ -59,8 +59,8 @@ void DisplaySrv::mainTask(void) {
     showLogo();
     while (true) {
         uint32_t tick = (uint32_t)FlintAPI::System::getTimeMillis();
-        displayFlush();
         FlintOS::postEvent(&monitorEvent);
+        displayFlush();
         int32_t remaining = screenPeriodic - (uint32_t)((uint32_t)FlintAPI::System::getTimeMillis() - tick);
         if (remaining > 0)
             FlintAPI::Thread::sleep(remaining);
