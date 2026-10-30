@@ -2,8 +2,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/gpio.h"
-#include "tusb_cdc_acm.h"
-#include "tusb_console.h"
+#include "tinyusb_cdc_acm.h"
+#include "tinyusb_console.h"
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "esp_vfs_fat.h"
@@ -82,7 +82,6 @@ void Board_Init(void) {
     NVS_Init();
     vTaskDelay(250 / portTICK_PERIOD_MS);
     USB_DeviceInit();
-    esp_tusb_init_console(TINYUSB_CDC_ACM_0);
     FS_Init();
     SD_Init();
     vTaskPrioritySet(NULL, 2);

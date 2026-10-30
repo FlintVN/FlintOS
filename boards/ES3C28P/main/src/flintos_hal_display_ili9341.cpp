@@ -132,52 +132,44 @@ static void SPI_WriteCmd(uint8_t cmd) {
 }
 
 static void SPI_WriteCmd(uint8_t cmd, uint8_t b) {
-    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
     SPI_Write(cmd, true);
     LCD_DC(1);
     SPI_Write(b, false);
-    spi_device_release_bus(spiHandle);
 }
 
 static void SPI_WriteCmd(uint8_t cmd, uint8_t b1, uint8_t b2) {
-    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
     SPI_Write(cmd, true);
     LCD_DC(1);
     SPI_Write(b1, b2);
-    spi_device_release_bus(spiHandle);
 }
 
 static void SPI_WriteCmd(uint8_t cmd, uint8_t b1, uint8_t b2, uint8_t b3) {
-    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
     SPI_Write(cmd, true);
     LCD_DC(1);
     SPI_Write(b1, b2, b3);
-    spi_device_release_bus(spiHandle);
 }
 
 static void SPI_WriteCmd(uint8_t cmd, uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4) {
-    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
     SPI_Write(cmd, true);
     LCD_DC(1);
     SPI_Write(b1, b2, b3, b4);
-    spi_device_release_bus(spiHandle);
 }
 
 static void SPI_WriteCmd(uint8_t cmd, uint8_t *data, uint32_t length) {
-    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
     SPI_Write(cmd, true);
     LCD_DC(1);
     SPI_Write(data, length, false);
-    spi_device_release_bus(spiHandle);
 }
 
 static void LCD_Clear(void) {
     static const uint8_t data[256] = {};
+
+    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
 
     /* Column address set */
     SPI_WriteCmd(0x2A, 0, 0, (240 >> 8), 240);
@@ -186,7 +178,6 @@ static void LCD_Clear(void) {
     SPI_WriteCmd(0x2B, 0, 0, (320 >> 8), (uint8_t)320);
 
     /* Write to RAM */
-    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
     SPI_Write(0x2C, true);
     LCD_DC(1);
@@ -195,7 +186,12 @@ static void LCD_Clear(void) {
         i++;
         SPI_Write((uint8_t *)data, sizeof(data), i < n ? true : false);
     }
+
     spi_device_release_bus(spiHandle);
+}
+
+static inline __attribute__((always_inline)) bool dmaCapable(void *buff) {
+    return ((uint32_t)buff % CONFIG_ESP32S3_DATA_CACHE_LINE_SIZE) == 0;
 }
 
 void ILI9341::init(void) const {
@@ -203,6 +199,7 @@ void ILI9341::init(void) const {
     LED_Init();
     SPI_Init();
 
+    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     /* SOFTWARE RESET */
     SPI_WriteCmd(0x01);
     FlintAPI::Thread::sleep(10);
@@ -242,11 +239,16 @@ void ILI9341::init(void) const {
     /* Turn on display */
     SPI_WriteCmd(0x29);
 
+    spi_device_release_bus(spiHandle);
+
     LCD_Clear();
 }
 
 void ILI9341::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *data, uint16_t stride) const {
-    spi_transaction_t trans[2] = {};
+    alignas(4) static uint8_t txBuf[SPI_MAX_TRANSFER_SZ];
+    spi_transaction_t trans = {};
+
+    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
 
     /* Column address set */
     uint16_t tmp = x + w - 1;
@@ -258,7 +260,6 @@ void ILI9341::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *dat
 
     /* Write to RAM */
     uint32_t count = 0;
-    spi_device_acquire_bus(spiHandle, portMAX_DELAY);
     LCD_DC(0);
     SPI_Write(0x2C, true);
     LCD_DC(1);
@@ -267,26 +268,35 @@ void ILI9341::write(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t *dat
         uint32_t len = w * h * 2;
         while (len > 0) {
             uint32_t sz = len > SPI_MAX_TRANSFER_SZ ? SPI_MAX_TRANSFER_SZ : len;
-            trans[count].length = sz * 8;
-            trans[count].rxlength = 0;
-            trans[count].tx_buffer = data;
+            trans.length = sz * 8;
+            trans.rxlength = 0;
+            if (dmaCapable(data))
+                trans.tx_buffer = data;
+            else {
+                trans.tx_buffer = txBuf;
+                memcpy(txBuf, data, sz);
+            }
             len -= sz;
-            trans[count].flags = len > 0 ? SPI_TRANS_CS_KEEP_ACTIVE : 0;
-            spi_device_transmit(spiHandle, &trans[count]);
+            trans.flags = len > 0 ? SPI_TRANS_CS_KEEP_ACTIVE : 0;
+            spi_device_transmit(spiHandle, &trans);
             count = !count;
             data += sz;
         }
     }
     else {
-        trans[0].length = w << 4;
-        trans[1].length = w << 4;
+        trans.length = w << 4;
         stride <<= 1;
         while (h > 0) {
-            trans[count].rxlength = 0;
-            trans[count].tx_buffer = data;
+            trans.rxlength = 0;
+            if (dmaCapable(data))
+                trans.tx_buffer = data;
+            else {
+                trans.tx_buffer = txBuf;
+                memcpy(txBuf, data, trans.length);
+            }
             h--;
-            trans[count].flags = h > 0 ? SPI_TRANS_CS_KEEP_ACTIVE : 0;
-            spi_device_transmit(spiHandle, &trans[count]);
+            trans.flags = h > 0 ? SPI_TRANS_CS_KEEP_ACTIVE : 0;
+            spi_device_transmit(spiHandle, &trans);
             count = !count;
             data += stride;
         }
