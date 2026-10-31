@@ -91,8 +91,9 @@ public class ToggleButton extends View {
                     checked = !checked;
                     changing = true;
                     startTimeChange = (int)System.currentTimeMillis();
-                    if (onCheckedChangeListener != null)
-                        onCheckedChangeListener.onCheckedChanged(this, checked);
+                    OnCheckedChangeListener listener = onCheckedChangeListener;
+                    if (listener != null)
+                        listener.onCheckedChanged(this, checked);
                     invalidate(false);
                 }
                 break;
@@ -124,8 +125,9 @@ public class ToggleButton extends View {
         FlintUI.checkThread();
         if (this.checked != checked) {
             this.checked = checked;
-            if (onCheckedChangeListener != null)
-                onCheckedChangeListener.onCheckedChanged(this, checked);
+            OnCheckedChangeListener listener = onCheckedChangeListener;
+            if (listener != null)
+                listener.onCheckedChanged(this, checked);
             invalidate(false);
         }
     }

@@ -104,8 +104,9 @@ public abstract class View {
     }
 
     protected final void dispatchTouchEvent(MotionEvent event) {
-        if (onTouchListener != null) {
-            if (onTouchListener.onTouch(this, event))
+        OnTouchListener touchListener = onTouchListener;
+        if (touchListener != null) {
+            if (touchListener.onTouch(this, event))
                 return;
         }
         if (event.action == MotionEvent.ACTION_DOWN) {
@@ -116,8 +117,9 @@ public abstract class View {
         onTouchEvent(event);
         switch (event.action) {
             case MotionEvent.ACTION_UP: {
-                if (isPressing && onClickListener != null && containsPoint(event.x, event.y))
-                    onClickListener.onClick(this);
+                OnClickListener clickListener = onClickListener;
+                if (clickListener != null && isPressing && containsPoint(event.x, event.y))
+                    clickListener.onClick(this);
                 return;
             }
             case MotionEvent.ACTION_MOVE: {

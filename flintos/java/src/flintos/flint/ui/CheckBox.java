@@ -125,8 +125,9 @@ public class CheckBox extends View {
                 startTime = (int)System.currentTimeMillis();
                 if (isPressing && containsPoint(event.x, event.y)) {
                     checked = !checked;
-                    if (onCheckedChangeListener != null)
-                        onCheckedChangeListener.onCheckedChanged(this, checked);
+                    OnCheckedChangeListener listener = onCheckedChangeListener;
+                    if (listener != null)
+                        listener.onCheckedChanged(this, checked);
                 }
                 invalidate(false);
                 return;
@@ -218,8 +219,9 @@ public class CheckBox extends View {
         FlintUI.checkThread();
         if (this.checked != checked) {
             this.checked = checked;
-            if (onCheckedChangeListener != null)
-                onCheckedChangeListener.onCheckedChanged(this, checked);
+            OnCheckedChangeListener listener = onCheckedChangeListener;
+            if (listener != null)
+                listener.onCheckedChanged(this, checked);
             invalidate(false);
         }
     }

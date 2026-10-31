@@ -230,6 +230,8 @@ public abstract class FlintUI extends View {
     }
 
     public void doubleBuffer(boolean enabled) {
+        if (disp1 != null)
+            throw new IllegalStateException("Changes can only be made before it is shown");
         this.doubleBuffer = enabled;
     }
 
