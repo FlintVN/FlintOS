@@ -117,7 +117,7 @@ public abstract class FlintUI extends View {
 
     @Override
     protected View hitTest(int x, int y) {
-        if (containsPoint(x, y)) {
+        if (containsPoint(x, y) && visible) {
             if (content != null) {
                 View v = content.hitTest(x, y);
                 if (v != null)

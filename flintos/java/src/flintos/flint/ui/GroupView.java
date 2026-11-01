@@ -12,7 +12,7 @@ public class GroupView extends PanelView {
 
     @Override
     protected View hitTest(int x, int y) {
-        if (containsPoint(x, y)) {
+        if (containsPoint(x, y) && visible) {
             for (int i = childrenCount - 1; i >= 0; i--) {
                 View v = children[i].hitTest(x, y);
                 if (v != null)

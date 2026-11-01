@@ -89,7 +89,7 @@ public abstract class View {
     }
 
     protected View hitTest(int x, int y) {
-        return containsPoint(x, y) ? this : null;
+        return (containsPoint(x, y) && visible) ? this : null;
     }
 
     protected boolean manipulationMode() {

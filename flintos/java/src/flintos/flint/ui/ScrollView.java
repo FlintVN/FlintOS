@@ -191,7 +191,7 @@ public class ScrollView extends PanelView {
 
     @Override
     protected View hitTest(int x, int y) {
-        if (containsPoint(x, y)) {
+        if (containsPoint(x, y) && visible) {
             if (scrolling)
                 return this;
             if (content != null) {
