@@ -25,7 +25,8 @@ public class ScrollView extends PanelView {
     private int vX, vY;
 
     public ScrollView() {
-
+        width = View.MATCH_PARENT;
+        height = View.MATCH_PARENT;
     }
 
     @Override
@@ -149,16 +150,20 @@ public class ScrollView extends PanelView {
     }
 
     private int getMinOffsetX() {
-        int contentW = content.actualWidth + content.marginLeft + content.marginRight;
-        if (content != null && contentW > actualWidth)
-            return (actualWidth - contentW) << FP_PRECISION;
+        if (content != null) {
+            int contentW = content.actualWidth + content.marginLeft + content.marginRight;
+            if (contentW > actualWidth)
+                return (actualWidth - contentW) << FP_PRECISION;
+        }
         return 0;
     }
 
     private int getMinOffsetY() {
-        int contentH = content.actualHeight + content.marginTop + content.marginBottom;
-        if (content != null && contentH > actualHeight)
-            return (actualHeight - contentH) << FP_PRECISION;
+        if (content != null) {
+            int contentH = content.actualHeight + content.marginTop + content.marginBottom;
+            if (contentH > actualHeight)
+                return (actualHeight - contentH) << FP_PRECISION;
+        }
         return 0;
     }
 
