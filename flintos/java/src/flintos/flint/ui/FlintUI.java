@@ -15,6 +15,7 @@ import flint.system.NativeEventReceiver;
 
 public abstract class FlintUI extends View {
     private static final String RES_PREFIX = "flint-app://";
+    private static final int LONG_PRESS_TIMEOUT = 500;
 
     private static FlintUI currentUI;
 
@@ -34,6 +35,8 @@ public abstract class FlintUI extends View {
     private MotionEvent motionEvent = new MotionEvent();
 
     private TaskQueue taskQueue = new TaskQueue();
+
+    private int pressStartTime;
 
     protected FlintUI() {
         this(240, 320);
@@ -137,8 +140,10 @@ public abstract class FlintUI extends View {
             }
             case EventTypes.TOUCH_EVENT: {
                 int action = event.getData(0);
-                if (action == MotionEvent.ACTION_DOWN)
+                if (action == MotionEvent.ACTION_DOWN) {
                     actView = hitTest(event.getData(1), event.getData(2));
+                    pressStartTime = (int)System.currentTimeMillis();
+                }
                 if (actView != null) {
                     motionEvent.action = action;
                     motionEvent.x = event.getData(1);
@@ -244,6 +249,11 @@ public abstract class FlintUI extends View {
             try {
                 if (NativeEventReceiver.waitEvent(event))
                     processEvent(event);
+                View v = actView;
+                if (v != null && v.isPressing) {
+                    if ((System.currentTimeMillis() - pressStartTime) >= LONG_PRESS_TIMEOUT)
+                        v.onLongClickEvent();
+                }
                 taskQueue.runAll();
             }
             catch (InterruptedException e) {

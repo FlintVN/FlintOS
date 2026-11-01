@@ -210,6 +210,16 @@ public class ScrollView extends PanelView {
     }
 
     @Override
+    protected void onLongClickEvent() {
+        if (actView != null) {
+            isPressing = false;
+            actView.onLongClickEvent();
+        }
+        else
+            super.onLongClickEvent();
+    }
+
+    @Override
     protected void onTouchEvent(MotionEvent event) {
         switch (event.action) {
             case MotionEvent.ACTION_DOWN: {

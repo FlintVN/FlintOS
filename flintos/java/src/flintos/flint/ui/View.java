@@ -36,6 +36,7 @@ public abstract class View {
 
     private OnTouchListener onTouchListener;
     private OnClickListener onClickListener;
+    private OnLongClickListener onLongClickListener;
 
     protected boolean isPressing;
     protected int startX, startY;
@@ -101,6 +102,13 @@ public abstract class View {
 
     protected void onTouchEvent(MotionEvent event) {
 
+    }
+
+    protected void onLongClickEvent() {
+        isPressing = false;
+        OnLongClickListener listener = onLongClickListener;
+        if (listener != null)
+            listener.onLongClick(this);
     }
 
     protected final void dispatchTouchEvent(MotionEvent event) {
@@ -283,5 +291,9 @@ public abstract class View {
 
     public void setOnTouchListener(OnTouchListener listener) {
         onTouchListener = listener;
+    }
+
+    public void setOnLongClickListener(OnLongClickListener listener) {
+        onLongClickListener = listener;
     }
 }
