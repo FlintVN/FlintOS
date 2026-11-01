@@ -37,7 +37,7 @@ public class GroupView extends PanelView {
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             invalidateAll();
         else
-            invalidate(false);
+            invalidate(true);
     }
 
     public void removeView(View v) {
@@ -63,12 +63,11 @@ public class GroupView extends PanelView {
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
             invalidateAll();
         else
-            invalidate(false);
+            invalidate(true);
     }
 
     public void removeAllView() {
         FlintUI.checkThread();
-        childrenCount = 0;
         if (children.length > MIN_CAPACITY * 4) {
             for (int i = 0; i < childrenCount; i++)
                 children[i].parent = null;
@@ -80,6 +79,7 @@ public class GroupView extends PanelView {
                 children[i] = null;
             }
         }
+        childrenCount = 0;
     }
 
     private void ensureCapacityInternal(int minimumCapacity) {
