@@ -3,6 +3,9 @@ package flint.ui;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.io.FileInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import flint.media.Display;
 import flint.drawing.Font;
@@ -16,6 +19,7 @@ import flint.system.NativeEventReceiver;
 public abstract class FlintUI extends View {
     private static final String RES_PREFIX = "flint-app://";
     private static final int LONG_PRESS_TIMEOUT = 500;
+    private static final String APP_PATH = System.getProperty("flint.application");
 
     private static FlintUI currentUI;
 
@@ -302,20 +306,25 @@ public abstract class FlintUI extends View {
         }
     }
 
-    public Image loadImage(String name) {
+    public static Image loadImage(String name) {
         return loadImage(name, false);
     }
 
-    public Image loadImage(String name, boolean mutable) {
+    public static Image loadImage(String name, boolean mutable) {
         try {
             if (name.startsWith(RES_PREFIX)) {
                 String resName = name.substring(RES_PREFIX.length());
-                InputStream stream = this.getClass().getResourceAsStream(resName);
-                if (stream == null)
-                    return null;
-                Image img = Image.create(stream, mutable);
-                stream.close();
-                return img;
+                ZipEntry entry;
+                ZipInputStream zis = new ZipInputStream(new FileInputStream(APP_PATH));
+                while ((entry = zis.getNextEntry()) != null) {
+                    if (entry.getName().equals(resName)) {
+                        Image img = Image.create(zis, mutable);
+                        zis.close();
+                        return img;
+                    }
+                    zis.closeEntry();
+                }
+                return null;
             }
             return Image.create(name);
         }
@@ -328,10 +337,17 @@ public abstract class FlintUI extends View {
         try {
             if (name.startsWith(RES_PREFIX)) {
                 String resName = name.substring(RES_PREFIX.length());
-                InputStream stream = this.getClass().getResourceAsStream(resName);
-                Font font = new Font(stream);
-                stream.close();
-                return font;
+                ZipEntry entry;
+                ZipInputStream zis = new ZipInputStream(new FileInputStream(APP_PATH));
+                while ((entry = zis.getNextEntry()) != null) {
+                    if (entry.getName().equals(resName)) {
+                        Font font = new Font(zis);
+                        zis.close();
+                        return font;
+                    }
+                    zis.closeEntry();
+                }
+                throw new UncheckedIOException(new IOException("Font not found"));
             }
             return new Font(name);
         }
