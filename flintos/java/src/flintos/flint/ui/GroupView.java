@@ -23,6 +23,14 @@ public class GroupView extends PanelView {
         return null;
     }
 
+    public int getChildCount() {
+        return childrenCount;
+    }
+
+    public View getChildAt(int index) {
+        return children[index];
+    }
+
     public void addView(View v) {
         FlintUI.checkThread();
         if (v == null)
