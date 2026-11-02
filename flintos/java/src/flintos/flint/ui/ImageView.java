@@ -55,7 +55,7 @@ public class ImageView extends View {
                 int gClipY = g.getClipY();
                 int gClipW = g.getClipWidth();
                 int gClipH = g.getClipHeight();
-                g.setClip(this.x, this.y, width, height, ClipMode.INTERSECT);
+                g.setClip(this.x, this.y, actualWidth, actualHeight, ClipMode.INTERSECT);
 
                 int ix = this.x + (actualWidth - img.getWidth()) / 2;
                 int iy = this.y + (actualHeight - img.getHeight()) / 2;
@@ -69,7 +69,7 @@ public class ImageView extends View {
                 int gClipY = g.getClipY();
                 int gClipW = g.getClipWidth();
                 int gClipH = g.getClipHeight();
-                g.setClip(this.x, this.y, width, height, ClipMode.INTERSECT);
+                g.setClip(this.x, this.y, actualWidth, actualHeight, ClipMode.INTERSECT);
 
                 int x, y, w, h;
                 if (((long)actualWidth * img.getHeight()) > ((long)actualHeight * img.getWidth())) {
