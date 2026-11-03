@@ -101,8 +101,9 @@ public class SeekBar extends View {
                     animStatus = true;
                     isPressed = true;
                     animStartTime = (int)System.currentTimeMillis();
-                    if (onSeekBarChangeListener != null)
-                        onSeekBarChangeListener.onStartTrackingTouch(this);
+                    OnSeekBarChangeListener listener = onSeekBarChangeListener;
+                    if (listener != null)
+                        listener.onStartTrackingTouch(this);
                     invalidate(false);
                 }
                 return;
@@ -112,8 +113,9 @@ public class SeekBar extends View {
                     isPressed = false;
                     animStatus = true;
                     animStartTime = (int)System.currentTimeMillis();
-                    if (onSeekBarChangeListener != null)
-                        onSeekBarChangeListener.onStopTrackingTouch(this);
+                    OnSeekBarChangeListener listener = onSeekBarChangeListener;
+                    if (listener != null)
+                        listener.onStopTrackingTouch(this);
                     invalidate(false);
                 }
                 return;
@@ -127,8 +129,9 @@ public class SeekBar extends View {
                     v = v * max / w;
                     if (value != v) {
                         value = v;
-                        if (onSeekBarChangeListener != null)
-                            onSeekBarChangeListener.onProgressChanged(this, true);
+                        OnSeekBarChangeListener listener = onSeekBarChangeListener;
+                        if (listener != null)
+                            listener.onProgressChanged(this, true);
                         invalidate(false);
                     }
                 }
@@ -175,8 +178,9 @@ public class SeekBar extends View {
         if (this.max != max) {
             if (value > max) {
                 value = max;
-                if (onSeekBarChangeListener != null)
-                    onSeekBarChangeListener.onProgressChanged(this, false);
+                OnSeekBarChangeListener listener = onSeekBarChangeListener;
+                if (listener != null)
+                    listener.onProgressChanged(this, false);
             }
             this.max = max;
         }
@@ -195,8 +199,9 @@ public class SeekBar extends View {
             value = max;
         if (this.value != value) {
             this.value = value;
-            if (onSeekBarChangeListener != null)
-                onSeekBarChangeListener.onProgressChanged(this, false);
+            OnSeekBarChangeListener listener = onSeekBarChangeListener;
+            if (listener != null)
+                listener.onProgressChanged(this, false);
             invalidate(false);
         }
     }

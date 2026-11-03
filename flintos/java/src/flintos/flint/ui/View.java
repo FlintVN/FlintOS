@@ -36,6 +36,7 @@ public abstract class View {
 
     private OnTouchListener onTouchListener;
     private OnClickListener onClickListener;
+    private OnLongClickListener onLongClickListener;
 
     protected boolean isPressing;
     protected int startX, startY;
@@ -88,7 +89,7 @@ public abstract class View {
     }
 
     protected View hitTest(int x, int y) {
-        return containsPoint(x, y) ? this : null;
+        return (containsPoint(x, y) && visible) ? this : null;
     }
 
     protected boolean manipulationMode() {
@@ -103,9 +104,17 @@ public abstract class View {
 
     }
 
+    protected void onLongClickEvent() {
+        isPressing = false;
+        OnLongClickListener listener = onLongClickListener;
+        if (listener != null)
+            listener.onLongClick(this);
+    }
+
     protected final void dispatchTouchEvent(MotionEvent event) {
-        if (onTouchListener != null) {
-            if (onTouchListener.onTouch(this, event))
+        OnTouchListener touchListener = onTouchListener;
+        if (touchListener != null) {
+            if (touchListener.onTouch(this, event))
                 return;
         }
         if (event.action == MotionEvent.ACTION_DOWN) {
@@ -116,8 +125,9 @@ public abstract class View {
         onTouchEvent(event);
         switch (event.action) {
             case MotionEvent.ACTION_UP: {
-                if (isPressing && onClickListener != null && containsPoint(event.x, event.y))
-                    onClickListener.onClick(this);
+                OnClickListener clickListener = onClickListener;
+                if (clickListener != null && isPressing && containsPoint(event.x, event.y))
+                    clickListener.onClick(this);
                 return;
             }
             case MotionEvent.ACTION_MOVE: {
@@ -281,5 +291,9 @@ public abstract class View {
 
     public void setOnTouchListener(OnTouchListener listener) {
         onTouchListener = listener;
+    }
+
+    public void setOnLongClickListener(OnLongClickListener listener) {
+        onLongClickListener = listener;
     }
 }

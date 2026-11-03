@@ -102,7 +102,7 @@ public class StackView extends GroupView {
     }
 
     private void updateActualWidthHorizontal(int availableW) {
-        int contentW = 0;
+        int contentW = getBorderThickness() << 1;
         int matchParentCount = 0;
         int matchParentIdx = -1;
         for (int i = 0; i < childrenCount; i++) {
@@ -139,7 +139,7 @@ public class StackView extends GroupView {
     }
 
     private void updateActualHeightHorizontal(int availableH) {
-        int contentH = 0;
+        int contentH = getBorderThickness() << 1;
         int matchParentCount = 0;
         int matchParentIdx = -1;
         for (int i = 0; i < childrenCount; i++) {
@@ -168,7 +168,7 @@ public class StackView extends GroupView {
     }
 
     private void updateActualWidthVertical(int availableW) {
-        int contentW = 0;
+        int contentW = getBorderThickness() << 1;
         int matchParentCount = 0;
         int matchParentIdx = -1;
         for (int i = 0; i < childrenCount; i++) {
@@ -197,7 +197,7 @@ public class StackView extends GroupView {
     }
 
     private void updateActualHeightVertical(int availableH) {
-        int contentH = 0;
+        int contentH = getBorderThickness() << 1;
         int matchParentCount = 0;
         int matchParentIdx = -1;
         for (int i = 0; i < childrenCount; i++) {

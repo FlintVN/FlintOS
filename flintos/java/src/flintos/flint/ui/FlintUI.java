@@ -3,6 +3,9 @@ package flint.ui;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.io.FileInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import flint.media.Display;
 import flint.drawing.Font;
@@ -15,6 +18,8 @@ import flint.system.NativeEventReceiver;
 
 public abstract class FlintUI extends View {
     private static final String RES_PREFIX = "flint-app://";
+    private static final int LONG_PRESS_TIMEOUT = 500;
+    private static ZipFile zip;
 
     private static FlintUI currentUI;
 
@@ -34,6 +39,8 @@ public abstract class FlintUI extends View {
     private MotionEvent motionEvent = new MotionEvent();
 
     private TaskQueue taskQueue = new TaskQueue();
+
+    private int pressStartTime;
 
     protected FlintUI() {
         this(240, 320);
@@ -114,7 +121,7 @@ public abstract class FlintUI extends View {
 
     @Override
     protected View hitTest(int x, int y) {
-        if (containsPoint(x, y)) {
+        if (containsPoint(x, y) && visible) {
             if (content != null) {
                 View v = content.hitTest(x, y);
                 if (v != null)
@@ -137,8 +144,10 @@ public abstract class FlintUI extends View {
             }
             case EventTypes.TOUCH_EVENT: {
                 int action = event.getData(0);
-                if (action == MotionEvent.ACTION_DOWN)
+                if (action == MotionEvent.ACTION_DOWN) {
                     actView = hitTest(event.getData(1), event.getData(2));
+                    pressStartTime = (int)System.currentTimeMillis();
+                }
                 if (actView != null) {
                     motionEvent.action = action;
                     motionEvent.x = event.getData(1);
@@ -230,6 +239,8 @@ public abstract class FlintUI extends View {
     }
 
     public void doubleBuffer(boolean enabled) {
+        if (disp1 != null)
+            throw new IllegalStateException("Changes can only be made before it is shown");
         this.doubleBuffer = enabled;
     }
 
@@ -242,6 +253,11 @@ public abstract class FlintUI extends View {
             try {
                 if (NativeEventReceiver.waitEvent(event))
                     processEvent(event);
+                View v = actView;
+                if (v != null && v.isPressing) {
+                    if ((System.currentTimeMillis() - pressStartTime) >= LONG_PRESS_TIMEOUT)
+                        v.onLongClickEvent();
+                }
                 taskQueue.runAll();
             }
             catch (InterruptedException e) {
@@ -290,19 +306,31 @@ public abstract class FlintUI extends View {
         }
     }
 
-    public Image loadImage(String name) {
+    public static Image loadImage(String name) {
         return loadImage(name, false);
     }
 
-    public Image loadImage(String name, boolean mutable) {
+    private static InputStream getResource(String name) throws IOException {
+        if (zip == null) {
+            synchronized (RES_PREFIX) {
+                if (zip == null)
+                    zip = new ZipFile(System.getProperty("flint.application"));
+            }
+        }
+        ZipEntry entry = zip.getEntry(name);
+        if (entry == null)
+            return null;
+        return zip.getInputStream(entry);
+    }
+
+    public static Image loadImage(String name, boolean mutable) {
         try {
             if (name.startsWith(RES_PREFIX)) {
-                String resName = name.substring(RES_PREFIX.length());
-                InputStream stream = this.getClass().getResourceAsStream(resName);
-                if (stream == null)
+                InputStream in = getResource(name.substring(RES_PREFIX.length()));
+                if (in == null)
                     return null;
-                Image img = Image.create(stream, mutable);
-                stream.close();
+                Image img = Image.create(in, mutable);
+                in.close();
                 return img;
             }
             return Image.create(name);
@@ -315,10 +343,11 @@ public abstract class FlintUI extends View {
     public Font loadFont(String name) {
         try {
             if (name.startsWith(RES_PREFIX)) {
-                String resName = name.substring(RES_PREFIX.length());
-                InputStream stream = this.getClass().getResourceAsStream(resName);
-                Font font = new Font(stream);
-                stream.close();
+                InputStream in = getResource(name.substring(RES_PREFIX.length()));
+                if (in == null)
+                    throw new UncheckedIOException(new IOException("Font not found"));
+                Font font = new Font(in);
+                in.close();
                 return font;
             }
             return new Font(name);
