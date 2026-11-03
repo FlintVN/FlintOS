@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.io.FileInputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 import flint.media.Display;
 import flint.drawing.Font;
@@ -19,7 +19,7 @@ import flint.system.NativeEventReceiver;
 public abstract class FlintUI extends View {
     private static final String RES_PREFIX = "flint-app://";
     private static final int LONG_PRESS_TIMEOUT = 500;
-    private static final String APP_PATH = System.getProperty("flint.application");
+    private static ZipFile zip;
 
     private static FlintUI currentUI;
 
@@ -310,21 +310,28 @@ public abstract class FlintUI extends View {
         return loadImage(name, false);
     }
 
+    private static InputStream getResource(String name) throws IOException {
+        if (zip == null) {
+            synchronized (RES_PREFIX) {
+                if (zip == null)
+                    zip = new ZipFile(System.getProperty("flint.application"));
+            }
+        }
+        ZipEntry entry = zip.getEntry(name);
+        if (entry == null)
+            return null;
+        return zip.getInputStream(entry);
+    }
+
     public static Image loadImage(String name, boolean mutable) {
         try {
             if (name.startsWith(RES_PREFIX)) {
-                String resName = name.substring(RES_PREFIX.length());
-                ZipEntry entry;
-                ZipInputStream zis = new ZipInputStream(new FileInputStream(APP_PATH));
-                while ((entry = zis.getNextEntry()) != null) {
-                    if (entry.getName().equals(resName)) {
-                        Image img = Image.create(zis, mutable);
-                        zis.close();
-                        return img;
-                    }
-                    zis.closeEntry();
-                }
-                return null;
+                InputStream in = getResource(name.substring(RES_PREFIX.length()));
+                if (in == null)
+                    return null;
+                Image img = Image.create(in, mutable);
+                in.close();
+                return img;
             }
             return Image.create(name);
         }
@@ -336,18 +343,12 @@ public abstract class FlintUI extends View {
     public Font loadFont(String name) {
         try {
             if (name.startsWith(RES_PREFIX)) {
-                String resName = name.substring(RES_PREFIX.length());
-                ZipEntry entry;
-                ZipInputStream zis = new ZipInputStream(new FileInputStream(APP_PATH));
-                while ((entry = zis.getNextEntry()) != null) {
-                    if (entry.getName().equals(resName)) {
-                        Font font = new Font(zis);
-                        zis.close();
-                        return font;
-                    }
-                    zis.closeEntry();
-                }
-                throw new UncheckedIOException(new IOException("Font not found"));
+                InputStream in = getResource(name.substring(RES_PREFIX.length()));
+                if (in == null)
+                    throw new UncheckedIOException(new IOException("Font not found"));
+                Font font = new Font(in);
+                in.close();
+                return font;
             }
             return new Font(name);
         }
