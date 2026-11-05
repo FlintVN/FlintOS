@@ -50,8 +50,8 @@ public class CheckBox extends View {
     }
 
     @Override
-    protected void invalidate(boolean layoutImpact) {
-        invalidate(x - PRESS_OFFSET, y - PRESS_OFFSET, actualWidth + PRESS_OFFSET_X2, actualHeight + PRESS_OFFSET_X2, layoutImpact);
+    public void invalidateVisual() {
+        invalidate(x - PRESS_OFFSET, y - PRESS_OFFSET, actualWidth + PRESS_OFFSET_X2, actualHeight + PRESS_OFFSET_X2, false);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class CheckBox extends View {
                 x -= tmp;
                 y -= tmp;
                 boxSize += tmp << 1;
-                invalidate(false);
+                invalidateVisual();
             }
             else if (!isReleased) {
                 x -= PRESS_OFFSET;
@@ -116,7 +116,7 @@ public class CheckBox extends View {
                 animStatus = true;
                 isReleased = false;
                 startTime = (int)System.currentTimeMillis();
-                invalidate(false);
+                invalidateVisual();
                 return;
             }
             case MotionEvent.ACTION_UP: {
@@ -129,7 +129,7 @@ public class CheckBox extends View {
                     if (listener != null)
                         listener.onCheckedChanged(this, checked);
                 }
-                invalidate(false);
+                invalidateVisual();
                 return;
             }
         }
@@ -164,7 +164,6 @@ public class CheckBox extends View {
     }
 
     public void setText(String text) {
-        FlintUI.checkThread();
         this.text = text;
         if (text != null) {
             textWidth = Graphics.measureStringWidth(text, font);
@@ -173,9 +172,9 @@ public class CheckBox extends View {
         else
             textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            invalidateAll();
+            invalidateLayout();
         else
-            invalidate(false);
+            invalidateVisual();
     }
 
     public Font getFont() {
@@ -183,7 +182,6 @@ public class CheckBox extends View {
     }
 
     public void setFont(Font font) {
-        FlintUI.checkThread();
         if (font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
@@ -194,9 +192,9 @@ public class CheckBox extends View {
         else
             textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            invalidateAll();
+            invalidateLayout();
         else
-            invalidate(false);
+            invalidateVisual();
     }
 
     public Color getTextColor() {
@@ -204,11 +202,10 @@ public class CheckBox extends View {
     }
 
     public void setTextColor(Color color) {
-        FlintUI.checkThread();
         if (color == null)
             throw new NullPointerException("color can not be null");
         textColor = color;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public boolean isChecked() {
@@ -216,13 +213,12 @@ public class CheckBox extends View {
     }
 
     public void setChecked(boolean checked) {
-        FlintUI.checkThread();
         if (this.checked != checked) {
             this.checked = checked;
             OnCheckedChangeListener listener = onCheckedChangeListener;
             if (listener != null)
                 listener.onCheckedChanged(this, checked);
-            invalidate(false);
+            invalidateVisual();
         }
     }
 
@@ -231,11 +227,10 @@ public class CheckBox extends View {
     }
 
     public void setColor(Color color) {
-        FlintUI.checkThread();
         if (color == null)
             throw new NullPointerException("color can not be null");
         this.color = color;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public CornerRadius getCornerRadius() {
@@ -251,12 +246,11 @@ public class CheckBox extends View {
     }
 
     public void setCornerRadius(int topLeft, int topRight, int bottomRight, int bottomLeft) {
-        FlintUI.checkThread();
         this.topLeftRadius = topLeft;
         this.topRightRadius = topRight;
         this.bottomLeftRadius = bottomLeft;
         this.bottomRightRadius = bottomRight;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public Padding getPadding() {
@@ -272,12 +266,11 @@ public class CheckBox extends View {
     }
 
     public void setPadding(int left, int top, int right, int bottom) {
-        FlintUI.checkThread();
         paddingLeft = left;
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
-        invalidateAll();
+        invalidateLayout();
     }
 
     public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {

@@ -32,7 +32,6 @@ public class GroupView extends PanelView {
     }
 
     public void addView(View v) {
-        FlintUI.checkThread();
         if (v == null)
             throw new NullPointerException("view cannot be null");
         if (v.parent != null)
@@ -43,9 +42,9 @@ public class GroupView extends PanelView {
         childrenCount++;
 
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            invalidateAll();
+            invalidateLayout();
         else
-            invalidate(true);
+            invalidate(x, y, actualWidth, actualHeight, true);
     }
 
     public void removeView(View v) {
@@ -58,7 +57,6 @@ public class GroupView extends PanelView {
     }
 
     public void removeViewAt(int index) {
-        FlintUI.checkThread();
         if (index < 0 || index >= childrenCount)
             throw new IndexOutOfBoundsException("Index: " + index);
         childrenCount--;
@@ -69,13 +67,12 @@ public class GroupView extends PanelView {
             children[index] = null;
 
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            invalidateAll();
+            invalidateLayout();
         else
-            invalidate(true);
+            invalidate(x, y, actualWidth, actualHeight, true);
     }
 
     public void removeAllView() {
-        FlintUI.checkThread();
         if (children.length > MIN_CAPACITY * 4) {
             for (int i = 0; i < childrenCount; i++)
                 children[i].parent = null;

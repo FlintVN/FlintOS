@@ -58,13 +58,14 @@ public abstract class FlintUI extends View {
         background = Theme.getProperty("backgroundColor");
     }
 
-    public static void checkThread() {
-        if (currentUI != null && currentUI.mThread != Thread.currentThread())
+    private void checkThread() {
+        if (mThread != Thread.currentThread())
             throw new CalledFromWrongThreadException("Only the original thread that created a view hierarchy can touch its views");
     }
 
     @Override
     protected final void invalidate(int x, int y, int w, int h, boolean layout) {
+        checkThread();
         int x2 = x + w;
         int y2 = y + h;
         if (x2 > width) x2 = width;
@@ -93,7 +94,8 @@ public abstract class FlintUI extends View {
     }
 
     @Override
-    protected final void invalidateAll() {
+    public final void invalidateLayout() {
+        checkThread();
         invX = 0;
         invY = 0;
         invW = width;

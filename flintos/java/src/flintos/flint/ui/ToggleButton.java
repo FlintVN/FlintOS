@@ -74,7 +74,7 @@ public class ToggleButton extends View {
                     x = y + time * (x2 - y) / ANIMATION_DURATION;
                 else
                     x = x2 - time * (x2 - y) / ANIMATION_DURATION;
-                invalidate(false);
+                invalidateVisual();
             }
             else
                 x = checked ? x2 : y;
@@ -94,7 +94,7 @@ public class ToggleButton extends View {
                     OnCheckedChangeListener listener = onCheckedChangeListener;
                     if (listener != null)
                         listener.onCheckedChanged(this, checked);
-                    invalidate(false);
+                    invalidateVisual();
                 }
                 break;
             }
@@ -122,13 +122,12 @@ public class ToggleButton extends View {
     }
 
     public void setChecked(boolean checked) {
-        FlintUI.checkThread();
         if (this.checked != checked) {
             this.checked = checked;
             OnCheckedChangeListener listener = onCheckedChangeListener;
             if (listener != null)
                 listener.onCheckedChanged(this, checked);
-            invalidate(false);
+            invalidateVisual();
         }
     }
 
@@ -137,12 +136,11 @@ public class ToggleButton extends View {
     }
 
     public void setOnColor(Color color) {
-        FlintUI.checkThread();
         if (color == null)
             throw new NullPointerException("color can not be null");
         onColor = color;
         if (checked)
-            invalidate(false);
+            invalidateVisual();
     }
 
     public Color getThumbColor() {
@@ -150,11 +148,10 @@ public class ToggleButton extends View {
     }
 
     public void setThumbColor(Color color) {
-        FlintUI.checkThread();
         if (color == null)
             throw new NullPointerException("color can not be null");
         thumbColor = color;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public Color getBorderColor() {
@@ -162,9 +159,8 @@ public class ToggleButton extends View {
     }
 
     public void setBorderColor(Color color) {
-        FlintUI.checkThread();
         borderColor = color;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public int getCornerRadius() {
@@ -172,9 +168,8 @@ public class ToggleButton extends View {
     }
 
     public void setCornerRadius(int radius) {
-        FlintUI.checkThread();
         cornerRadius = radius;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {

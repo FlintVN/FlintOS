@@ -61,7 +61,7 @@ public class SeekBar extends View {
             x -= tmp;
             y -= tmp;
             s += tmp << 1;
-            invalidate(false);
+            invalidateVisual();
         }
         else if (isPressed) {
             x -= PRESS_OFFSET;
@@ -73,13 +73,13 @@ public class SeekBar extends View {
     }
 
     @Override
-    protected void invalidate(boolean layoutImpact) {
+    public void invalidateVisual() {
         invalidate(
             x - PRESS_OFFSET,
             y - PRESS_OFFSET,
             actualWidth + PRESS_OFFSET_X2,
             actualHeight + PRESS_OFFSET_X2,
-            layoutImpact
+            false
         );
     }
 
@@ -104,7 +104,7 @@ public class SeekBar extends View {
                     OnSeekBarChangeListener listener = onSeekBarChangeListener;
                     if (listener != null)
                         listener.onStartTrackingTouch(this);
-                    invalidate(false);
+                    invalidateVisual();
                 }
                 return;
             }
@@ -116,7 +116,7 @@ public class SeekBar extends View {
                     OnSeekBarChangeListener listener = onSeekBarChangeListener;
                     if (listener != null)
                         listener.onStopTrackingTouch(this);
-                    invalidate(false);
+                    invalidateVisual();
                 }
                 return;
             }
@@ -132,7 +132,7 @@ public class SeekBar extends View {
                         OnSeekBarChangeListener listener = onSeekBarChangeListener;
                         if (listener != null)
                             listener.onProgressChanged(this, true);
-                        invalidate(false);
+                        invalidateVisual();
                     }
                 }
                 return;
@@ -149,10 +149,9 @@ public class SeekBar extends View {
 
     @Override
     public void setSize(int width, int height) {
-        FlintUI.checkThread();
         this.width = width;
         this.height = View.WRAP_CONTENT;
-        invalidateAll();
+        invalidateLayout();
     }
 
     public Color getColor() {
@@ -160,11 +159,10 @@ public class SeekBar extends View {
     }
 
     public void setColor(Color color) {
-        FlintUI.checkThread();
         if (color == null)
             throw new NullPointerException("color can not be null");
         this.color = color;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public int getMax() {
@@ -172,7 +170,6 @@ public class SeekBar extends View {
     }
 
     public void setMax(int max) {
-        FlintUI.checkThread();
         if (max < 0)
             max = 1;
         if (this.max != max) {
@@ -184,7 +181,7 @@ public class SeekBar extends View {
             }
             this.max = max;
         }
-        invalidate(false);
+        invalidateVisual();
     }
 
     public int getValue() {
@@ -192,7 +189,6 @@ public class SeekBar extends View {
     }
 
     public void setValue(int value) {
-        FlintUI.checkThread();
         if (value < 0)
             value = 0;
         else if (value > max)
@@ -202,7 +198,7 @@ public class SeekBar extends View {
             OnSeekBarChangeListener listener = onSeekBarChangeListener;
             if (listener != null)
                 listener.onProgressChanged(this, false);
-            invalidate(false);
+            invalidateVisual();
         }
     }
 
@@ -211,11 +207,10 @@ public class SeekBar extends View {
     }
 
     public void setThumbColor(Color color) {
-        FlintUI.checkThread();
         if (color == null)
             throw new NullPointerException("color can not be null");
         thumbColor = color;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public void setOnSeekBarChangeListener(OnSeekBarChangeListener listener) {
