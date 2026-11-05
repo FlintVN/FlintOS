@@ -11,9 +11,15 @@
 #include "flintos_default_conf.h"
 #include "flintos_display_service.h"
 
+#define MAX_SURFACE_QUEUE           3
+
 static atomic<bool> displayLocked = ATOMIC_FLAG_INIT;
 static uint8_t brightness = 0;
-static DisplaySrv::Surface surface;
+
+static uint8_t surfaceHead = 0;
+static uint8_t surfaceTail = 0;
+static uint8_t surfaceCount = 0;
+static DisplaySrv::Surface surfaces[MAX_SURFACE_QUEUE];
 
 static void displayLock(void) {
     while (displayLocked.exchange(true, memory_order_acquire))
@@ -33,24 +39,21 @@ static void showLogo(void) {
     disp->write(x, y, flintosLogo.width, flintosLogo.height, (uint8_t *)flintosLogo.data, flintosLogo.width);
 }
 
-static bool displayFlush(void) {
+static void displayFlush(void) {
     const HAL::Display *disp = HAL::Devices::display();
-    if (disp == NULL || surface.buffer == NULL) return false;
+    if (disp == NULL || surfaceCount == 0) return;
 
     displayLock();
-    DisplaySrv::Surface surf = surface;
-    surface.buffer = NULL;
+    DisplaySrv::Surface surf = surfaces[surfaceTail];
+    surfaceTail = (surfaceTail + 1) % LENGTH(surfaces);
+    surfaceCount--;
     displayUnlock();
-
-    if (surf.buffer == NULL) return false;
 
     disp->write(
         surf.invalid.x, surf.invalid.y,
         surf.invalid.width, surf.invalid.height,
         &surf.buffer[(surf.invalid.y * surf.width + surf.invalid.x) << 1], surf.width
     );
-
-    return true;
 }
 
 void DisplaySrv::mainTask(void) {
@@ -78,39 +81,78 @@ void DisplaySrv::setBrightness(uint8_t value) {
         disp->brightness(value);
 }
 
+static bool setSurface(DisplaySrv::Surface *surf, DisplaySrv::Surface *value) {
+    int32_t x1 = std::max<int32_t>(0, value->invalid.x);
+    int32_t y1 = std::max<int32_t>(0, value->invalid.y);
+    int32_t x2 = std::min<int32_t>(value->invalid.x + value->invalid.width, std::min<int32_t>(value->width, DISPLAY_WIDTH));
+    int32_t y2 = std::min<int32_t>(value->invalid.y + value->invalid.height, std::min<int32_t>(value->height, DISPLAY_HEIGHT));
+
+    if (x1 < x2 && y1 < y2) {
+        surf->invalid.x = x1;
+        surf->invalid.y = y1;
+        surf->invalid.width = x2 - x1;
+        surf->invalid.height = y2 - y1;
+        surf->width = value->width;
+        surf->height = value->height;
+        surf->buffer = value->buffer;
+        return true;
+    }
+
+    return false;
+}
+
+static void mergeSurface(DisplaySrv::Surface *surf, DisplaySrv::Surface *value) {
+    int32_t x1 = std::max<int32_t>(0, std::min(surf->invalid.x, value->invalid.x));
+    int32_t y1 = std::max<int32_t>(0, std::min(surf->invalid.y, value->invalid.y));
+    int32_t x2 = std::max<int32_t>(surf->invalid.x + surf->invalid.width, value->invalid.x + value->invalid.width);
+    int32_t y2 = std::max<int32_t>(surf->invalid.y + surf->invalid.height, value->invalid.y + value->invalid.height);
+    x2 = std::min<int32_t>(x2, std::min<int32_t>(value->width, DISPLAY_WIDTH));
+    y2 = std::min<int32_t>(y2, std::min<int32_t>(value->height, DISPLAY_HEIGHT));
+
+    if (x1 < x2 && y1 < y2) {
+        surf->invalid.x = x1;
+        surf->invalid.y = y1;
+        surf->invalid.width = x2 - x1;
+        surf->invalid.height = y2 - y1;
+        surf->height = value->height;
+    }
+}
+
+static bool contains(DisplaySrv::Surface *a, DisplaySrv::Surface *b) {
+    if (
+        a->invalid.x <= b->invalid.x &&
+        a->invalid.y <= b->invalid.y &&
+        a->invalid.x + a->invalid.width >= b->invalid.x + b->invalid.width &&
+        a->invalid.y + a->invalid.height >= b->invalid.y + b->invalid.height
+    ) {
+        return true;
+    }
+    return false;
+}
+
 void DisplaySrv::present(Surface *surf) {
     displayLock();
-    if (surface.buffer != surf->buffer || surface.width != surf->width) {
-        int32_t x1 = std::max<int32_t>(0, surf->invalid.x);
-        int32_t y1 = std::max<int32_t>(0, surf->invalid.y);
-        int32_t x2 = std::min<int32_t>(surf->invalid.x + surf->invalid.width, std::min<int32_t>(surf->width, DISPLAY_WIDTH));
-        int32_t y2 = std::min<int32_t>(surf->invalid.y + surf->invalid.height, std::min<int32_t>(surf->height, DISPLAY_HEIGHT));
-
-        if (x1 < x2 && y1 < y2) {
-            surface.invalid.x = x1;
-            surface.invalid.y = y1;
-            surface.invalid.width = x2 - x1;
-            surface.invalid.height = y2 - y1;
-            surface.width = surf->width;
-            surface.height = surf->height;
-            surface.buffer = surf->buffer;
+    if (surfaceCount > 0) {
+        uint8_t surfaceLatest = (surfaceHead + (LENGTH(surfaces) - 1)) % LENGTH(surfaces);
+        DisplaySrv::Surface *surface = &surfaces[surfaceLatest];
+        if (surface->buffer == surf->buffer) {
+            if (surface->width != surf->width)
+                setSurface(surface, surf);
+            else
+                mergeSurface(surface, surf);
+            displayUnlock();
+            return;
+        }
+        else if (contains(surf, surface)) {
+            setSurface(surface, surf);
+            displayUnlock();
+            return;
         }
     }
-    else {
-        int32_t x1 = std::max<int32_t>(0, std::min(surface.invalid.x, surf->invalid.x));
-        int32_t y1 = std::max<int32_t>(0, std::min(surface.invalid.y, surf->invalid.y));
-        int32_t x2 = std::max<int32_t>(surface.invalid.x + surface.invalid.width, surf->invalid.x + surf->invalid.width);
-        int32_t y2 = std::max<int32_t>(surface.invalid.y + surface.invalid.height, surf->invalid.y + surf->invalid.height);
-        x2 = std::min<int32_t>(x2, std::min<int32_t>(surf->width, DISPLAY_WIDTH));
-        y2 = std::min<int32_t>(y2, std::min<int32_t>(surf->height, DISPLAY_HEIGHT));
-
-        if (x1 < x2 && y1 < y2) {
-            surface.invalid.x = x1;
-            surface.invalid.y = y1;
-            surface.invalid.width = x2 - x1;
-            surface.invalid.height = y2 - y1;
-            surface.height = surf->height;
-        }
+    if (setSurface(&surfaces[surfaceHead], surf)) {
+        surfaceHead = (surfaceHead + 1) % LENGTH(surfaces);
+        if (surfaceCount < LENGTH(surfaces))
+            surfaceCount++;
     }
     displayUnlock();
 }

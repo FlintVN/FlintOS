@@ -360,14 +360,14 @@ FProcess *FlintOS::open(FExec *ctx, const char *file, JStringArray *args) {
     if (file == NULL) return NULL;
     if (FlintAPI::IO::finfo(file, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
         const char *extName = getExtensionName(file);
+        if (extName == NULL)
+            return NULL;
         if (strcasecmp(extName, "jar") == 0)
             return openApp(ctx, file, args);
-        else if (extName != NULL) {
-            const char *app = DefaultApps::find(extName);
-            if (app != NULL && FlintAPI::IO::finfo(app, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
-                const char *argv[] = {file};
-                return openApp(ctx, app, 1, argv);
-            }
+        const char *app = DefaultApps::find(extName);
+        if (app != NULL && FlintAPI::IO::finfo(app, NULL) == FlintAPI::IO::FILE_RESULT_OK) {
+            const char *argv[] = {file};
+            return openApp(ctx, app, 1, argv);
         }
     }
     return NULL;
