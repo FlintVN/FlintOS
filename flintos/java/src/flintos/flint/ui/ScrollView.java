@@ -50,7 +50,7 @@ public class ScrollView extends PanelView {
                 requestUpdate |= elasticEffectY();
 
             if (requestUpdate)
-                invalidate(true);
+                invalidate(x, y, actualWidth, actualHeight, true);
             else
                 scrolling = false;
         }
@@ -248,7 +248,7 @@ public class ScrollView extends PanelView {
                 }
                 isPressed = false;
                 if (scrolling)
-                    invalidate(true);
+                    invalidate(x, y, actualWidth, actualHeight, true);
                 return;
             }
             case MotionEvent.ACTION_MOVE: {
@@ -274,7 +274,7 @@ public class ScrollView extends PanelView {
                 }
 
                 scrolling = true;
-                invalidate(true);
+                invalidate(x, y, actualWidth, actualHeight, true);
                 if (actView != null)
                     actView.dispatchTouchEvent(event);
                 return;
@@ -341,7 +341,6 @@ public class ScrollView extends PanelView {
     }
 
     public void setContent(View v) {
-        FlintUI.checkThread();
         if (v != null) {
             if (v.parent != null)
                 throw new IllegalStateException("The specified child already has a parent");
@@ -357,13 +356,12 @@ public class ScrollView extends PanelView {
     }
 
     public void setHorizontalScrollMode(boolean enabled) {
-        FlintUI.checkThread();
         if (enabled)
             mode |= 1;
         else {
             mode &= ~1;
             offsetX = 0;
-            invalidate(false);
+            invalidateVisual();
         }
     }
 
@@ -372,13 +370,12 @@ public class ScrollView extends PanelView {
     }
 
     public void setVerticalScrollMode(boolean enabled) {
-        FlintUI.checkThread();
         if (enabled)
             mode |= 2;
         else {
             mode &= ~2;
             offsetY = 0;
-            invalidate(false);
+            invalidateVisual();
         }
     }
 
@@ -423,7 +420,7 @@ public class ScrollView extends PanelView {
             }
         }
         if (requestUpdate)
-            invalidate(true);
+            invalidate(x, y, actualWidth, actualHeight, true);
     }
 
     public void scrollBy(int x, int y) {

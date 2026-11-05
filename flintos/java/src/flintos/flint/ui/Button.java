@@ -52,8 +52,8 @@ public class Button extends PanelView {
     }
 
     @Override
-    protected void invalidate(boolean layoutImpact) {
-        invalidate(x - PRESS_OFFSET, y - PRESS_OFFSET, actualWidth + PRESS_OFFSET_X2, actualHeight + PRESS_OFFSET_X2, layoutImpact);
+    public void invalidateVisual() {
+        invalidate(x - PRESS_OFFSET, y - PRESS_OFFSET, actualWidth + PRESS_OFFSET_X2, actualHeight + PRESS_OFFSET_X2, false);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class Button extends PanelView {
             y -= tmp;
             w += tmp << 1;
             h += tmp << 1;
-            invalidate(false);
+            invalidateVisual();
         }
         else if (!isReleased) {
             x -= PRESS_OFFSET;
@@ -122,14 +122,14 @@ public class Button extends PanelView {
                 animStatus = true;
                 isReleased = false;
                 startTime = (int)System.currentTimeMillis();
-                invalidate(false);
+                invalidateVisual();
                 return;
             }
             case MotionEvent.ACTION_UP: {
                 animStatus = true;
                 isReleased = true;
                 startTime = (int)System.currentTimeMillis();
-                invalidate(false);
+                invalidateVisual();
                 return;
             }
         }
@@ -166,7 +166,6 @@ public class Button extends PanelView {
     }
 
     public void setText(String text) {
-        FlintUI.checkThread();
         this.text = text;
         if (text != null) {
             textWidth = Graphics.measureStringWidth(text, font);
@@ -175,9 +174,9 @@ public class Button extends PanelView {
         else
             textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            invalidateAll();
+            invalidateLayout();
         else
-            invalidate(false);
+            invalidateVisual();
     }
 
     public Font getFont() {
@@ -185,7 +184,6 @@ public class Button extends PanelView {
     }
 
     public void setFont(Font font) {
-        FlintUI.checkThread();
         if (font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
@@ -196,9 +194,9 @@ public class Button extends PanelView {
         else
             textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            invalidateAll();
+            invalidateLayout();
         else
-            invalidate(false);
+            invalidateVisual();
     }
 
     public Color getTextColor() {
@@ -206,11 +204,10 @@ public class Button extends PanelView {
     }
 
     public void setTextColor(Color color) {
-        FlintUI.checkThread();
         if (color == null)
             throw new NullPointerException("color can not be null");
         textColor = color;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public Color getPressedBackground() {
@@ -218,10 +215,9 @@ public class Button extends PanelView {
     }
 
     public void setPressedBackground(Color bg) {
-        FlintUI.checkThread();
         pressedBackground = bg;
         if (!isReleased)
-            invalidate(false);
+            invalidateVisual();
     }
 
     public Padding getPadding() {
@@ -237,11 +233,10 @@ public class Button extends PanelView {
     }
 
     public void setPadding(int left, int top, int right, int bottom) {
-        FlintUI.checkThread();
         paddingLeft = left;
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
-        invalidateAll();
+        invalidateLayout();
     }
 }

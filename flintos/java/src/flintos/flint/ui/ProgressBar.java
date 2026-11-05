@@ -55,7 +55,7 @@ public class ProgressBar extends PanelView {
             value = calcCurrValue();
             if (value == target)
                 currValue = value;
-            invalidate(false);
+            invalidateVisual();
         }
 
         return value;
@@ -88,11 +88,10 @@ public class ProgressBar extends PanelView {
     }
 
     public void setColor(Color color) {
-        FlintUI.checkThread();
         if (color == null)
             throw new NullPointerException("color can not be null");
         this.color = color;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public int getMax() {
@@ -100,7 +99,6 @@ public class ProgressBar extends PanelView {
     }
 
     public void setMax(int max) {
-        FlintUI.checkThread();
         if (max < 0)
             max = 1;
         if (this.max != max) {
@@ -112,7 +110,7 @@ public class ProgressBar extends PanelView {
             startTime = (int)System.currentTimeMillis();
             this.max = max;
         }
-        invalidate(false);
+        invalidateVisual();
     }
 
     public int getValue() {
@@ -124,7 +122,6 @@ public class ProgressBar extends PanelView {
     }
 
     public void setValue(int value, boolean animate) {
-        FlintUI.checkThread();
         if (value < 0)
             value = 0;
         else if (value > max)
@@ -139,7 +136,7 @@ public class ProgressBar extends PanelView {
                 startTime = (int)System.currentTimeMillis();
             }
             this.value = value;
-            invalidate(false);
+            invalidateVisual();
         }
     }
 }
