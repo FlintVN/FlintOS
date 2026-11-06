@@ -77,7 +77,6 @@ public class TextView extends View {
     }
 
     public void setText(String text) {
-        FlintUI.checkThread();
         this.text = text;
         if (text != null) {
             textWidth = Graphics.measureStringWidth(text, font);
@@ -86,9 +85,9 @@ public class TextView extends View {
         else
             textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            invalidateAll();
+            invalidateLayout();
         else
-            invalidate(false);
+            invalidateVisual();
     }
 
     public Font getFont() {
@@ -96,7 +95,6 @@ public class TextView extends View {
     }
 
     public void setFont(Font font) {
-        FlintUI.checkThread();
         if (font == null)
             throw new NullPointerException("font cannot be null");
         this.font = font;
@@ -107,9 +105,9 @@ public class TextView extends View {
         else
             textWidth = textHeight = 0;
         if (width == View.WRAP_CONTENT || height == View.WRAP_CONTENT)
-            invalidateAll();
+            invalidateLayout();
         else
-            invalidate(false);
+            invalidateVisual();
     }
 
     public Color getTextColor() {
@@ -117,11 +115,10 @@ public class TextView extends View {
     }
 
     public void setTextColor(Color color) {
-        FlintUI.checkThread();
         if (color == null)
             throw new NullPointerException("color can not be null");
         textColor = color;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public CornerRadius getCornerRadius() {
@@ -137,12 +134,11 @@ public class TextView extends View {
     }
 
     public void setCornerRadius(int topLeft, int topRight, int bottomRight, int bottomLeft) {
-        FlintUI.checkThread();
         this.topLeftRadius = topLeft;
         this.topRightRadius = topRight;
         this.bottomLeftRadius = bottomLeft;
         this.bottomRightRadius = bottomRight;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public Padding getPadding() {
@@ -158,11 +154,10 @@ public class TextView extends View {
     }
 
     public void setPadding(int left, int top, int right, int bottom) {
-        FlintUI.checkThread();
         paddingLeft = left;
         paddingTop = top;
         paddingRight = right;
         paddingBottom = bottom;
-        invalidateAll();
+        invalidateLayout();
     }
 }

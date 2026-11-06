@@ -140,9 +140,8 @@ public class ImageView extends View {
     }
 
     public void setImage(Image img) {
-        FlintUI.checkThread();
         image = img;
-        invalidate(false);
+        invalidateVisual();
     }
 
     public ScaleType getScaleType() {
@@ -150,12 +149,11 @@ public class ImageView extends View {
     }
 
     public void setScaleType(ScaleType type) {
-        FlintUI.checkThread();
         if (type == null)
             throw new NullPointerException("type cannot be null");
         if (scaleType != type.value) {
             scaleType = type.value;
-            invalidate(false);
+            invalidateVisual();
         }
     }
 }
